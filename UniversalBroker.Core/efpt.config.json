@@ -1,0 +1,92 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "BrockerContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Database\/Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "UniversalBroker.Core",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "public.attributes",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.chanel_chanels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.chanels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.communication_attributes",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.communications",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.connection_attributes",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.connection_chanels",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.connections",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.execution_logs",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.headers",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.messages",
+         "ObjectType": 0
+      },
+      {
+         "Name": "public.scripts",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": true,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
