@@ -14,15 +14,18 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     /// <param name="logger"></param>
     /// <param name="mapper"></param>
     /// <param name="brockerContext"></param>
-    public class SendMessageCommandHandler(
-        ILogger<AddConnectionCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-        ) : IRequestHandler<SendMessageCommand>
+    public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        public SendMessageCommandHandler(ILogger logger, IMapper mapper, BrockerContext context)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task Handle(SendMessageCommand request, CancellationToken cancellationToken)
         {

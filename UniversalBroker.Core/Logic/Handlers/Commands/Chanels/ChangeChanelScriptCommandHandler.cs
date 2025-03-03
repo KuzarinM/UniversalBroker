@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
     /// <summary>
     /// Изменить текст скрипта в канале
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class ChangeChanelScriptCommandHandler(
-   ILogger<AddChanelCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-    ) : IRequestHandler<ChangeChanelScriptCommand, ChanelFullDto>
+    public class ChangeChanelScriptCommandHandler : IRequestHandler<ChangeChanelScriptCommand, ChanelFullDto>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public ChangeChanelScriptCommandHandler(
+   ILogger<AddChanelCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+    )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task<ChanelFullDto> Handle(ChangeChanelScriptCommand request, CancellationToken cancellationToken)
         {

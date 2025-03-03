@@ -12,21 +12,29 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
     /// <summary>
     /// Выполнить скрипт в канале = отправить сообщение в этот канал
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    /// <param name="interpretatorService"></param>
-    public class ExecuteScriptCommandHandler(
-        ILogger<ExecuteScriptCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext,
-        IChanelJsInterpretatorService interpretatorService
-    ) : IRequestHandler<ExecuteScriptCommand>
+    public class ExecuteScriptCommandHandler : IRequestHandler<ExecuteScriptCommand>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
-        private readonly IChanelJsInterpretatorService _interpretatorService = interpretatorService;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+        private readonly IChanelJsInterpretatorService _interpretatorService;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        /// <param name="interpretatorService"></param>
+        public ExecuteScriptCommandHandler(
+            ILogger<ExecuteScriptCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext,
+            IChanelJsInterpretatorService interpretatorService
+    )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+            _interpretatorService = interpretatorService;
+        }
 
         public async Task Handle(ExecuteScriptCommand request, CancellationToken cancellationToken)
         {

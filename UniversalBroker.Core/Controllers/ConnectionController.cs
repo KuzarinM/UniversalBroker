@@ -13,8 +13,11 @@ namespace UniversalBroker.Core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ConnectionController(IMediator mediator) : CustomControllerBase(mediator)
+    public class ConnectionController : CustomControllerBase
     {
+        public ConnectionController(IMediator mediator) : base(mediator)
+        {
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetConnections(

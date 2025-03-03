@@ -63,7 +63,7 @@ namespace UniversalBroker.Core.Extentions
         {
             services.AddDbContextPool<BrockerContext>(cfg =>
             {
-                cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.254.121");
+                cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.1.169");
             });
             return services;
         }

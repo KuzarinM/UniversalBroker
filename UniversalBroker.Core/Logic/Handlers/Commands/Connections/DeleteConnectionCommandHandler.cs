@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     /// <summary>
     /// Удаление подключения
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class DeleteConnectionCommandHandler(
-        ILogger<DeleteConnectionCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-        ) : IRequestHandler<DeleteConnectionCommand>
+    public class DeleteConnectionCommandHandler : IRequestHandler<DeleteConnectionCommand>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public DeleteConnectionCommandHandler(
+            ILogger<DeleteConnectionCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task Handle(DeleteConnectionCommand request, CancellationToken cancellationToken)
         {

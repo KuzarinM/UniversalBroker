@@ -16,8 +16,12 @@ namespace UniversalBroker.Core.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChanelController(IMediator mediator) : CustomControllerBase(mediator)
+    public class ChanelController : CustomControllerBase
     {
+        public ChanelController(IMediator mediator) : base(mediator)
+        {
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetChannels(
             [FromQuery]

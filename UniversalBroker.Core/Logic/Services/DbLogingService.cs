@@ -7,18 +7,25 @@ using UniversalBroker.Core.Models.Internals;
 
 namespace UniversalBroker.Core.Logic.Services
 {
-    public class DbLogingService(
-        ILogger<DbLogingService> logger,
-        IMapper mapper,
-        Func<BrockerContext> context
-        ) : IDbLogingService
+    public class DbLogingService : IDbLogingService
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = context();
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
 
         private readonly ConcurrentQueue<MessageLog> messageLogs = new();
         private readonly ConcurrentQueue<ScriptExecutionLog> scriptExecutionLogs = new();
+
+        public DbLogingService(
+            ILogger<DbLogingService> logger,
+            IMapper mapper,
+            Func<BrockerContext> context
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context();
+        }
 
         public Task LogMessage(MessageLog log)
         {

@@ -12,17 +12,24 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Communication
     /// <summary>
     /// Получить информацию о Соединении
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class GetCommunicationQueryHandler(
-        ILogger<GetCommunicationQueryHandler> logger, 
-        IMapper mapper, 
-        BrockerContext brockerContext) : IRequestHandler<GetCommunicationQuery, CommunicationDto?>
+    public class GetCommunicationQueryHandler : IRequestHandler<GetCommunicationQuery, CommunicationDto?>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _brockerContext = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _brockerContext;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public GetCommunicationQueryHandler(
+            ILogger<GetCommunicationQueryHandler> logger, 
+            IMapper mapper, 
+            BrockerContext brockerContext)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _brockerContext = brockerContext;
+        }
 
         public async Task<CommunicationDto?> Handle(GetCommunicationQuery request, CancellationToken cancellationToken)
         {

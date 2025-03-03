@@ -13,18 +13,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
     /// <summary>
     /// Удалить канал
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class DeleteChanelCommandHandler(
-        ILogger<DeleteChanelCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-    ) : IRequestHandler<DeleteChanelCommand>
+    public class DeleteChanelCommandHandler : IRequestHandler<DeleteChanelCommand>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public DeleteChanelCommandHandler(
+            ILogger<DeleteChanelCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+    )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task Handle(DeleteChanelCommand request, CancellationToken cancellationToken)
         {

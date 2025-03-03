@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
     /// <summary>
     /// Получить расширенную инофрмацию о Подключении
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="context"></param>
-    public class GetConnectionQueryHandler(
-        ILogger<GetConnectionListQueryHandler> logger,
-        IMapper mapper,
-        BrockerContext context
-        ) : IRequestHandler<GetConnectionQuery, ConnectionFullDto>
+    public class GetConnectionQueryHandler : IRequestHandler<GetConnectionQuery, ConnectionFullDto>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private BrockerContext _context = context;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="context"></param>
+        public GetConnectionQueryHandler(
+            ILogger<GetConnectionListQueryHandler> logger,
+            IMapper mapper,
+            BrockerContext context
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task<ConnectionFullDto> Handle(GetConnectionQuery request, CancellationToken cancellationToken)
         {

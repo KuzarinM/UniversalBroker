@@ -12,18 +12,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
     /// <summary>
     /// Получить сообщения из истории канала
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="context"></param>
-    public class GetChanelMessagesQueryHandler(
-        ILogger<GetChanelMessagesQueryHandler> logger,
-        IMapper mapper,
-        BrockerContext context
-        ) : IRequestHandler<GetChanelMessagesQuery, List<MessageViewDto>>
+    public class GetChanelMessagesQueryHandler : IRequestHandler<GetChanelMessagesQuery, List<MessageViewDto>>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = context;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="context"></param>
+        public GetChanelMessagesQueryHandler(
+            ILogger<GetChanelMessagesQueryHandler> logger,
+            IMapper mapper,
+            BrockerContext context
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task<List<MessageViewDto>> Handle(GetChanelMessagesQuery request, CancellationToken cancellationToken)
         {

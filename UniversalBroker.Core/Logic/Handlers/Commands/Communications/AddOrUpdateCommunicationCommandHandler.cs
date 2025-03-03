@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
     /// <summary>
     /// Добавить Подключение, если его нет, или обноить, если оно с таким именеием уже ест
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class AddOrUpdateCommunicationCommandHandler(
-        ILogger<AddOrUpdateCommunicationCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-        ) : IRequestHandler<AddOrUpdateCommunicationCommand, CommunicationDto>
+    public class AddOrUpdateCommunicationCommandHandler : IRequestHandler<AddOrUpdateCommunicationCommand, CommunicationDto>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public AddOrUpdateCommunicationCommandHandler(
+            ILogger<AddOrUpdateCommunicationCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task<CommunicationDto> Handle(AddOrUpdateCommunicationCommand request, CancellationToken cancellationToken)
         {

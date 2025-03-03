@@ -13,18 +13,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
     /// <summary>
     /// Получить инормацию о логах скрипта канала
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="context"></param>
-    public class GetChanelScriptLogsQueryHandler(
-        ILogger<DbLogingService> logger,
-        IMapper mapper,
-        BrockerContext context
-        ) : IRequestHandler<GetChanelScriptLogsQuery, List<ChanelScriptLogDto>>
+    public class GetChanelScriptLogsQueryHandler : IRequestHandler<GetChanelScriptLogsQuery, List<ChanelScriptLogDto>>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = context;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="context"></param>
+        public GetChanelScriptLogsQueryHandler(
+            ILogger<DbLogingService> logger,
+            IMapper mapper,
+            BrockerContext context
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task<List<ChanelScriptLogDto>> Handle(GetChanelScriptLogsQuery request, CancellationToken cancellationToken)
         {

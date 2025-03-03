@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
     /// <summary>
     /// Установить значения атрибутов доя Подключения
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class CommunicationSetAttributeCommandHandler(
-        ILogger<CommunicationSetAttributeCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-        ) : IRequestHandler<CommunicationSetAttributeCommand, CommunicationDto>
+    public class CommunicationSetAttributeCommandHandler : IRequestHandler<CommunicationSetAttributeCommand, CommunicationDto>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public CommunicationSetAttributeCommandHandler(
+            ILogger<CommunicationSetAttributeCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task<CommunicationDto> Handle(CommunicationSetAttributeCommand request, CancellationToken cancellationToken)
         {

@@ -17,14 +17,10 @@ namespace UniversalBroker.Core.Logic.Contexts
     /// <summary>
     /// Контекст, который передаётся внуть JS
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="dbLogingService"></param>
-    public class JsContext(
-        ILogger<JsContext> logger,
-        IDbLogingService dbLogingService)
+    public class JsContext
     {
-        private readonly ILogger _logger = logger;
-        private readonly IDbLogingService _dbLogingService = dbLogingService;
+        private readonly ILogger _logger;
+        private readonly IDbLogingService _dbLogingService;
         private static ConcurrentDictionary<string, string?> _internalStorage = new(); //TODO поменять на что-то более стабильное
 
         /// <summary>
@@ -43,6 +39,16 @@ namespace UniversalBroker.Core.Logic.Contexts
         public PropertyBag Connections { get; set; } = new();
 
         private ConcurrentQueue<MessageLog> _sending = new();
+
+        /// <param name="logger"></param>
+        /// <param name="dbLogingService"></param>
+        public JsContext(
+            ILogger<JsContext> logger,
+            IDbLogingService dbLogingService)
+        {
+            _logger = logger;
+            _dbLogingService = dbLogingService;
+        }
 
         /// <summary>
         /// Получить все сообщения для отправки

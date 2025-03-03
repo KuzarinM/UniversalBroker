@@ -13,18 +13,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
     /// <summary>
     /// Получить информацию о сообщениях в Подключении
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="context"></param>
-    public class GetConnectionMessagesQueryHandler(
-   ILogger<GetConnectionMessagesQueryHandler> logger,
-        IMapper mapper,
-        BrockerContext context
-        ) : IRequestHandler<GetConnectionMessagesQuery, List<MessageViewDto>>
+    public class GetConnectionMessagesQueryHandler : IRequestHandler<GetConnectionMessagesQuery, List<MessageViewDto>>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = context;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="context"></param>
+        public GetConnectionMessagesQueryHandler(
+   ILogger<GetConnectionMessagesQueryHandler> logger,
+            IMapper mapper,
+            BrockerContext context
+        )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task<List<MessageViewDto>> Handle(GetConnectionMessagesQuery request, CancellationToken cancellationToken)
         {

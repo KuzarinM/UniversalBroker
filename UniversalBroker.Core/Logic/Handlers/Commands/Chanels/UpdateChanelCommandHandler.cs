@@ -11,18 +11,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
     /// <summary>
     /// Изменить все данные канала на новые.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class UpdateChanelCommandHandler(
-        ILogger<UpdateChanelCommandHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-    ) : IRequestHandler<UpdateChanelCommand, ChanelDto>
+    public class UpdateChanelCommandHandler : IRequestHandler<UpdateChanelCommand, ChanelDto>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public UpdateChanelCommandHandler(
+            ILogger<UpdateChanelCommandHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+    )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task<ChanelDto> Handle(UpdateChanelCommand request, CancellationToken cancellationToken)
         {

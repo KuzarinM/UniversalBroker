@@ -9,9 +9,14 @@ namespace UniversalBroker.Core.Controllers
     /// Небольшая абстракиця для упрощения контрллера
     /// </summary>
     /// <param name="mediator"></param>
-    public class CustomControllerBase(IMediator mediator) : ControllerBase
+    public class CustomControllerBase : ControllerBase
     {
-        protected readonly IMediator _mediator = mediator;
+        protected readonly IMediator _mediator;
+
+        public CustomControllerBase(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         /// <summary>
         /// Отправяет запрос в медиатор и если вылетит кастомный эксепшен - запишет ответ как StatusCode()
@@ -60,4 +65,5 @@ namespace UniversalBroker.Core.Controllers
         }
 
     }
+
 }

@@ -13,18 +13,25 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
     /// <summary>
     /// Полученить лист каналов
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="mapper"></param>
-    /// <param name="brockerContext"></param>
-    public class GetChanelListQueryHandler(
-        ILogger<GetChanelListQueryHandler> logger,
-        IMapper mapper,
-        BrockerContext brockerContext
-    ) : IRequestHandler<GetChanelListQuery, List<ChanelDto>>
+    public class GetChanelListQueryHandler : IRequestHandler<GetChanelListQuery, List<ChanelDto>>
     {
-        private readonly ILogger _logger = logger;
-        private readonly IMapper _mapper = mapper;
-        private readonly BrockerContext _context = brockerContext;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly BrockerContext _context;
+
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        /// <param name="brockerContext"></param>
+        public GetChanelListQueryHandler(
+            ILogger<GetChanelListQueryHandler> logger,
+            IMapper mapper,
+            BrockerContext brockerContext
+    )
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _context = brockerContext;
+        }
 
         public async Task<List<ChanelDto>> Handle(GetChanelListQuery request, CancellationToken cancellationToken)
         {
