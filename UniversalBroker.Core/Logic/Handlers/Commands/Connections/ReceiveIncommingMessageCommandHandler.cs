@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
-using UniversalBroker.Core.Logic.Interfaces;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Chanels;
 using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Connections;
@@ -25,14 +25,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
         IMapper mapper,
         IMediator mediator,
         BrockerContext brockerContext,
-        IDbLogingService dbLogingService
+        AbstractDbLogingService dbLogingService
         ) : IRequestHandler<ReceiveIncommingMessageCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly IMediator _mediator = mediator;
         private readonly BrockerContext _context = brockerContext;
-        private readonly IDbLogingService _dbLogingService = dbLogingService;
+        private readonly AbstractDbLogingService _dbLogingService = dbLogingService;
 
         public async Task Handle(ReceiveIncommingMessageCommand request, CancellationToken cancellationToken)
         {

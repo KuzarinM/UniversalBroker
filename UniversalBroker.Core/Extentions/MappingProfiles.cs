@@ -91,8 +91,15 @@ namespace UniversalBroker.Core.Extentions
                 .ForMember(x => x.TargetId, opt => opt.MapFrom(x => x.Connection != null && !x.Connection.Isinput ? x.ConnectionId : x.TargetChannelId))
                 .ForMember(x=>x.Headers, opt => opt.MapFrom(x=>x.Headers.ToDictionary(y=>y.Name, y=>y.Value)));
 
-                
-                
+
+            CreateMap<Protos.CommunicationDto, CreateCommunicationDto>();
+
+            CreateMap<CommunicationDto, Protos.CommunicationFullDto>().
+                ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attributes.Select(x => new Protos.AttributeDto()
+                {
+                    Name = x.Key,
+                    Value = x.Value,
+                })));
         }
 
         public Guid? GetConnectionIdForMessage(MessageLog message) =>

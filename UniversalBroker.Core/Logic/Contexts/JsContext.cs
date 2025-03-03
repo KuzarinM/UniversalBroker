@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Text;
 using UniversalBroker.Core.Database.Models;
-using UniversalBroker.Core.Logic.Interfaces;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Chanels;
 using UniversalBroker.Core.Models.Enums;
 using UniversalBroker.Core.Models.Internals;
@@ -21,10 +21,10 @@ namespace UniversalBroker.Core.Logic.Contexts
     /// <param name="dbLogingService"></param>
     public class JsContext(
         ILogger<JsContext> logger,
-        IDbLogingService dbLogingService)
+        AbstractDbLogingService dbLogingService)
     {
         private readonly ILogger _logger = logger;
-        private readonly IDbLogingService _dbLogingService = dbLogingService;
+        private readonly AbstractDbLogingService _dbLogingService = dbLogingService;
         private static ConcurrentDictionary<string, string?> _internalStorage = new(); //TODO поменять на что-то более стабильное
 
         /// <summary>

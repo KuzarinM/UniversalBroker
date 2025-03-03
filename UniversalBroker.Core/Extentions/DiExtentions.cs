@@ -10,6 +10,7 @@ using UniversalBroker.Core.Logic.Services;
 using NLog.Config;
 using UniversalBroker.Core.Logic.Contexts;
 using System;
+using UniversalBroker.Core.Logic.Abstracts;
 
 namespace UniversalBroker.Core.Extentions
 {
@@ -26,6 +27,8 @@ namespace UniversalBroker.Core.Extentions
 
             services.AddGrpc();
 
+            services.AddHostedService(p => p.GetRequiredService<AbstractDbLogingService>());
+
             services.AddSwaggerStaf();
 
             services.AddDatabase();
@@ -34,7 +37,7 @@ namespace UniversalBroker.Core.Extentions
 
         public static IServiceCollection AddSingletons(this IServiceCollection services)
         {
-            services.AddSingleton<IDbLogingService, DbLogingService>();
+            services.AddSingleton<AbstractDbLogingService, DbLogingService>();
             services.AddSingleton<Func<BrockerContext>>(sp => () => sp.CreateAsyncScope().ServiceProvider.GetService<BrockerContext>()!);
             return services;
         }
@@ -56,6 +59,7 @@ namespace UniversalBroker.Core.Extentions
         {
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddGrpcSwagger();
             return services;
         }
 
