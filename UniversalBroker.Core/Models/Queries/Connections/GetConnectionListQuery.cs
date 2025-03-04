@@ -13,5 +13,7 @@ namespace UniversalBroker.Core.Models.Queries.Connections
         public Guid? CommunicationId { get; set; }
 
         public bool? InputOnly { get; set; } = null;
+
+        public string? NameContains { get; set; } = null;
     }
 }

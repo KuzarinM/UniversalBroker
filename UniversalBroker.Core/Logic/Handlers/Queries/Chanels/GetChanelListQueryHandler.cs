@@ -34,6 +34,9 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                                 .Include(x=>x.Script)
                                 .Include(x=>x.Connections)
                                 .Include(x=>x.FromChanels)
+                                .Where(x=>
+                                    (string.IsNullOrEmpty(request.NameContatins) || x.Name.Contains(request.NameContatins))
+                                )
                                 .Skip(request.PageNumber*request.PageSize).Take(request.PageSize)
                                 .ToListAsync();
 

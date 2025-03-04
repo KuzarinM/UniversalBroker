@@ -15,15 +15,21 @@ namespace UniversalBroker.Core.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommunications(
             [FromQuery]
-            int pageSize = 10, 
+            int pageSize = 10,
             [FromQuery]
-            int pageIndex = 0
+            int pageIndex = 0,
+            [FromQuery]
+            bool? Status = null,
+            [FromQuery]
+            string? Search = null
             )
         {
             return await ControllerSimpleRequest(new GetAllCommunicationsQuery()
             {
                 PageSize = pageSize,
                 PageNumber = pageIndex,
+                Status = Status,
+                NameSearch = Search
             });
         }
 

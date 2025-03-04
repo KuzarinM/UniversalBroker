@@ -7,6 +7,8 @@ using Protos;
 using UniversalBroker.Core.Exceptions;
 using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Dtos.Communications;
+using UniversalBroker.Core.Models.Queries.Connections;
+using static Google.Rpc.Context.AttributeContext.Types;
 using static Protos.CoreService;
 
 namespace UniversalBroker.Core.Logic.Services
@@ -39,14 +41,40 @@ namespace UniversalBroker.Core.Logic.Services
             return base.Connect(requestStream, responseStream, context);
         }
 
-        public override Task<ConnectionsList> LoadInConnections(CommunicationSmallDto request, ServerCallContext context)
+        public override async Task<ConnectionsList> LoadInConnections(CommunicationSmallDto request, ServerCallContext context)
         {
-            return base.LoadInConnections(request, context);
+            var communicationId = Guid.TryParse(request.Id, out var communication)? communication : (Guid?)null;
+
+            var rawRes = await _mediator.Send(new GetConnectionListQuery()
+            {
+                PageSize = 100000,
+                PageNumber = 0,
+                InputOnly = true,
+                CommunicationId = communicationId
+            });
+
+            return new ConnectionsList
+            {
+                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes) }
+            };
         }
 
-        public override Task<ConnectionsList> LoadOutConnections(CommunicationSmallDto request, ServerCallContext context)
+        public override async Task<ConnectionsList> LoadOutConnections(CommunicationSmallDto request, ServerCallContext context)
         {
-            return base.LoadOutConnections(request, context);
+            var communicationId = Guid.TryParse(request.Id, out var communication) ? communication : (Guid?)null;
+
+            var rawRes = await _mediator.Send(new GetConnectionListQuery()
+            {
+                PageSize = 100000,
+                PageNumber = 0,
+                InputOnly = false,
+                CommunicationId = communicationId
+            });
+
+            return new ConnectionsList
+            {
+                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes) }
+            };
         }
 
         public override Task<Empty> Disconnect(CommunicationSmallDto request, ServerCallContext context)

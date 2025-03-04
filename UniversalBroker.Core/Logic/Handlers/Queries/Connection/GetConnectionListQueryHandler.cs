@@ -33,7 +33,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
                                 .Skip(request.PageSize*request.PageNumber).Take(request.PageSize)
                                 .Where(x=>
                                         (request.CommunicationId == null || request.CommunicationId == x.CommunicationId) &&
-                                        (request.InputOnly == null || x.Isinput == request.InputOnly)
+                                        (request.InputOnly == null || x.Isinput == request.InputOnly) &&
+                                        (string.IsNullOrEmpty(request.NameContains) || x.Name.Contains(request.NameContains))
                                 )
                                 .ToListAsync();
 

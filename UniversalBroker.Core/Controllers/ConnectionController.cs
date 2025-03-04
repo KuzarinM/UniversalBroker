@@ -23,18 +23,20 @@ namespace UniversalBroker.Core.Controllers
             [FromQuery]
             int pageIndex = 0,
             [FromQuery]
-            Guid? CommunicationId = null,
+            Guid? communicationId = null,
             [FromQuery]
-            bool? InputOnly = null
-
+            bool? inputOnly = null,
+            [FromQuery]
+            string? iearch = null
             )
         {
             return await ControllerSimpleRequest(new GetConnectionListQuery()
             {
                 PageSize = pageSize,
                 PageNumber = pageIndex,
-                CommunicationId = CommunicationId,
-                InputOnly = InputOnly
+                CommunicationId = communicationId,
+                InputOnly = inputOnly,
+                NameContains = iearch
             });
         }
 
@@ -47,9 +49,9 @@ namespace UniversalBroker.Core.Controllers
             [FromQuery]
              int pageIndex = 0,
             [FromQuery]
-             DateTime? StartInterval = null,
+             DateTime? startInterval = null,
             [FromQuery]
-             DateTime? StopInterval = null
+             DateTime? stopInterval = null
         )
         {
             return await ControllerSimpleRequest(new GetConnectionMessagesQuery()
@@ -57,8 +59,8 @@ namespace UniversalBroker.Core.Controllers
                 PageSize = pageSize,
                 PageNumber = pageIndex,
                 ConnectionId = id,
-                FromDate = StartInterval,
-                ToDate = StopInterval
+                FromDate = startInterval,
+                ToDate = stopInterval
             });
         }
 
@@ -118,18 +120,18 @@ namespace UniversalBroker.Core.Controllers
             [FromRoute]
             Guid connectionId,
             [FromQuery]
-            string Path,
+            string path,
             [FromQuery]
-            Dictionary<string,string> Headers,
+            Dictionary<string,string> headers,
             [FromBody]
-            List<byte> Data
+            List<byte> data
             )
         {
             return await ControllerSimpleRequest(new ReceiveIncommingMessageCommand()
             {
-                Path = Path,
-                Headers = Headers,
-                Data = Data,
+                Path = path,
+                Headers = headers,
+                Data = data,
                 CommunicationId = connectionId
             });
         }
@@ -138,17 +140,17 @@ namespace UniversalBroker.Core.Controllers
             [FromRoute]
             Guid connectionId,
             [FromQuery]
-            string Path,
+            string path,
             [FromQuery]
-            Dictionary<string,string> Headers,
+            Dictionary<string,string> headers,
             [FromBody]
             string text
             )
         {
             return await ControllerSimpleRequest(new ReceiveIncommingMessageCommand()
             {
-                Path = Path,
-                Headers = Headers,
+                Path = path,
+                Headers = headers,
                 Data = Encoding.UTF8.GetBytes(text).ToList(),
                 CommunicationId = connectionId
             });

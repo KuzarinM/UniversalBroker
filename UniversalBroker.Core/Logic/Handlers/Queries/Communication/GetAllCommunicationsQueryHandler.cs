@@ -30,6 +30,10 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Communication
             {
                 var rawList = await _brockerContext.Communications
                     .Include(x => x.CommunicationAttributes).ThenInclude(x => x.Attribute)
+                    .Where(x=>
+                            (!request.Status.HasValue || x.Status == request.Status) &&
+                            (string.IsNullOrEmpty(request.NameSearch) || x.Name.Contains(request.NameSearch))
+                    )
                     .Skip(request.PageNumber * request.PageSize).Take(request.PageSize)
                     .ToListAsync();
 

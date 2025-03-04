@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.Threading.Channels;
 using UniversalBroker.Core.Database.Models;
+using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Dtos.Chanels;
 using UniversalBroker.Core.Models.Dtos.Communications;
 using UniversalBroker.Core.Models.Dtos.Connections;
@@ -93,13 +94,29 @@ namespace UniversalBroker.Core.Extentions
 
 
             CreateMap<Protos.CommunicationDto, CreateCommunicationDto>();
+            CreateMap<Protos.CommunicationFullDto, CreateCommunicationDto>();
 
-            CreateMap<CommunicationDto, Protos.CommunicationFullDto>().
-                ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attributes.Select(x => new Protos.AttributeDto()
+            CreateMap<CommunicationDto, Protos.CommunicationFullDto>()
+                .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attributes.Select(x => new Protos.AttributeDto()
                 {
                     Name = x.Key,
                     Value = x.Value,
                 })));
+
+            CreateMap<ConnectionDto, Protos.ConnectionDto>()
+                .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attribues.Select(x => new Protos.AttributeDto()
+                {
+                    Name = x.Key,
+                    Value = x.Value,
+                })));
+
+            CreateMap<Protos.CommunicationFullDto, CommunicationSetAttributeCommand>()
+                .ForMember(x => x.CommunicationId, opt => opt.MapFrom(x => x.Id))
+                .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attributes.ToDictionary(x=>x.Name, x=>x.Value))); //todo тут не предусмотрены отправка повторов
+
+            CreateMap<Protos.ConnectionDto, UpdateConnectionDto>()
+                .ForMember(x => x.Attribues, opt => opt.MapFrom(x => x.Attributes.ToDictionary(x => x.Name, x => x.Value)));
+
         }
 
         public Guid? GetConnectionIdForMessage(MessageLog message) =>
