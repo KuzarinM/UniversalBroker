@@ -5,6 +5,7 @@ using Grpc.Core;
 using MediatR;
 using Protos;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Dtos.Communications;
 using UniversalBroker.Core.Models.Queries.Connections;
@@ -16,11 +17,13 @@ namespace UniversalBroker.Core.Logic.Services
     public class CoreGrpcService(
         ILogger<CoreGrpcService> logger,
         IMediator mediator,
-        IMapper mapper) : CoreServiceBase
+        IMapper mapper,
+        AbstractAdaptersManager adaptersManager) : CoreServiceBase
     {
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
         private readonly IMapper _mapper = mapper;
+        private readonly AbstractAdaptersManager _adaptersManager = adaptersManager;
 
         public override async Task<CommunicationFullDto> Init(Protos.CommunicationDto request, ServerCallContext context)
         {
@@ -38,7 +41,11 @@ namespace UniversalBroker.Core.Logic.Services
 
         public override Task Connect(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream, ServerCallContext context)
         {
-            return base.Connect(requestStream, responseStream, context);
+            var adapterCoreService = _adaptersManager.CreateService;
+
+            adapterCoreService.StartWork(requestStream, responseStream);
+
+            return Task.CompletedTask;
         }
 
         public override async Task<ConnectionsList> LoadInConnections(CommunicationSmallDto request, ServerCallContext context)
@@ -77,9 +84,13 @@ namespace UniversalBroker.Core.Logic.Services
             };
         }
 
-        public override Task<Empty> Disconnect(CommunicationSmallDto request, ServerCallContext context)
+        public override async Task<Empty> Disconnect(CommunicationSmallDto request, ServerCallContext context)
         {
-            return base.Disconnect(request, context);
+            var communicationId = Guid.TryParse(request.Id, out var communication) ? communication : (Guid?)null;
+
+            await _adaptersManager.GetAdapterById(communicationId!.Value)!.Stop();
+
+            return new();
         }
     }
 }

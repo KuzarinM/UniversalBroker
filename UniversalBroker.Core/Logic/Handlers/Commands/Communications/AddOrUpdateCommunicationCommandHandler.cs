@@ -32,8 +32,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
 
                 var existingModel = await _context.Communications
                     .Include(x=>x.CommunicationAttributes).ThenInclude(x=>x.Attribute)
-                    .FirstOrDefaultAsync(x => /*x.Name == model.Name &&*/ x.TypeIdentifier == model.TypeIdentifier /*&& !x.Status*/);
-                // todo Когда статусы будут падать, можно будет ещё и по ним
+                    .FirstOrDefaultAsync(x => /*x.Name == model.Name &&*/ x.TypeIdentifier == model.TypeIdentifier && !x.Status);
 
                 if (existingModel == null)
                 {

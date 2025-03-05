@@ -7,6 +7,8 @@ using Protos;
 using System.IO;
 using System.Reflection.PortableExecutable;
 using UniversalBroker.Core.Database.Models;
+using UniversalBroker.Core.Logic.Abstracts;
+using UniversalBroker.Core.Logic.Interfaces;
 using UniversalBroker.Core.Logic.Managers;
 using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Commands.Connections;
@@ -22,12 +24,12 @@ namespace UniversalBroker.Core.Logic.Services
         ILogger<AdapterCoreService> logger, 
         IMediator mediator, 
         IMapper mapper, 
-        AdaptersManager manager)
+        AbstractAdaptersManager manager): IAdapterCoreService
     {
         protected readonly ILogger _logger = logger;
         protected readonly IMediator _mediator = mediator;
         protected readonly IMapper _mapper = mapper;
-        protected readonly AdaptersManager _manager = manager;
+        protected readonly AbstractAdaptersManager _manager = manager;
         
         protected readonly CancellationTokenSource _cancellationTokenSource = new();
         protected IAsyncStreamReader<CoreMessage> _requestStream;
@@ -167,7 +169,7 @@ namespace UniversalBroker.Core.Logic.Services
 
         protected async Task HandleStatusMessage(Protos.Status statusMessage, CancellationToken cancellationToken)
         {
-            // TODO тут будет система HealthCheck
+            // TODO тут будет обработчик ошибок от адаптера
         }
 
         protected async Task HandleDataMessage(Protos.MessageDto dataMessage, CancellationToken cancellationToken)
@@ -244,17 +246,6 @@ namespace UniversalBroker.Core.Logic.Services
                 {
                     CreateCommunicationDto = communicationCreateDto,
                 });
-
-                var res = _mapper.Map<CommunicationFullDto>(_myCommunication);
-
-                // Отвечаем полной версией конфига
-                await SendMessage(new()
-                {
-                    Config = res,
-                }, cancellationToken);
-
-                // Регистрируемся как полноправный участник
-                await _manager.RegisterNewAdapter(_myCommunication.Id, this);
             }
             else
             {
@@ -263,15 +254,18 @@ namespace UniversalBroker.Core.Logic.Services
                 var communicationSetAttribute = _mapper.Map<CommunicationSetAttributeCommand>(communicationFullDto);
 
                 var _myCommunication = await _mediator.Send(communicationSetAttribute);
-
-                var res = _mapper.Map<CommunicationFullDto>(_myCommunication);
-
-                // Отвечаем полной версией конфига
-                await SendMessage(new()
-                {
-                    Config = res,
-                }, cancellationToken);
             }
+
+            var res = _mapper.Map<CommunicationFullDto>(_myCommunication);
+
+            // Отвечаем полной версией конфига
+            await SendMessage(new()
+            {
+                Config = res,
+            }, cancellationToken);
+
+            // Регистрируемся как полноправный участник
+            await _manager.RegisterNewAdapter(_myCommunication.Id, this);
         }
 
         /// <summary>
