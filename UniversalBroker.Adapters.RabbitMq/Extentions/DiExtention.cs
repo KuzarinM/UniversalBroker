@@ -1,7 +1,11 @@
-﻿using NLog.Config;
+﻿using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
+using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
 using System.Reflection;
+using UniversalBroker.Adapters.RabbitMq.Configurations;
+using static Protos.CoreService;
 using LogLevel = NLog.LogLevel;
 
 namespace UniversalBroker.Adapters.RabbitMq.Extentions
@@ -34,6 +38,15 @@ namespace UniversalBroker.Adapters.RabbitMq.Extentions
 
         public static IServiceCollection AddGrpc(this IServiceCollection services)
         {
+            services.AddSingleton(sp =>
+            {
+                var config = sp.GetRequiredService<IOptions<BaseConfiguration>>().Value;
+
+                var channel = GrpcChannel.ForAddress(config.CoreBaseUrl);
+
+                return new CoreServiceClient(channel);
+            });
+
             return services;
         }
 
