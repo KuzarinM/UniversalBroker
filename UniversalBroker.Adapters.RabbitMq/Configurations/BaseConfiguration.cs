@@ -12,13 +12,5 @@ namespace UniversalBroker.Adapters.RabbitMq.Configurations
         public string AdapterName { get; set; } = string.Empty;
 
         public string AdapterDescription {  get; set; } = string.Empty;
-
-        public double TimeToLiveSeconds { get; set; } = 20;
-
-        public string ConnectionString { get; set; } = string.Empty;
-
-        public string Login {  get; set; } = string.Empty;
-
-        public string Password { get; set; } = string.Empty;
     }
 }

@@ -4,6 +4,8 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Protos;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
+using UniversalBroker.Adapters.RabbitMq.Extentions;
+using UniversalBroker.Adapters.RabbitMq.Models.Commands;
 using static Protos.CoreService;
 
 namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
@@ -12,12 +14,16 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         ILogger<MainService> logger,
         IMediator mediator,
         CoreServiceClient coreService,
-        IOptions<BaseConfiguration> options)
+        RabbitMqService rabbitMqService,
+        IOptions<BaseConfiguration> options,
+        IOptions<AdapterConfiguration> adapterConfig)
     {
         protected readonly ILogger _logger = logger;
         protected readonly IMediator _mediator = mediator;
         protected readonly CoreServiceClient _coreService = coreService;
+        protected readonly RabbitMqService _rabbitMqService = rabbitMqService;
         protected readonly BaseConfiguration _baseConfig = options.Value;
+        protected readonly AdapterConfiguration _adapterConfig = adapterConfig.Value;
 
         protected IClientStreamWriter<CoreMessage> _requestStream;
         protected IAsyncStreamReader<CoreMessage> _responseStream;
@@ -158,12 +164,25 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         protected async Task HandleDataMessage(MessageDto dataMessage, CancellationToken cancellationToken)
         {
-            // TODO отправка сообщений в Rabbit
+            await _mediator.Send(new PublishToTopicCommand()
+            {
+                Message = dataMessage,
+            });
         }
 
         protected async Task HandleConnectionMessage(ConnectionDto connectionDto, CancellationToken cancellationToken)
         {
-            // todo Создаём читателя если это входное подключение, а если выходное, видимо, ничего 
+            if (connectionDto.IsInput)
+            {
+                await _mediator.Send(new SubscribeOnTopicCommand()
+                {
+                    Connection = connectionDto,
+                });
+            }
+            else
+            {
+                _rabbitMqService.OutputConnections.AddOrUpdate(connectionDto.Path, connectionDto, (_, _) => connectionDto);
+            }
         }
 
         protected async Task HandleConfigMessage(CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)
@@ -178,25 +197,23 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             bool needUpdate = false;
 
-            needUpdate |= await GetOrUpdateAttribute(
-                nameof(_baseConfig.TimeToLiveSeconds),
-                conf => Task.FromResult(((int)_baseConfig.TimeToLiveSeconds).ToString()),
-                async (conf, str) => _baseConfig.TimeToLiveSeconds = int.TryParse(str, out int val) ? val : _baseConfig.TimeToLiveSeconds);
+            var updatedCount = _adapterConfig.SetValueFromAttributes(_myCommunication.Attributes);
 
-            needUpdate |= await GetOrUpdateAttribute(
-                nameof(_baseConfig.ConnectionString),
-                async conf => conf.ConnectionString,
-                async (conf, str) => _baseConfig.ConnectionString = str);
+            // todo тут можно понять, обновилось ли у нас что-то
 
-            needUpdate |= await GetOrUpdateAttribute(
-                nameof(_baseConfig.Login),
-                async conf => conf.Login,
-                async (conf, str) => _baseConfig.Login = str);
+            needUpdate = _adapterConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
 
-            needUpdate |= await GetOrUpdateAttribute(
-                nameof(_baseConfig.Password),
-                async conf => conf.Password,
-                async (conf, str) => _baseConfig.Password = str);
+            // Пытаемся сконфигурировать RabbitMQ
+            updatedCount = rabbitMqService.GetConnectionConfig.SetValueFromAttributes(_myCommunication.Attributes);
+
+            if(updatedCount > 0)
+            {
+                // Если какие-то параметры уже есть, давайте коннектится
+                await _rabbitMqService.ConnectAsync(cancellationToken);
+            }
+
+            // В любом случае, вдруг что-то там такое интересное забыли
+            needUpdate |= _rabbitMqService.GetConnectionConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
 
             if (needUpdate)
                 await SendMessage(new()
@@ -236,7 +253,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         /// <param name="coreMessage"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected async Task SendMessage(CoreMessage coreMessage, CancellationToken cancellationToken)
+        public async Task SendMessage(CoreMessage coreMessage, CancellationToken cancellationToken)
         {
             try
             {

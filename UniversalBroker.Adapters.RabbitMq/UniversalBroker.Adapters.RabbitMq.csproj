@@ -26,9 +26,7 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Logic\Interfaces\" />
-    <Folder Include="Logic\Handlers\" />
     <Folder Include="Models\Queries\" />
-    <Folder Include="Models\Commands\" />
     <Folder Include="Models\Internals\" />
   </ItemGroup>
 
