@@ -59,7 +59,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             while (!cancellationToken.IsCancellationRequested)
             {
                 var withoutMessageS = DateTime.UtcNow.Subtract(_lastSendMessage).TotalSeconds;
-                if (withoutMessageS > _baseConfig.TimeToLiveSeconds)
+                if (withoutMessageS > _adapterConfig.TimeToLiveSeconds)
                 {
                     // Шлём сообщение
                     await SendMessage(new()
@@ -75,7 +75,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                     withoutMessageS = 0;
                 }
                 // Если ещё не время, довайте подождём до момента, когда будет время
-                await Task.Delay((int)double.Max(_baseConfig.TimeToLiveSeconds - withoutMessageS, 0) * 1000 + 1);
+                await Task.Delay((int)double.Max(_adapterConfig.TimeToLiveSeconds - withoutMessageS, 0) * 1000 + 1);
             }
         }
 
@@ -83,14 +83,14 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                if(SiliensInterval.TotalSeconds > (_baseConfig.TimeToLiveSeconds * 1.25))
+                if(SiliensInterval.TotalSeconds > (_adapterConfig.TimeToLiveSeconds * 1.25))
                 {
                     await CancellationTokenSource.CancelAsync();
                     _processSemaphore.Release();
                     break;
                 }
 
-                await Task.Delay((int)_baseConfig.TimeToLiveSeconds * 800, CancellationTokenSource.Token); // *0.8*1000 = * 800
+                await Task.Delay((int)_adapterConfig.TimeToLiveSeconds * 800, CancellationTokenSource.Token); // *0.8*1000 = * 800
             }
         }
 
