@@ -99,7 +99,7 @@ namespace UniversalBroker.Core.Logic.Services
 
         public async Task<Protos.StatusDto> ReceiveMessage(CoreMessage message, CancellationToken cancellationToken)
         {
-            _logger.LogDebug("Пришло сообщение от Адаптера {id}", _myCommunication.Id);
+            _logger.LogInformation("Пришло сообщение от Адаптера {id}", _myCommunication.Id);
 
             _lastReceivedMessage = DateTime.UtcNow;
 

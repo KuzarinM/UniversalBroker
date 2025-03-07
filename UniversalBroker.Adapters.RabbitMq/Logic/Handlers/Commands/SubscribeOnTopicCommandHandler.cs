@@ -71,28 +71,20 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
 
                 consumer.ReceivedAsync += async (model, ea) =>
                 {
-                    RepeatedField<AttributeDto> headers = new();
-                    try
-                    {
-                        ea.GetAttributesFromModel(headers);
-                    }
-                    catch (Exception ex) 
-                    {
-                        _logger.LogError(ex, "Ошибка при сборке заголовков");
-                        headers.AddOrUpdateAttribute("Error", ex.Message);
-                    }
-
-                    // Докидываем заголовков которые считаем верными
-                    headers.Add(new AttributeDto()
-                    {
-                        Name = "Custom.ReceiveDateTimeUtc",
-                        Value = DateTime.UtcNow.ToString()
-                    });
-                    headers.Add(new AttributeDto()
-                    {
-                        Name = "Custom.DataLenth",
-                        Value = ea.Body.Length.ToString()
-                    });
+                    RepeatedField<AttributeDto> headers =
+                    [
+                        // Докидываем заголовков которые считаем верными
+                        new AttributeDto()
+                        {
+                            Name = "Custom.ReceiveDateTimeUtc",
+                            Value = DateTime.UtcNow.ToString()
+                        },
+                        new AttributeDto()
+                        {
+                            Name = "Custom.DataLenth",
+                            Value = ea.Body.Length.ToString()
+                        },
+                    ];
 
                     try
                     {
