@@ -1,4 +1,6 @@
 ﻿
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
+
 namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 {
     public class InitService(
@@ -10,27 +12,30 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         protected readonly IServiceProvider _serviceProvider = serviceProvider;
 
         protected CancellationTokenSource _cancellationTokenSource = new();
-        protected MainService? _mainService;
+        protected IMainService? _mainService;
 
-        public MainService? GetService => _mainService;
+        public IMainService? GetService => _mainService;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            while (_cancellationTokenSource.IsCancellationRequested)
+            _ = Task.Run( async() =>
             {
-                _cancellationTokenSource.Cancel();
-                _cancellationTokenSource = new();
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource = new();
 
-                _mainService = _serviceProvider.CreateAsyncScope().ServiceProvider.GetRequiredService<MainService>();
+                    _mainService = _serviceProvider.CreateAsyncScope().ServiceProvider.GetRequiredService<IMainService>();
 
-                var waiter = await _mainService.StartWork(_cancellationTokenSource);
+                    var waiter = await _mainService.StartWork(_cancellationTokenSource);
 
-                await waiter.WaitAsync(cancellationToken);
+                    await waiter.WaitAsync(cancellationToken);
 
-                _mainService = null;
-            }
+                    _mainService = null;
+                }
 
-            _cancellationTokenSource?.Cancel();
+                _cancellationTokenSource?.Cancel();
+            }, cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Concurrent;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
 using UniversalBroker.Adapters.RabbitMq.Models.Commands;
 
 namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
@@ -13,7 +14,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
     public class RabbitMqService(
         ILogger<RabbitMqService> logger, 
         IMediator mediator, 
-        IMapper mapper)
+        IMapper mapper): IRabbitMqService
     {
         protected readonly ILogger _logger = logger;
         protected readonly IMediator _mediator = mediator;
@@ -30,10 +31,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         public IConnection? GetConnection => _connection;
         public ConnectionFactory GetConnectionConfig => _connectionConfig;
 
-        public readonly ConcurrentDictionary<string, ConnectionDto> InputConnections = new();
-        public readonly ConcurrentDictionary<string, CancellationTokenSource> Consumers = new();
+        public ConcurrentDictionary<string, ConnectionDto> InputConnections { get; private set; } = new();
 
-        public readonly ConcurrentDictionary<string, ConnectionDto> OutputConnections = new();
+        public ConcurrentDictionary<string, CancellationTokenSource> Consumers { get; private set; } = new();
+
+        public ConcurrentDictionary<string, ConnectionDto> OutputConnections { get; private set; } = new();
 
         public async Task ConnectAsync(CancellationToken cancellationToken)
         {

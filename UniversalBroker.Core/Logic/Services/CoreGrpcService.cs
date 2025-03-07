@@ -39,13 +39,11 @@ namespace UniversalBroker.Core.Logic.Services
             return res;
         }
 
-        public override Task Connect(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream, ServerCallContext context)
+        public override async Task Connect(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream, ServerCallContext context)
         {
             var adapterCoreService = _adaptersManager.CreateService;
 
-            adapterCoreService.StartWork(requestStream, responseStream);
-
-            return Task.CompletedTask;
+            await adapterCoreService.StartWork(requestStream, responseStream);
         }
 
         public override async Task<ConnectionsList> LoadInConnections(CommunicationSmallDto request, ServerCallContext context)

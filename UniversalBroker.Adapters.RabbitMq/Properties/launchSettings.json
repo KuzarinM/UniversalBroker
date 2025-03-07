@@ -26,7 +26,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7260;http://localhost:5086",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BASE_CONFIGURATION_CORE_BASE_URL": "https://localhost:7071",
+        "BASE_CONFIGURATION_ADAPTER_TYPE_ID": "38585705-5805-4453-98bf-e05bafa8a0eb",
+        "BASE_CONFIGURATION_ADAPTER_NAME": "Адаптер RabbitMQ",
+        "BASE_CONFIGURATION_ADAPTER_DESCRIPTION": "Тесовый адаптер. Заработает ли? да кто знает то"
       }
     },
     "IIS Express": {

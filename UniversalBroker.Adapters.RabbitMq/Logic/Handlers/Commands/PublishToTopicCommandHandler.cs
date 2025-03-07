@@ -6,6 +6,7 @@ using Protos;
 using RabbitMQ.Client;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
 using UniversalBroker.Adapters.RabbitMq.Logic.Services;
 using UniversalBroker.Adapters.RabbitMq.Models.Commands;
 using static Google.Rpc.Context.AttributeContext.Types;
@@ -22,14 +23,14 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
     public class PublishToTopicCommandHandler(
         ILogger<PublishToTopicCommandHandler> logger, 
         IMediator mediator, 
-        RabbitMqService rabbitMqService, 
-        MainService mainService
+        IRabbitMqService rabbitMqService, 
+        IMainService mainService
         ) : IRequestHandler<PublishToTopicCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
-        private readonly RabbitMqService _rabbitMqService = rabbitMqService;
-        private readonly MainService _mainService = mainService;
+        private readonly IRabbitMqService _rabbitMqService = rabbitMqService;
+        private readonly IMainService _mainService = mainService;
 
         public async Task Handle(PublishToTopicCommand request, CancellationToken cancellationToken)
         {

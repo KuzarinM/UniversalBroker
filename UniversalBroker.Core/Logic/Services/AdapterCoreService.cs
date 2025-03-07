@@ -97,11 +97,14 @@ namespace UniversalBroker.Core.Logic.Services
         {
             while (!cancellationToken.IsCancellationRequested) 
             {
-                await foreach (var message in _requestStream.ReadAllAsync())
+
+                while(await _requestStream.MoveNext())
                 {
-                    _logger.LogDebug("Пришло сообщение от Адаптера {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
+                    _logger.LogInformation("Пришло сообщение от Адаптера {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
 
                     _lastReceivedMessage = DateTime.UtcNow;
+
+                    var message = _requestStream.Current;
 
                     try
                     {
@@ -278,7 +281,7 @@ namespace UniversalBroker.Core.Logic.Services
         {
             try
             {
-                logger.LogDebug("Отправлено сообщение Адаптеру {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
+                logger.LogInformation("Отправлено сообщение Адаптеру {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
                 await _responseStream.WriteAsync(coreMessage, cancellationToken);
 
                 _lastSendMessage = DateTime.UtcNow;

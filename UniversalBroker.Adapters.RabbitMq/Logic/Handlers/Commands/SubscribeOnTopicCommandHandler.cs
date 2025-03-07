@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
 using UniversalBroker.Adapters.RabbitMq.Logic.Services;
 using UniversalBroker.Adapters.RabbitMq.Models.Commands;
 using static Google.Rpc.Context.AttributeContext.Types;
@@ -22,13 +23,13 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
     public class SubscribeOnTopicCommandHandler(
         ILogger<SubscribeOnTopicCommandHandler> logger,
         IMediator mediator,
-        RabbitMqService rabbitMqService,
-        MainService mainService) : IRequestHandler<SubscribeOnTopicCommand>
+        IRabbitMqService rabbitMqService,
+        IMainService mainService) : IRequestHandler<SubscribeOnTopicCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
-        private readonly RabbitMqService _rabbitMqService = rabbitMqService;
-        private readonly MainService _mainService = mainService;
+        private readonly IRabbitMqService _rabbitMqService = rabbitMqService;
+        private readonly IMainService _mainService = mainService;
 
         public async Task Handle(SubscribeOnTopicCommand request, CancellationToken cancellationToken)
         {

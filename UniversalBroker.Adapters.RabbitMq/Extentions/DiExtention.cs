@@ -5,6 +5,8 @@ using NLog.Extensions.Logging;
 using NLog.Targets;
 using System.Reflection;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
+using UniversalBroker.Adapters.RabbitMq.Logic.Services;
 using static Protos.CoreService;
 using LogLevel = NLog.LogLevel;
 
@@ -23,16 +25,22 @@ namespace UniversalBroker.Adapters.RabbitMq.Extentions
 
             services.AddGrpc();
 
+            services.AddHostedService<InitService>();
+
             return services;
         }
 
         public static IServiceCollection AddSingletons(this IServiceCollection services)
         {
+            services.AddSingleton<IRabbitMqService, RabbitMqService>();
+
             return services;
         }
 
         public static IServiceCollection AddScopeds(this IServiceCollection services)
         {
+            services.AddScoped<IMainService, MainService>();
+
             return services;
         }
 

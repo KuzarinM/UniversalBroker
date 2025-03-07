@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Protos;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
+using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
 using UniversalBroker.Adapters.RabbitMq.Models.Commands;
 using static Protos.CoreService;
 
@@ -14,14 +15,14 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         ILogger<MainService> logger,
         IMediator mediator,
         CoreServiceClient coreService,
-        RabbitMqService rabbitMqService,
+        IRabbitMqService rabbitMqService,
         IOptions<BaseConfiguration> options,
-        IOptions<AdapterConfiguration> adapterConfig)
+        IOptions<AdapterConfiguration> adapterConfig) : IMainService
     {
         protected readonly ILogger _logger = logger;
         protected readonly IMediator _mediator = mediator;
         protected readonly CoreServiceClient _coreService = coreService;
-        protected readonly RabbitMqService _rabbitMqService = rabbitMqService;
+        protected readonly IRabbitMqService _rabbitMqService = rabbitMqService;
         protected readonly BaseConfiguration _baseConfig = options.Value;
         protected readonly AdapterConfiguration _adapterConfig = adapterConfig.Value;
 
@@ -33,9 +34,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         private DateTime _lastSendMessage = DateTime.UtcNow;
         private DateTime _lastReceivedMessage = DateTime.UtcNow;
 
-        public TimeSpan SiliensInterval => DateTime.UtcNow.Subtract(_lastSendMessage > _lastReceivedMessage ? _lastReceivedMessage : _lastSendMessage);
-
         public CommunicationFullDto? Communication => _myCommunication;
+
+        private TimeSpan SiliensInterval => DateTime.UtcNow.Subtract(_lastSendMessage > _lastReceivedMessage ? _lastReceivedMessage : _lastSendMessage);
 
         public async Task<SemaphoreSlim> StartWork(CancellationTokenSource CancellationTokenSource)
         {
@@ -46,10 +47,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             _ = Task.Run(() => ListenMessages(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartStatusCheker(CancellationTokenSource.Token), CancellationTokenSource.Token);
-            
-            await SendInit(CancellationTokenSource.Token);
-
             _ = Task.Run(() => StartLifesignChecker(CancellationTokenSource), CancellationTokenSource.Token);
+
+            await Task.Delay(1000);
+
+            await SendInit(CancellationTokenSource.Token);
 
             return _processSemaphore;
         }
@@ -112,9 +114,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await foreach (var message in _responseStream.ReadAllAsync())
+                while (await _responseStream.MoveNext())
                 {
-                    _logger.LogDebug("Пришло сообщение от Ядра");
+                    var message = _responseStream.Current;
+
+                    _logger.LogInformation("Пришло сообщение от Ядра");
 
                     _lastReceivedMessage = DateTime.UtcNow;
 
@@ -187,6 +191,10 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         protected async Task HandleConfigMessage(CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)
         {
+            bool needLoadConnections = false;
+            if(_myCommunication == null)
+                needLoadConnections = true;
+            
             _myCommunication = communicationFullDto;
 
             if(_baseConfig.AdapterName != _myCommunication.Name)
@@ -204,7 +212,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             needUpdate = _adapterConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
 
             // Пытаемся сконфигурировать RabbitMQ
-            updatedCount = rabbitMqService.GetConnectionConfig.SetValueFromAttributes(_myCommunication.Attributes);
+            updatedCount = _rabbitMqService.GetConnectionConfig.SetValueFromAttributes(_myCommunication.Attributes);
 
             if(updatedCount > 0)
             {
@@ -215,12 +223,58 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             // В любом случае, вдруг что-то там такое интересное забыли
             needUpdate |= _rabbitMqService.GetConnectionConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
 
+            if (needLoadConnections)
+                await LoadConnections(cancellationToken);
+
             if (needUpdate)
                 await SendMessage(new()
                 {
                     Config = _myCommunication
                 },
                 cancellationToken);
+        }
+
+        protected async Task LoadConnections(CancellationToken cancellationToken)
+        {
+            var inputConnections = await _coreService.LoadInConnectionsAsync(new()
+            {
+                Id = _myCommunication!.Id
+            });
+
+            foreach (var connection in inputConnections.Connections)
+            {
+                await HandleConnectionMessage(connection, cancellationToken);
+            }
+
+            await SendMessage(new()
+            {
+                Status = new()
+                {
+                    Status_ = true,
+                    Data = "IN CONNECTIONS LOADED"
+                }
+            },
+            cancellationToken);
+
+            var outputConnections = await _coreService.LoadOutConnectionsAsync(new()
+            {
+                Id = _myCommunication!.Id
+            });
+
+            foreach (var connection in outputConnections.Connections)
+            {
+                await HandleConnectionMessage(connection, cancellationToken);
+            }
+
+            await SendMessage(new()
+            {
+                Status = new()
+                {
+                    Status_ = true,
+                    Data = "OUT CONNECTIONS LOADED"
+                }
+            },
+            cancellationToken);
         }
 
         protected async Task<bool> GetOrUpdateAttribute(string attributeName, Func<BaseConfiguration,Task<string>> getter, Func<BaseConfiguration, string, Task> setter)
@@ -257,7 +311,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             try
             {
-                logger.LogDebug("Отправлено сообщение Ядру");
+                logger.LogInformation("Отправлено сообщение Ядру");
                 await _requestStream.WriteAsync(coreMessage, cancellationToken);
 
                 _lastSendMessage = DateTime.UtcNow;
