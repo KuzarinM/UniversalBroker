@@ -50,7 +50,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
                     return tokenSource;
                 });
 
-                using var channel = await connection.CreateChannelAsync(cancellationToken: tokenSource.Token);
+                var channel = await connection.CreateChannelAsync(cancellationToken: tokenSource.Token);
 
                 var queueConfig = request.Connection.Attributes.GetModelFromAttributes<QueueConfiguration>();
 

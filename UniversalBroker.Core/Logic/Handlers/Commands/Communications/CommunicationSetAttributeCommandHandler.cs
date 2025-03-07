@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
+using UniversalBroker.Core.Logic.Managers;
 using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Dtos.Communications;
 
@@ -17,12 +19,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
     public class CommunicationSetAttributeCommandHandler(
         ILogger<CommunicationSetAttributeCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
         ) : IRequestHandler<CommunicationSetAttributeCommand, CommunicationDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _adaptersManager = abstractAdaptersManager;
 
         public async Task<CommunicationDto> Handle(CommunicationSetAttributeCommand request, CancellationToken cancellationToken)
         {
@@ -67,7 +71,15 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
                 }
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<CommunicationDto>(communoication!);
+                var resModel =  _mapper.Map<CommunicationDto>(communoication!);
+
+                // Отвечаем полной версией конфига
+                _adaptersManager.GetAdapterById(resModel.Id)?.SendMessage(new()
+                    {
+                        Config = _mapper.Map<Protos.CommunicationFullDto>(resModel),
+                    }, cancellationToken);
+
+                return resModel;
             }
             catch(ControllerException ex)
             {

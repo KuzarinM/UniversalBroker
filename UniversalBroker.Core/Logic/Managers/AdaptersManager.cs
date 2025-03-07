@@ -73,8 +73,10 @@ namespace UniversalBroker.Core.Logic.Managers
                 .ExecuteUpdateAsync(x => x.SetProperty(y => y.Status, staus));
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await _contextFunc().Communications.ExecuteUpdateAsync(x=>x.SetProperty(y=>y.Status, false));
+
             _ = Task.Run(async () =>
             {
                 while (stoppingToken.IsCancellationRequested)
@@ -83,8 +85,6 @@ namespace UniversalBroker.Core.Logic.Managers
                     await Task.Delay(_timeToLiveS * 800); // *0.8*1000 = * 800
                 }
             });
-
-            return Task.CompletedTask;
         }
     }
 }

@@ -123,7 +123,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Extentions
                                 if (shortAttribute != null)
                                     existing.Remove(shortAttribute);
 
-                                var valueStr = JsonConvert.SerializeObject(value);
+                                var valueStr = value?.ToString() ?? "null";
 
                                 updatedCount += AddOrUpdateAttribute(existing, name, valueStr);
                             }

@@ -15,9 +15,13 @@ service CoreService{
 	};
 
 	// Основная двухсторонняя коммуникация будет происходит тут
-	rpc Connect(stream CoreMessage) returns (stream CoreMessage){
+	rpc Connect(CommunicationSmallDto) returns (stream CoreMessage){
 		option (google.api.http) = {post: "/v1/gRPC/CoreService/Connect"};
 	};
+
+	rpc SendAdapterMessage(AdapterMessage) returns (StatusDto){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/SendAdapterMessage"};
+	}
 
 	// Получение входов
 	rpc LoadInConnections(CommunicationSmallDto) returns (ConnectionsList){
@@ -39,11 +43,16 @@ service CoreService{
 
 message CoreMessage{
 	oneof Body{
-		Status Status = 1;
+		StatusDto StatusDto = 1;
 		CommunicationFullDto Config = 2;
 		ConnectionDto Connection = 3;
 		MessageDto Message = 4;
 	}
+}
+
+message AdapterMessage{
+	string adapterId = 1; 
+	CoreMessage Message = 2;
 }
 
 // Обёртка для списка
@@ -52,7 +61,7 @@ message ConnectionsList {
 }
 
 // Статусное сообщение. Выстукает и запросов и ответом на него
-message Status {
+message StatusDto {
 	bool Status = 1;
 	string Data = 2;
 }

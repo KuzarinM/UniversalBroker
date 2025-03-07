@@ -3,6 +3,7 @@ using Grpc.Core;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Protos;
+using System.Threading;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
 using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
@@ -26,7 +27,6 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         protected readonly BaseConfiguration _baseConfig = options.Value;
         protected readonly AdapterConfiguration _adapterConfig = adapterConfig.Value;
 
-        protected IClientStreamWriter<CoreMessage> _requestStream;
         protected IAsyncStreamReader<CoreMessage> _responseStream;
 
         private readonly SemaphoreSlim _processSemaphore = new SemaphoreSlim(0, 1);
@@ -40,18 +40,25 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         public async Task<SemaphoreSlim> StartWork(CancellationTokenSource CancellationTokenSource)
         {
-            var streams = _coreService.Connect();
 
-            _requestStream = streams.RequestStream;
+            await SendInit(CancellationTokenSource.Token);
+
+            var streams = _coreService.Connect(
+                new()
+                {
+                    Id = _myCommunication!.Id
+                }
+            );
+
             _responseStream = streams.ResponseStream;
 
             _ = Task.Run(() => ListenMessages(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartStatusCheker(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartLifesignChecker(CancellationTokenSource), CancellationTokenSource.Token);
 
-            await Task.Delay(1000);
+            await HandleConfigMessage(_myCommunication, CancellationTokenSource.Token);
 
-            await SendInit(CancellationTokenSource.Token);
+            await LoadConnections(CancellationTokenSource.Token);
 
             return _processSemaphore;
         }
@@ -66,9 +73,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                     // Шлём сообщение
                     await SendMessage(new()
                     {
-                        Status = new()
+                        StatusDto = new()
                         {
-                            Status_ = true,
+                            Status = true,
                             Data = "LIFESIGN_REQ"
                         }
                     },
@@ -87,6 +94,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             {
                 if(SiliensInterval.TotalSeconds > (_adapterConfig.TimeToLiveSeconds * 1.25))
                 {
+                    _logger.LogWarning("Тест жизнеспособности провален, отключаемся");
                     await CancellationTokenSource.CancelAsync();
                     _processSemaphore.Release();
                     break;
@@ -98,16 +106,12 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         private async Task SendInit(CancellationToken cancellationToken)
         {
-            await SendMessage(new CoreMessage()
+            _myCommunication = await _coreService.InitAsync(new CommunicationDto
             {
-                Config = new()
-                {
-                    TypeIdentifier = _baseConfig.AdapterTypeId.ToString(),
-                    Name = _baseConfig.AdapterName,
-                    Description = _baseConfig.AdapterDescription
-                }
-            },
-            cancellationToken);
+                TypeIdentifier = _baseConfig.AdapterTypeId.ToString(),
+                Name = _baseConfig.AdapterName,
+                Description = _baseConfig.AdapterDescription
+            });
         }
 
         private async Task ListenMessages(CancellationToken cancellationToken)
@@ -126,8 +130,8 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                     {
                         switch (message.BodyCase)
                         {
-                            case CoreMessage.BodyOneofCase.Status:
-                                await HandleStatusMessage(message.Status, cancellationToken);
+                            case CoreMessage.BodyOneofCase.StatusDto:
+                                await HandleStatusMessage(message.StatusDto, cancellationToken);
                                 break;
                             case CoreMessage.BodyOneofCase.Config:
                                 await HandleConfigMessage(message.Config, cancellationToken);
@@ -149,9 +153,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
                         await SendMessage(new()
                         {
-                            Status = new()
+                            StatusDto = new()
                             {
-                                Status_ = false,
+                                Status = false,
                                 Data = "MESSAGE NOT HANDLED"
                             }
                         },
@@ -161,9 +165,20 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             }
         }
 
-        protected async Task HandleStatusMessage(Protos.Status statusMessage, CancellationToken cancellationToken)
+        protected async Task HandleStatusMessage(Protos.StatusDto statusMessage, CancellationToken cancellationToken)
         {
-
+            if (statusMessage.Status && statusMessage.Data.Contains("LIFESIGN_REQ"))
+            {
+                await SendMessage(new()
+                {
+                    StatusDto = new()
+                    {
+                        Status = true,
+                        Data = "LIFESIGN_RES"
+                    }
+                },
+                cancellationToken);
+            }
         }
 
         protected async Task HandleDataMessage(MessageDto dataMessage, CancellationToken cancellationToken)
@@ -191,10 +206,6 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         protected async Task HandleConfigMessage(CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)
         {
-            bool needLoadConnections = false;
-            if(_myCommunication == null)
-                needLoadConnections = true;
-            
             _myCommunication = communicationFullDto;
 
             if(_baseConfig.AdapterName != _myCommunication.Name)
@@ -223,9 +234,6 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             // В любом случае, вдруг что-то там такое интересное забыли
             needUpdate |= _rabbitMqService.GetConnectionConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
 
-            if (needLoadConnections)
-                await LoadConnections(cancellationToken);
-
             if (needUpdate)
                 await SendMessage(new()
                 {
@@ -248,9 +256,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             await SendMessage(new()
             {
-                Status = new()
+                StatusDto = new()
                 {
-                    Status_ = true,
+                    Status = true,
                     Data = "IN CONNECTIONS LOADED"
                 }
             },
@@ -268,9 +276,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             await SendMessage(new()
             {
-                Status = new()
+                StatusDto = new()
                 {
-                    Status_ = true,
+                    Status = true,
                     Data = "OUT CONNECTIONS LOADED"
                 }
             },
@@ -311,9 +319,13 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             try
             {
-                logger.LogInformation("Отправлено сообщение Ядру");
-                await _requestStream.WriteAsync(coreMessage, cancellationToken);
+                logger.LogInformation("Отправлено сообщение Ядру: {message}", coreMessage);
 
+                Protos.StatusDto? res = await _coreService.SendAdapterMessageAsync(new()
+                {
+                    AdapterId = _myCommunication?.Id.ToString() ?? string.Empty,
+                    Message = coreMessage,
+                });
                 _lastSendMessage = DateTime.UtcNow;
             }
             catch (Exception ex)

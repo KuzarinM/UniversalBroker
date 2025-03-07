@@ -6,6 +6,7 @@ using MediatR;
 using Protos;
 using System.IO;
 using System.Reflection.PortableExecutable;
+using System.Threading;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Logic.Interfaces;
@@ -32,12 +33,11 @@ namespace UniversalBroker.Core.Logic.Services
         protected readonly AbstractAdaptersManager _manager = manager;
         
         protected readonly CancellationTokenSource _cancellationTokenSource = new();
-        protected IAsyncStreamReader<CoreMessage> _requestStream;
         protected IServerStreamWriter<CoreMessage> _responseStream;
         protected Models.Dtos.Communications.CommunicationDto? _myCommunication;
         private DateTime _lastSendMessage = DateTime.UtcNow;
         private DateTime _lastReceivedMessage = DateTime.UtcNow;
-       
+        private SemaphoreSlim _workingSemaphore = new SemaphoreSlim(0, 1);
 
         public TimeSpan SiliensInterval => DateTime.UtcNow.Subtract(_lastSendMessage > _lastReceivedMessage ? _lastReceivedMessage: _lastSendMessage ); 
 
@@ -48,31 +48,35 @@ namespace UniversalBroker.Core.Logic.Services
             // Сообщаем, что всё, общение окончено
             await SendMessage(new()
             {
-                Status = new()
+                StatusDto = new()
                 {
-                    Status_ = false,
+                    Status = false,
                     Data = "DISCONNECT"
                 }
             },_cancellationTokenSource.Token);
 
             _cancellationTokenSource.Cancel();
+            _workingSemaphore.Release();
 
             if (_myCommunication != null)
                 await _manager.DisregisterAdapter(_myCommunication.Id);
         }
 
-        public Task StartWork(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream)
+        public Task StartWork(Models.Dtos.Communications.CommunicationDto communication)
         {
-            _requestStream = requestStream;
-            _responseStream = responseStream;
-
-            // Запускаем слушателя
-            _ = Task.Run(() => StartMessageListener(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
+            _myCommunication = communication;
 
             // Запускам проверку жизнеспособности
             _ = Task.Run(() => StartStatusCheker(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
 
             return Task.CompletedTask;
+        }
+
+        public Task<SemaphoreSlim> ConnectAdapter(IServerStreamWriter<CoreMessage> responseStream)
+        {
+            _responseStream = responseStream;
+
+            return Task.FromResult(_workingSemaphore);
         }
 
         public async Task SendMessageToPath(InternalMessage message, string Path)
@@ -93,55 +97,47 @@ namespace UniversalBroker.Core.Logic.Services
             _cancellationTokenSource.Token);
         }
 
-        private async Task StartMessageListener(CancellationToken cancellationToken)
+        public async Task<Protos.StatusDto> ReceiveMessage(CoreMessage message, CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested) 
+            _logger.LogDebug("Пришло сообщение от Адаптера {id}", _myCommunication.Id);
+
+            _lastReceivedMessage = DateTime.UtcNow;
+
+            try
             {
-
-                while(await _requestStream.MoveNext())
+                switch (message.BodyCase)
                 {
-                    _logger.LogInformation("Пришло сообщение от Адаптера {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
-
-                    _lastReceivedMessage = DateTime.UtcNow;
-
-                    var message = _requestStream.Current;
-
-                    try
-                    {
-                        switch (message.BodyCase)
-                        {
-                            case CoreMessage.BodyOneofCase.Status:
-                                await HandleStatusMessage(message.Status, cancellationToken);
-                                break;
-                            case CoreMessage.BodyOneofCase.Config:
-                                await HandleConfigMessage(message.Config, cancellationToken);
-                                break;
-                            case CoreMessage.BodyOneofCase.Connection:
-                                await HandleConnectionMessage(message.Connection, cancellationToken);
-                                break;
-                            case CoreMessage.BodyOneofCase.Message:
-                                await HandleDataMessage(message.Message, cancellationToken);
-                                break;
-                            default:
-                                _logger.LogWarning("Сообщение прибыло вообще без данных. Это подозрительно");
-                                break;
-                        }
-                    }
-                    catch (Exception ex) 
-                    {
-                        _logger.LogError(ex, "Ошибка в процессе обработки сообщения.");
-
-                        await SendMessage(new()
-                        {
-                            Status = new()
-                            {
-                                Status_ = false,
-                                Data = "MESSAGE NOT HANDLED"
-                            }
-                        },
-                        cancellationToken);
-                    }
+                    case CoreMessage.BodyOneofCase.StatusDto:
+                        await HandleStatusMessage(message.StatusDto, cancellationToken);
+                        break;
+                    case CoreMessage.BodyOneofCase.Config:
+                        await HandleConfigMessage(message.Config, cancellationToken);
+                        break;
+                    case CoreMessage.BodyOneofCase.Connection:
+                        await HandleConnectionMessage(message.Connection, cancellationToken);
+                        break;
+                    case CoreMessage.BodyOneofCase.Message:
+                        await HandleDataMessage(message.Message, cancellationToken);
+                        break;
+                    default:
+                        _logger.LogWarning("Сообщение прибыло вообще без данных. Это подозрительно");
+                        break;
                 }
+
+                return new()
+                {
+                    Status = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка в процессе обработки сообщения.");
+
+                return new()
+                {
+                    Status = false,
+                    Data = "MESSAGE NOT HANDLED"
+                };
             }
         }
 
@@ -155,9 +151,9 @@ namespace UniversalBroker.Core.Logic.Services
                     // Шлём сообщение
                     await SendMessage(new()
                     {
-                        Status = new()
+                        StatusDto = new()
                         {
-                            Status_ = true,
+                            Status = true,
                             Data = "LIFESIGN_REQ"
                         }
                     },
@@ -170,9 +166,20 @@ namespace UniversalBroker.Core.Logic.Services
             }
         }
 
-        protected async Task HandleStatusMessage(Protos.Status statusMessage, CancellationToken cancellationToken)
+        protected async Task HandleStatusMessage(Protos.StatusDto statusMessage, CancellationToken cancellationToken)
         {
-            // TODO тут будет обработчик ошибок от адаптера
+            if (statusMessage.Status && statusMessage.Data.Contains("LIFESIGN_REQ"))
+            {
+                await SendMessage(new()
+                {
+                    StatusDto = new()
+                    {
+                        Status = true,
+                        Data = "LIFESIGN_RES"
+                    }
+                },
+                cancellationToken);
+            }
         }
 
         protected async Task HandleDataMessage(Protos.MessageDto dataMessage, CancellationToken cancellationToken)
@@ -183,9 +190,9 @@ namespace UniversalBroker.Core.Logic.Services
 
                 await SendMessage(new()
                 {
-                    Status = new()
+                    StatusDto = new()
                     {
-                        Status_ = false,
+                        Status = false,
                         Data = "UNKNOWN COMMUNICATION"
                     }
                 }, cancellationToken);
@@ -212,9 +219,9 @@ namespace UniversalBroker.Core.Logic.Services
 
                 await SendMessage(new()
                 {
-                    Status = new()
+                    StatusDto = new()
                     {
-                        Status_ = false,
+                        Status = false,
                         Data = "UNKNOWN COMMUNICATION"
                     }
                 }, cancellationToken);
@@ -252,36 +259,29 @@ namespace UniversalBroker.Core.Logic.Services
             }
             else
             {
-                //TODO обновление description
-
                 var communicationSetAttribute = _mapper.Map<CommunicationSetAttributeCommand>(communicationFullDto);
 
-                var _myCommunication = await _mediator.Send(communicationSetAttribute);
+                _myCommunication = await _mediator.Send(communicationSetAttribute);
             }
-
-            var res = _mapper.Map<CommunicationFullDto>(_myCommunication);
-
-            // Отвечаем полной версией конфига
-            await SendMessage(new()
-            {
-                Config = res,
-            }, cancellationToken);
-
-            // Регистрируемся как полноправный участник
-            await _manager.RegisterNewAdapter(_myCommunication.Id, this);
         }
 
-        /// <summary>
-        ///  Отправка адаптеру сообщения по установленному каналу связи
-        /// </summary>
-        /// <param name="coreMessage"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        protected async Task SendMessage(Protos.CoreMessage coreMessage, CancellationToken cancellationToken)
+        public async Task SendMessage(Protos.CoreMessage coreMessage, CancellationToken cancellationToken)
         {
+            if(_responseStream == null)
+            {
+                _cancellationTokenSource.Cancel();
+
+                if (_myCommunication != null)
+                    await _manager.DisregisterAdapter(_myCommunication.Id);
+
+                _workingSemaphore.Release();
+
+                return;
+            }
+
             try
             {
-                logger.LogInformation("Отправлено сообщение Адаптеру {id}", _myCommunication?.Id.ToString() ?? "UNKNOWN");
+                logger.LogInformation("Отправлено сообщение Адаптеру {id}:{message}", _myCommunication?.Id.ToString() ?? "UNKNOWN", coreMessage);
                 await _responseStream.WriteAsync(coreMessage, cancellationToken);
 
                 _lastSendMessage = DateTime.UtcNow;

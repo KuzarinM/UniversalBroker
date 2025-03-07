@@ -97,9 +97,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
 
                 await _mainService.SendMessage(new()
                 {
-                    Status = new()
+                    StatusDto = new()
                     {
-                        Status_ = false,
+                        Status = false,
                         Data = "MESSAGE SEND ERROR",
                     }
                 },
