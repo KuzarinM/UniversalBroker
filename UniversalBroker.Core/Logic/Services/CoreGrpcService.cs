@@ -36,6 +36,8 @@ namespace UniversalBroker.Core.Logic.Services
                 CreateCommunicationDto = communicationCreateDto,
             });
 
+            
+
             var adapterCoreService = _adaptersManager.CreateService;
 
             await adapterCoreService.StartWork(resInternalDto);

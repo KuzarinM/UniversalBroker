@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using UniversalBroker.Core.Configurations;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Extentions;
 using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Logic.Managers;
 using UniversalBroker.Core.Models.Commands.Communications;
@@ -32,6 +34,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
         {
             try
             {
+                await SetInternalAttributes(request.Attributes, cancellationToken);
+
                 var communoication = await _context.Communications
                                                 .Include(x => x.CommunicationAttributes).ThenInclude(x => x.Attribute)
                                                 .FirstOrDefaultAsync(x => x.Id == request.CommunicationId);
@@ -91,6 +95,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
                 _logger.LogError(ex, "Ошибка при обновлении аттрибутов соединения");
                 throw new ControllerException("Ошибка при обновлении аттрибутов соединения");
             }
+        }
+
+        private async Task SetInternalAttributes(Dictionary<string, string?> attributes, CancellationToken cancellationToken)
+        {
+            // todo добавть конфиг
+            var ttlAttributeName = $"{nameof(AdapterConfiguration)}.{nameof(AdapterConfiguration.TimeToLiveSeconds)}";
+
+            attributes.AddOrUpdateAttribute(ttlAttributeName, _adaptersManager.TimeToLiveS.ToString());
         }
     }
 }

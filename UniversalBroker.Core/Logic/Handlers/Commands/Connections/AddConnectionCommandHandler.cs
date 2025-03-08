@@ -50,7 +50,6 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
 
                 var res = _mapper.Map<ConnectionDto>(model);
 
-
                 var sendTask = _abstractAdaptersManager.GetAdapterById(request.ConnectionDto.CommunicationId)?.SendMessage(new()
                 {
                     Connection = _mapper.Map<Protos.ConnectionDto>(model)

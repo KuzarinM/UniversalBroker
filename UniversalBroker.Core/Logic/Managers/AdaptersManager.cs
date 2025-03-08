@@ -21,7 +21,7 @@ namespace UniversalBroker.Core.Logic.Managers
         protected IServiceProvider _serviceProvider = serviceProvider;
 
         protected readonly ConcurrentDictionary<Guid, IAdapterCoreService> _activeServices = new();
-        private int _timeToLiveS = 20;
+        private int _timeToLiveS = /*20*/ 120;
 
         public override int TimeToLiveS => _timeToLiveS;
 
