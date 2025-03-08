@@ -6,9 +6,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
     public class InitService(
         ILogger<InitService> logger,
         IServiceProvider serviceProvider
-        ) : IHostedService
+        ) : IInitService
     {
-        protected readonly ILogger<InitService> _logger = logger;
+        protected readonly ILogger _logger = logger;
         protected readonly IServiceProvider _serviceProvider = serviceProvider;
 
         protected CancellationTokenSource _cancellationTokenSource = new();

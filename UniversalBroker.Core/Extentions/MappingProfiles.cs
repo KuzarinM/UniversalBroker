@@ -75,6 +75,9 @@ namespace UniversalBroker.Core.Extentions
             CreateMap<Connection, ConnectionFullDto>()
                 .ForMember(x => x.Attribues, opt => opt.MapFrom(x => x.ConnectionAttributes.ToDictionary(x => x.Attribute.Key, x => x.Attribute.Value)));
 
+            CreateMap<Connection, Protos.ConnectionDto>()
+               .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.ConnectionAttributes.ToDictionary(x => x.Attribute.Key, x => x.Attribute.Value)));
+
             CreateMap<ConnectionDto, Protos.ConnectionDto>()
                 .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.Attribues.Select(x => new Protos.AttributeDto()
                 {

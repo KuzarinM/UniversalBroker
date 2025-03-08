@@ -25,7 +25,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Extentions
 
             services.AddGrpc();
 
-            services.AddHostedService<InitService>();
+            services.AddHostedService(p => p.GetRequiredService<IInitService>());
 
             return services;
         }
@@ -33,14 +33,13 @@ namespace UniversalBroker.Adapters.RabbitMq.Extentions
         public static IServiceCollection AddSingletons(this IServiceCollection services)
         {
             services.AddSingleton<IRabbitMqService, RabbitMqService>();
-
+            services.AddSingleton<IInitService, InitService>();
             return services;
         }
 
         public static IServiceCollection AddScopeds(this IServiceCollection services)
         {
             services.AddScoped<IMainService, MainService>();
-
             return services;
         }
 

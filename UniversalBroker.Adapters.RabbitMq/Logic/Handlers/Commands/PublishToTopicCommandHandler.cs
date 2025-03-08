@@ -24,13 +24,13 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
         ILogger<PublishToTopicCommandHandler> logger, 
         IMediator mediator, 
         IRabbitMqService rabbitMqService, 
-        IMainService mainService
+        IInitService initService
         ) : IRequestHandler<PublishToTopicCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
         private readonly IRabbitMqService _rabbitMqService = rabbitMqService;
-        private readonly IMainService _mainService = mainService;
+        private readonly IInitService _initService = initService;
 
         public async Task Handle(PublishToTopicCommand request, CancellationToken cancellationToken)
         {
@@ -95,15 +95,16 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
             {
                 _logger.LogError(ex, "Ошибка при попытке отправить сообщение в топик");
 
-                await _mainService.SendMessage(new()
-                {
-                    StatusDto = new()
+                if(_initService.GetService != null)
+                    await _initService.GetService!.SendMessage(new()
                     {
-                        Status = false,
-                        Data = "MESSAGE SEND ERROR",
-                    }
-                },
-                cancellationToken);
+                        StatusDto = new()
+                        {
+                            Status = false,
+                            Data = "MESSAGE SEND ERROR",
+                        }
+                    },
+                    cancellationToken);
 
                 // Идём на 2-ой заход
                 _ = Task.Run(async() => await _mediator.Send(request));

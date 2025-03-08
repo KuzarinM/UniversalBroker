@@ -24,12 +24,12 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
         ILogger<SubscribeOnTopicCommandHandler> logger,
         IMediator mediator,
         IRabbitMqService rabbitMqService,
-        IMainService mainService) : IRequestHandler<SubscribeOnTopicCommand>
+        IInitService initService) : IRequestHandler<SubscribeOnTopicCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
         private readonly IRabbitMqService _rabbitMqService = rabbitMqService;
-        private readonly IMainService _mainService = mainService;
+        private readonly IInitService _initService = initService;
 
         public async Task Handle(SubscribeOnTopicCommand request, CancellationToken cancellationToken)
         {
@@ -88,7 +88,8 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
 
                     try
                     {
-                        await _mainService.SendMessage(new()
+                        if (_initService.GetService != null)
+                            await _initService.GetService.SendMessage(new()
                             {
                                 Message = new()
                                 {
@@ -128,7 +129,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
         {
             try
             {
-                await _mainService.SendMessage(new()
+                await _initService.GetService!.SendMessage(new()
                 {
                     Connection = connectionDto
                 }, cancellationToken);

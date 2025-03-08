@@ -75,8 +75,6 @@ namespace UniversalBroker.Core.Logic.Managers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _contextFunc().Communications.ExecuteUpdateAsync(x=>x.SetProperty(y=>y.Status, false));
-
             _ = Task.Run(async () =>
             {
                 while (stoppingToken.IsCancellationRequested)
