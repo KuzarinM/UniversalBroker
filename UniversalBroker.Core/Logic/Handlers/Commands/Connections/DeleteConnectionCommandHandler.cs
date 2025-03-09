@@ -3,6 +3,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
+using UniversalBroker.Core.Logic.Managers;
 using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Connections;
 
@@ -17,12 +19,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     public class DeleteConnectionCommandHandler(
         ILogger<DeleteConnectionCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
         ) : IRequestHandler<DeleteConnectionCommand>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _abstractAdaptersManager = abstractAdaptersManager;
 
         public async Task Handle(DeleteConnectionCommand request, CancellationToken cancellationToken)
         {
@@ -43,6 +47,15 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                 _context.Connections.Remove(model);
 
                 await _context.SaveChangesAsync();
+
+                var sendTask = _abstractAdaptersManager.GetAdapterById(model.CommunicationId)?.SendMessage(new()
+                {
+                    DeletedConnection = _mapper.Map<Protos.ConnectionDeleteDto>(model)
+                },
+                   cancellationToken);
+
+                if (sendTask != null)
+                    await sendTask;
             }
             catch (ControllerException ex)
             {

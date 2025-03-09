@@ -18,13 +18,11 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.UseMiddleware<SwaggerServerMiddleware>();
-app.UseMiddleware<TimeMiddleware>(); 
+app.AddMiddlewares();
 
+app.AddSwagger();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
+app.ClearCommunications();
 
 app.UseHttpsRedirection();
 

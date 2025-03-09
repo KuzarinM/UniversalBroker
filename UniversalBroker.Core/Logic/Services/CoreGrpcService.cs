@@ -4,6 +4,8 @@ using Google.Rpc;
 using Grpc.Core;
 using MediatR;
 using Protos;
+using System.Threading;
+using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
 using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Communications;
@@ -34,18 +36,53 @@ namespace UniversalBroker.Core.Logic.Services
                 CreateCommunicationDto = communicationCreateDto,
             });
 
+            
+
+            var adapterCoreService = _adaptersManager.CreateService;
+
+            await adapterCoreService.StartWork(resInternalDto);
+
+            await _adaptersManager.RegisterNewAdapter(resInternalDto.Id, adapterCoreService);
+
             var res = _mapper.Map<CommunicationFullDto>(resInternalDto);
 
             return res;
         }
 
-        public override Task Connect(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream, ServerCallContext context)
+        public override async Task Connect(CommunicationSmallDto request, IServerStreamWriter<CoreMessage> responseStream, ServerCallContext context)
         {
-            var adapterCoreService = _adaptersManager.CreateService;
+            if (!Guid.TryParse(request.Id, out var adapterId))
+                return;
 
-            adapterCoreService.StartWork(requestStream, responseStream);
+            var service = _adaptersManager.GetAdapterById(adapterId);
 
-            return Task.CompletedTask;
+            if (service == null)
+                return;
+
+            var working = await service.ConnectAdapter(responseStream);
+
+            await working.WaitAsync();
+        }
+
+        public override async Task<Protos.StatusDto> SendAdapterMessage(AdapterMessage request, ServerCallContext context)
+        {
+            if (!Guid.TryParse(request.AdapterId, out var adapterId))
+                return new()
+                {
+                    Status = false,
+                    Data = "ADAPTER ID NOT STATED"
+                };
+
+            var service = _adaptersManager.GetAdapterById(adapterId);
+
+            if (service == null)
+                return new()
+                {
+                    Status = false,
+                    Data = "ADAPTER BY ID NOT FOUND"
+                };
+
+            return await service.ReceiveMessage(request.Message, new());
         }
 
         public override async Task<ConnectionsList> LoadInConnections(CommunicationSmallDto request, ServerCallContext context)

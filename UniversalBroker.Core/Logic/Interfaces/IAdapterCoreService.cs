@@ -26,7 +26,14 @@ namespace UniversalBroker.Core.Logic.Interfaces
         /// <param name="requestStream"></param>
         /// <param name="responseStream"></param>
         /// <returns></returns>
-        Task StartWork(IAsyncStreamReader<CoreMessage> requestStream, IServerStreamWriter<CoreMessage> responseStream);
+        Task StartWork(Models.Dtos.Communications.CommunicationDto communication);
+
+        /// <summary>
+        /// Передать обратный вызов
+        /// </summary>
+        /// <param name="responseStream"></param>
+        /// <returns></returns>
+        Task<SemaphoreSlim> ConnectAdapter(IServerStreamWriter<CoreMessage> responseStream);
 
         /// <summary>
         /// Отправка Адаптеру сообщения в Канал
@@ -35,5 +42,21 @@ namespace UniversalBroker.Core.Logic.Interfaces
         /// <param name="Path"></param>
         /// <returns></returns>
         Task SendMessageToPath(InternalMessage message, string Path);
+
+        /// <summary>
+        /// Принять и обработать сообщение от адаптера
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Protos.StatusDto> ReceiveMessage(CoreMessage message, CancellationToken cancellationToken);
+
+        /// <summary>
+        ///  Отправка адаптеру сообщения по установленному каналу связи
+        /// </summary>
+        /// <param name="coreMessage"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task SendMessage(Protos.CoreMessage coreMessage, CancellationToken cancellationToken);
     }
 }

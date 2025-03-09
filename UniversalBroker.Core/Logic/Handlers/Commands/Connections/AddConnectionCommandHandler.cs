@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Connections;
 
@@ -17,12 +18,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     public class AddConnectionCommandHandler(
         ILogger<AddConnectionCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
         ) : IRequestHandler<AddConnectionCommand, ConnectionDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _abstractAdaptersManager = abstractAdaptersManager;
 
         public async Task<ConnectionDto> Handle(AddConnectionCommand request, CancellationToken cancellationToken)
         {
@@ -45,7 +48,18 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
 
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<ConnectionDto>(model);
+                var res = _mapper.Map<ConnectionDto>(model);
+
+                var sendTask = _abstractAdaptersManager.GetAdapterById(request.ConnectionDto.CommunicationId)?.SendMessage(new()
+                {
+                    Connection = _mapper.Map<Protos.ConnectionDto>(model)
+                },
+                cancellationToken);
+
+                if(sendTask != null)
+                    await sendTask;
+
+                return res;
 
             }
             catch (ControllerException ex)

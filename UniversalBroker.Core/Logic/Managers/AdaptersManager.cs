@@ -21,7 +21,7 @@ namespace UniversalBroker.Core.Logic.Managers
         protected IServiceProvider _serviceProvider = serviceProvider;
 
         protected readonly ConcurrentDictionary<Guid, IAdapterCoreService> _activeServices = new();
-        private int _timeToLiveS = 20;
+        private int _timeToLiveS = /*20*/ 120;
 
         public override int TimeToLiveS => _timeToLiveS;
 
@@ -73,7 +73,7 @@ namespace UniversalBroker.Core.Logic.Managers
                 .ExecuteUpdateAsync(x => x.SetProperty(y => y.Status, staus));
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _ = Task.Run(async () =>
             {
@@ -83,8 +83,6 @@ namespace UniversalBroker.Core.Logic.Managers
                     await Task.Delay(_timeToLiveS * 800); // *0.8*1000 = * 800
                 }
             });
-
-            return Task.CompletedTask;
         }
     }
 }

@@ -48,6 +48,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
 
                 await _context.SaveChangesAsync();
 
+                // тут возможно надо сделать тут обновление адаптера
                 return _mapper.Map<CommunicationDto>(existingModel ?? model);
             }
             catch (Exception ex) 

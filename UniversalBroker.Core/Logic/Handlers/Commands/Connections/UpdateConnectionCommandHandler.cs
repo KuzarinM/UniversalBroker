@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Connections;
 
@@ -17,12 +18,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     public class UpdateConnectionCommandHandler(
         ILogger<UpdateConnectionCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
         ) : IRequestHandler<UpdateConnectionCommand, ConnectionDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _adaptersManager = abstractAdaptersManager;
 
         public async Task<ConnectionDto> Handle(UpdateConnectionCommand request, CancellationToken cancellationToken)
         {
@@ -49,6 +52,10 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                         connectionAttribute.Attribute.Value = request.UpdateDto.Attribues[connectionAttribute.Attribute.Key];
                         request.UpdateDto.Attribues.Remove(connectionAttribute.Attribute.Key);
                     }
+                    else
+                    {
+                        request.UpdateDto.Attribues.Remove(connectionAttribute.Attribute.Key);
+                    }
                 }
 
                 foreach (var newAttribute in request.UpdateDto.Attribues)
@@ -61,6 +68,18 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                 }
 
                 await _context.SaveChangesAsync();
+
+                if (request.NeedNotifyAdapter)
+                {
+                    var sendTask = _adaptersManager.GetAdapterById(existingModel.CommunicationId)?.SendMessage(new()
+                    {
+                        Connection = _mapper.Map<Protos.ConnectionDto>(existingModel)
+                    },
+                    cancellationToken);
+
+                    if (sendTask != null)
+                        await sendTask;
+                }
 
                 return _mapper.Map<ConnectionDto>(existingModel);
 

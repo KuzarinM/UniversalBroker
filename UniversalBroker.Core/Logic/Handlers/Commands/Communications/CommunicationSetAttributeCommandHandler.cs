@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using UniversalBroker.Core.Configurations;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Extentions;
+using UniversalBroker.Core.Logic.Abstracts;
+using UniversalBroker.Core.Logic.Managers;
 using UniversalBroker.Core.Models.Commands.Communications;
 using UniversalBroker.Core.Models.Dtos.Communications;
 
@@ -17,17 +21,21 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
     public class CommunicationSetAttributeCommandHandler(
         ILogger<CommunicationSetAttributeCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
         ) : IRequestHandler<CommunicationSetAttributeCommand, CommunicationDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _adaptersManager = abstractAdaptersManager;
 
         public async Task<CommunicationDto> Handle(CommunicationSetAttributeCommand request, CancellationToken cancellationToken)
         {
             try
             {
+                await SetInternalAttributes(request.Attributes, cancellationToken);
+
                 var communoication = await _context.Communications
                                                 .Include(x => x.CommunicationAttributes).ThenInclude(x => x.Attribute)
                                                 .FirstOrDefaultAsync(x => x.Id == request.CommunicationId);
@@ -67,7 +75,15 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
                 }
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<CommunicationDto>(communoication!);
+                var resModel =  _mapper.Map<CommunicationDto>(communoication!);
+
+                // Отвечаем полной версией конфига
+                _adaptersManager.GetAdapterById(resModel.Id)?.SendMessage(new()
+                    {
+                        Config = _mapper.Map<Protos.CommunicationFullDto>(resModel),
+                    }, cancellationToken);
+
+                return resModel;
             }
             catch(ControllerException ex)
             {
@@ -79,6 +95,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
                 _logger.LogError(ex, "Ошибка при обновлении аттрибутов соединения");
                 throw new ControllerException("Ошибка при обновлении аттрибутов соединения");
             }
+        }
+
+        private async Task SetInternalAttributes(Dictionary<string, string?> attributes, CancellationToken cancellationToken)
+        {
+            // todo добавть конфиг
+            var ttlAttributeName = $"{nameof(AdapterConfiguration)}.{nameof(AdapterConfiguration.TimeToLiveSeconds)}";
+
+            attributes.AddOrUpdateAttribute(ttlAttributeName, _adaptersManager.TimeToLiveS.ToString());
         }
     }
 }
