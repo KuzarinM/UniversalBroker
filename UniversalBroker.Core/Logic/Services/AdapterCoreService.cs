@@ -234,16 +234,10 @@ namespace UniversalBroker.Core.Logic.Services
 
             var res = await _mediator.Send(new UpdateConnectionCommand()
             {
-                ConnectionId = _myCommunication.Id,
+                ConnectionId = Guid.TryParse(connectionDto.Id, out var id)? id:Guid.Empty,
                 UpdateDto = upateConnectionDto,
+                NeedNotifyAdapter = false,
             });
-
-            var resDto = _mapper.Map<Protos.ConnectionDto>(res);
-
-            await SendMessage(new()
-            {
-                Connection = resDto,
-            }, cancellationToken);
         }
 
         protected async Task HandleConfigMessage(Protos.CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)

@@ -3,6 +3,7 @@ using Grpc.Core;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Protos;
+using RabbitMQ.Client;
 using System.Threading;
 using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Extentions;
@@ -142,6 +143,9 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                             case CoreMessage.BodyOneofCase.Message:
                                 await HandleDataMessage(message.Message, cancellationToken);
                                 break;
+                            case CoreMessage.BodyOneofCase.DeletedConnection:
+                                await HandleDeleteConnectionMessage(message.DeletedConnection, cancellationToken);
+                                break;
                             default:
                                 _logger.LogWarning("Сообщение прибыло вообще без данных. Это подозрительно");
                                 break;
@@ -240,6 +244,81 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                     Config = _myCommunication
                 },
                 cancellationToken);
+        }
+
+        protected async Task HandleDeleteConnectionMessage(ConnectionDeleteDto connectionDeleteDto, CancellationToken cancellationToken)
+        {
+            if (connectionDeleteDto.IsInput)
+            {
+                if (
+                    _rabbitMqService.InputConnections.TryRemove(connectionDeleteDto.Path, out var connection) &&
+                    _rabbitMqService.Consumers.TryRemove(connectionDeleteDto.Path, out var consumer)
+                    )
+                {
+                    if(connection.Id != connectionDeleteDto.Id)
+                    {
+                        _logger.LogInformation(
+                            "Невозможная ситуация, удаляем по одинаковому пути {path}, но Id разные {myId}!={deleteId}", 
+                            connectionDeleteDto.Path,
+                            connection.Id,
+                            connectionDeleteDto.Id);
+
+                        _rabbitMqService.InputConnections.AddOrUpdate(connectionDeleteDto.Path, connection, (_, _) => connection);
+                        _rabbitMqService.Consumers.AddOrUpdate(connectionDeleteDto.Path, consumer, (_, _) => consumer);
+
+                        await SendMessage(new()
+                        {
+                            StatusDto = new()
+                            {
+                                Status = false,
+                                Data = "ID MISMATCH"
+                            }
+                        },
+                        cancellationToken);
+
+                        return;
+                    }
+
+                    _logger.LogInformation("Входное подключене {path} было удалено ",connectionDeleteDto.Path);
+                    consumer.Item1.Cancel();
+                    await consumer.Item2.CloseAsync();
+                }
+                        
+            }
+            else
+            {
+                if(
+                    _rabbitMqService.OutputConnections.TryRemove(connectionDeleteDto.Path, out var connection)
+                    )
+                {
+                    if (connection.Id != connectionDeleteDto.Id)
+                    {
+                        _logger.LogInformation(
+                            "Невозможная ситуация, удаляем по одинаковому пути {path}, но Id разные {myId}!={deleteId}",
+                            connectionDeleteDto.Path,
+                            connection.Id,
+                            connectionDeleteDto.Id);
+
+                        _rabbitMqService.InputConnections.AddOrUpdate(connectionDeleteDto.Path, connection, (_, _) => connection);
+
+                        await SendMessage(new()
+                        {
+                            StatusDto = new()
+                            {
+                                Status = false,
+                                Data = "ID MISMATCH"
+                            }
+                        },
+                        cancellationToken);
+
+                        return;
+                    }
+
+                    _logger.LogInformation("Выходное подключене {path} было удалено ", connectionDeleteDto.Path);
+                }
+            }
+
+            
         }
 
         protected async Task LoadConnections(CancellationToken cancellationToken)

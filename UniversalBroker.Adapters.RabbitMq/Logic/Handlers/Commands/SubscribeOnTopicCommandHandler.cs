@@ -38,19 +38,26 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
                 _rabbitMqService.InputConnections.AddOrUpdate(request.Connection.Path, request.Connection, (key, old)=>request.Connection);
 
                 if(_rabbitMqService.Consumers.TryGetValue(request.Connection.Path, out var removedConcumer))
-                        removedConcumer.Cancel();
+                {
+                    removedConcumer.Item1.Cancel();
+                    await removedConcumer.Item2.CloseAsync();
+                }
+                        
 
                 // Создаём канал
                 var connection = _rabbitMqService.GetConnection!;
 
                 var tokenSource = new CancellationTokenSource();
 
-                _rabbitMqService.Consumers.AddOrUpdate(request.Connection.Path, tokenSource, (key, oldT)=>{
-                    oldT.Cancel();
-                    return tokenSource;
-                });
+                
 
                 var channel = await connection.CreateChannelAsync(cancellationToken: tokenSource.Token);
+
+                _rabbitMqService.Consumers.AddOrUpdate(request.Connection.Path, (tokenSource,channel), (key, oldT) => {
+                    oldT.Item1.Cancel();
+                    oldT.Item2.CloseAsync().Wait();
+                    return (tokenSource, channel);
+                });
 
                 var queueConfig = request.Connection.Attributes.GetModelFromAttributes<QueueConfiguration>();
 
@@ -114,7 +121,8 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
                 await channel.BasicConsumeAsync(
                     request.Connection.Path, 
                     autoAck: false, //Модель общения асинхронная, но нам нужно слать подтверждения, чтобы избежать проблем
-                    consumer: consumer);
+                    consumer: consumer,
+                    cancellationToken:cancellationToken);
             }
             catch (Exception ex) 
             {

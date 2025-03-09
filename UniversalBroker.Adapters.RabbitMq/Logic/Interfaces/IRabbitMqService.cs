@@ -12,7 +12,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Interfaces
 
         ConcurrentDictionary<string, ConnectionDto> InputConnections { get; }
 
-        ConcurrentDictionary<string, CancellationTokenSource> Consumers { get; }
+        ConcurrentDictionary<string, (CancellationTokenSource, IChannel)> Consumers { get; }
 
         ConcurrentDictionary<string, ConnectionDto> OutputConnections { get; }
 

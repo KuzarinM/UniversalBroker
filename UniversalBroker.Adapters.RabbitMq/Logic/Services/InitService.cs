@@ -1,4 +1,8 @@
 ﻿
+using Microsoft.Extensions.Options;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using UniversalBroker.Adapters.RabbitMq.Configurations;
 using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
 
 namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
@@ -20,6 +24,15 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             _ = Task.Run( async() =>
             {
+                var serverHost = _serviceProvider.GetService<IOptions<BaseConfiguration>>();
+
+                while (!cancellationToken.IsCancellationRequested) 
+                {
+                    if (PingHost(serverHost.Value.CoreBaseUrl))
+                        break;
+                    await Task.Delay(200);
+                }
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     _cancellationTokenSource.Cancel();
@@ -43,6 +56,29 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             _cancellationTokenSource.Cancel();
             _mainService = null;
             return Task.CompletedTask;
+        }
+
+        private bool PingHost(string nameOrAddress)
+        {
+            try
+            {
+                var rawAddres = nameOrAddress.Split("://").Last().Split("/").First();
+
+                var parts = rawAddres.Split(":");
+
+                var host = parts[0];
+
+                var portStr = parts.Length == 1? (nameOrAddress.StartsWith("https")?"443":"80") : parts[1];
+
+                var port = int.TryParse(portStr, out var value) ? value : 80;
+
+                using (var client = new TcpClient(host, port))
+                    return true;
+            }
+            catch (SocketException ex)
+            {
+                return false;
+            }
         }
     }
 }

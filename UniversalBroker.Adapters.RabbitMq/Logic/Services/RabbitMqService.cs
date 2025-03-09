@@ -33,7 +33,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         public ConcurrentDictionary<string, ConnectionDto> InputConnections { get; private set; } = new();
 
-        public ConcurrentDictionary<string, CancellationTokenSource> Consumers { get; private set; } = new();
+        public ConcurrentDictionary<string, (CancellationTokenSource, IChannel)> Consumers { get; private set; } = new();
 
         public ConcurrentDictionary<string, ConnectionDto> OutputConnections { get; private set; } = new();
 
@@ -47,7 +47,8 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
                 foreach (var item in Consumers.Values)
                 {
-                    item.Cancel();
+                    item.Item1.Cancel();
+                    await item.Item2.CloseAsync();
                 }
 
                 needResubscribe = true;

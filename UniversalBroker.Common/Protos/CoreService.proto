@@ -14,11 +14,12 @@ service CoreService{
 		option (google.api.http) = {post: "/v1/gRPC/CoreService/Init"};
 	};
 
-	// Основная двухсторонняя коммуникация будет происходит тут
+	// Основная коммуникация от ядра будет происходит тут
 	rpc Connect(CommunicationSmallDto) returns (stream CoreMessage){
 		option (google.api.http) = {post: "/v1/gRPC/CoreService/Connect"};
 	};
 
+	// Основная коммуникация в ядро
 	rpc SendAdapterMessage(AdapterMessage) returns (StatusDto){
 		option (google.api.http) = {post: "/v1/gRPC/CoreService/SendAdapterMessage"};
 	}
@@ -47,6 +48,7 @@ message CoreMessage{
 		CommunicationFullDto Config = 2;
 		ConnectionDto Connection = 3;
 		MessageDto Message = 4;
+		ConnectionDeleteDto DeletedConnection = 5;
 	}
 }
 
@@ -95,10 +97,18 @@ message CommunicationFullDto {
 
 // Сообщение, которое приходит при создании Поделючения
 message ConnectionDto{
-	string Name = 1;
+	string Id = 1;
+	string Name = 2;
+	string Path = 3;
+	bool isInput = 4;
+	repeated AttributeDto Attributes = 5;
+}
+
+//сообщение на удаление Соединения
+message ConnectionDeleteDto{
+	string Id = 1;
 	string Path = 2;
 	bool isInput = 3;
-	repeated AttributeDto Attributes = 4;
 }
 
 // Модель самого пересылаемого сообщения
