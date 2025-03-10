@@ -55,8 +55,6 @@ namespace UniversalBroker.Adapters.Scheduler.Logic.Services
             _ = Task.Run(() => StartStatusCheker(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartLifesignChecker(CancellationTokenSource), CancellationTokenSource.Token);
 
-            await HandleConfigMessage(_myCommunication, CancellationTokenSource.Token);
-
             await LoadConnections(CancellationTokenSource.Token);
 
             return _processSemaphore;

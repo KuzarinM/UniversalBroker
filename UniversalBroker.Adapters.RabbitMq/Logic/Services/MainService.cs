@@ -53,11 +53,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             _responseStream = streams.ResponseStream;
 
+            await HandleConfigMessage(_myCommunication, CancellationTokenSource.Token);
+
             _ = Task.Run(() => ListenMessages(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartStatusCheker(CancellationTokenSource.Token), CancellationTokenSource.Token);
             _ = Task.Run(() => StartLifesignChecker(CancellationTokenSource), CancellationTokenSource.Token);
-
-            await HandleConfigMessage(_myCommunication, CancellationTokenSource.Token);
 
             await LoadConnections(CancellationTokenSource.Token);
 
@@ -96,6 +96,22 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                 if(SiliensInterval.TotalSeconds > (_adapterConfig.TimeToLiveSeconds * 1.25))
                 {
                     _logger.LogWarning("Тест жизнеспособности провален, отключаемся");
+
+                    if (_myCommunication != null)
+                    {
+                        try
+                        {
+                            await _coreService.DisconnectAsync(new()
+                            {
+                                Id = _myCommunication.Id
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Ошибка при дисконнекте");
+                        }
+                    }
+
                     await CancellationTokenSource.CancelAsync();
                     _processSemaphore.Release();
                     break;
