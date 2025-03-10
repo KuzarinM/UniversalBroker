@@ -1,30 +1,26 @@
-﻿using Google.Rpc;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MediatR;
 using Microsoft.Extensions.Options;
 using Protos;
-using RabbitMQ.Client;
-using System.Threading;
-using UniversalBroker.Adapters.RabbitMq.Configurations;
-using UniversalBroker.Adapters.RabbitMq.Extentions;
-using UniversalBroker.Adapters.RabbitMq.Logic.Interfaces;
-using UniversalBroker.Adapters.RabbitMq.Models.Commands;
+using UniversalBroker.Adapters.Scheduler.Configurations;
+using UniversalBroker.Adapters.Scheduler.Extentions;
+using UniversalBroker.Adapters.Scheduler.Logic.Interfaces;
+using UniversalBroker.Adapters.Scheduler.Models.Commands;
 using static Protos.CoreService;
 
-namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
+namespace UniversalBroker.Adapters.Scheduler.Logic.Services
 {
     public class MainService(
         ILogger<MainService> logger,
         IMediator mediator,
         CoreServiceClient coreService,
-        IRabbitMqService rabbitMqService,
         IOptions<BaseConfiguration> options,
-        IOptions<AdapterConfiguration> adapterConfig) : IMainService
+        IOptions<AdapterConfiguration> adapterConfig)
+        : IMainService
     {
         protected readonly ILogger _logger = logger;
         protected readonly IMediator _mediator = mediator;
         protected readonly CoreServiceClient _coreService = coreService;
-        protected readonly IRabbitMqService _rabbitMqService = rabbitMqService;
         protected readonly BaseConfiguration _baseConfig = options.Value;
         protected readonly AdapterConfiguration _adapterConfig = adapterConfig.Value;
 
@@ -93,11 +89,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                if(SiliensInterval.TotalSeconds > (_adapterConfig.TimeToLiveSeconds * 1.25))
+                if (SiliensInterval.TotalSeconds > (_adapterConfig.TimeToLiveSeconds * 1.25))
                 {
                     _logger.LogWarning("Тест жизнеспособности провален, отключаемся");
 
-                    if (_myCommunication != null)
+                    if(_myCommunication != null)
                     {
                         try
                         {
@@ -111,7 +107,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
                             _logger.LogError(ex, "Ошибка при дисконнекте");
                         }
                     }
-
+                    
                     await CancellationTokenSource.CancelAsync();
                     _processSemaphore.Release();
                     break;
@@ -203,7 +199,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         protected async Task HandleDataMessage(MessageDto dataMessage, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new PublishToTopicCommand()
+            var res = await _mediator.Send(new RestartSchedulerCommand()
             {
                 Message = dataMessage,
             });
@@ -213,25 +209,26 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
         {
             if (connectionDto.IsInput)
             {
-                await _mediator.Send(new SubscribeOnTopicCommand()
+                var res = await _mediator.Send(new AddOrUpdateSchedulerCommand()
                 {
                     Connection = connectionDto,
                 });
             }
             else
             {
-                _rabbitMqService.OutputConnections.AddOrUpdate(connectionDto.Path, connectionDto, (_, _) => connectionDto);
+                _logger.LogInformation("Создание виртуального выходного подключения для сброса таймеров");
             }
+
         }
 
         protected async Task HandleConfigMessage(CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)
         {
             _myCommunication = communicationFullDto;
 
-            if(_baseConfig.AdapterName != _myCommunication.Name)
+            if (_baseConfig.AdapterName != _myCommunication.Name)
                 _baseConfig.AdapterName = _myCommunication.Name;
 
-            if(_baseConfig.AdapterDescription != _myCommunication.Description)
+            if (_baseConfig.AdapterDescription != _myCommunication.Description)
                 _baseConfig.AdapterDescription = _myCommunication.Description;
 
             bool needUpdate = false;
@@ -240,19 +237,7 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
             // todo тут можно понять, обновилось ли у нас что-то
 
-            needUpdate = _adapterConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
-
-            // Пытаемся сконфигурировать RabbitMQ
-            updatedCount = _rabbitMqService.GetConnectionConfig.SetValueFromAttributes(_myCommunication.Attributes);
-
-            if(updatedCount > 0)
-            {
-                // Если какие-то параметры уже есть, давайте коннектится
-                await _rabbitMqService.ConnectAsync(cancellationToken);
-            }
-
-            // В любом случае, вдруг что-то там такое интересное забыли
-            needUpdate |= _rabbitMqService.GetConnectionConfig.GetAttributesFromModel(_myCommunication.Attributes) > 0;
+            needUpdate = _adapterConfig.GetAttributesFromModel(_myCommunication.Attributes, false) > 0;
 
             if (needUpdate)
                 await SendMessage(new()
@@ -264,77 +249,11 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
 
         protected async Task HandleDeleteConnectionMessage(ConnectionDeleteDto connectionDeleteDto, CancellationToken cancellationToken)
         {
-            if (connectionDeleteDto.IsInput)
+            var res = _mediator.Send(new DisableSchedulerCommand()
             {
-                if (
-                    _rabbitMqService.InputConnections.TryRemove(connectionDeleteDto.Path, out var connection) &&
-                    _rabbitMqService.Consumers.TryRemove(connectionDeleteDto.Path, out var consumer)
-                    )
-                {
-                    if(connection.Id != connectionDeleteDto.Id)
-                    {
-                        _logger.LogInformation(
-                            "Невозможная ситуация, удаляем по одинаковому пути {path}, но Id разные {myId}!={deleteId}", 
-                            connectionDeleteDto.Path,
-                            connection.Id,
-                            connectionDeleteDto.Id);
-
-                        _rabbitMqService.InputConnections.AddOrUpdate(connectionDeleteDto.Path, connection, (_, _) => connection);
-                        _rabbitMqService.Consumers.AddOrUpdate(connectionDeleteDto.Path, consumer, (_, _) => consumer);
-
-                        await SendMessage(new()
-                        {
-                            StatusDto = new()
-                            {
-                                Status = false,
-                                Data = "ID MISMATCH"
-                            }
-                        },
-                        cancellationToken);
-
-                        return;
-                    }
-
-                    _logger.LogInformation("Входное подключене {path} было удалено ",connectionDeleteDto.Path);
-                    consumer.Item1.Cancel();
-                    await consumer.Item2.CloseAsync();
-                }
-                        
-            }
-            else
-            {
-                if(
-                    _rabbitMqService.OutputConnections.TryRemove(connectionDeleteDto.Path, out var connection)
-                    )
-                {
-                    if (connection.Id != connectionDeleteDto.Id)
-                    {
-                        _logger.LogInformation(
-                            "Невозможная ситуация, удаляем по одинаковому пути {path}, но Id разные {myId}!={deleteId}",
-                            connectionDeleteDto.Path,
-                            connection.Id,
-                            connectionDeleteDto.Id);
-
-                        _rabbitMqService.InputConnections.AddOrUpdate(connectionDeleteDto.Path, connection, (_, _) => connection);
-
-                        await SendMessage(new()
-                        {
-                            StatusDto = new()
-                            {
-                                Status = false,
-                                Data = "ID MISMATCH"
-                            }
-                        },
-                        cancellationToken);
-
-                        return;
-                    }
-
-                    _logger.LogInformation("Выходное подключене {path} было удалено ", connectionDeleteDto.Path);
-                }
-            }
-
-            
+                ConnectionId = connectionDeleteDto.Id,
+                Path = connectionDeleteDto.Path,
+            });
         }
 
         protected async Task LoadConnections(CancellationToken cancellationToken)
@@ -380,30 +299,6 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Services
             cancellationToken);
         }
 
-        protected async Task<bool> GetOrUpdateAttribute(string attributeName, Func<BaseConfiguration,Task<string>> getter, Func<BaseConfiguration, string, Task> setter)
-        {
-            if (_myCommunication == null)
-                return false;
-
-            var Header = _myCommunication.Attributes.FirstOrDefault(x => x.Name == attributeName);
-            if (Header == null)
-            {
-                _myCommunication.Attributes.Add(new AttributeDto()
-                {
-                    Name = attributeName,
-                    Value = await getter(_baseConfig)
-                });
-
-                return true;
-            }
-            else if (Header.Value != await getter(_baseConfig))
-            {
-                await setter(_baseConfig, Header.Value);
-            }
-
-            return false;
-        }
-        
         /// <summary>
         ///  Отправка ядру сообщения по установленному каналу связи
         /// </summary>
