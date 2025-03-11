@@ -5,6 +5,7 @@ using Protos;
 using UniversalBroker.Adapters.Tcp.Configurations;
 using UniversalBroker.Adapters.Tcp.Extentions;
 using UniversalBroker.Adapters.Tcp.Logic.Interfaces;
+using UniversalBroker.Adapters.Tcp.Models.Commands;
 using static Protos.CoreService;
 
 namespace UniversalBroker.Adapters.Tcp.Logic.Services
@@ -198,7 +199,7 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
 
         protected async Task HandleDataMessage(MessageDto dataMessage, CancellationToken cancellationToken)
         {
-            var res = await _mediator.Send(new RestartSchedulerCommand()
+            var res = await _mediator.Send(new SendMessageCommand()
             {
                 Message = dataMessage,
             });
@@ -206,18 +207,22 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
 
         protected async Task HandleConnectionMessage(ConnectionDto connectionDto, CancellationToken cancellationToken)
         {
-            if (connectionDto.IsInput)
+            var tcpConfig = connectionDto.Attributes.GetModelFromAttributes<TcpConfiguration>();
+
+            if (tcpConfig.IsClient)
             {
-                var res = await _mediator.Send(new AddOrUpdateSchedulerCommand()
+                var res = await _mediator.Send(new AddOrUpdateClientCommand()
                 {
-                    Connection = connectionDto,
+                    ConnectionDto = connectionDto,
                 });
             }
             else
             {
-                _logger.LogInformation("Создание виртуального выходного подключения для сброса таймеров");
+                var res = await _mediator.Send(new AddOrUpdateServerCommand()
+                {
+                    ConnectionDto = connectionDto,
+                });
             }
-
         }
 
         protected async Task HandleConfigMessage(CommunicationFullDto communicationFullDto, CancellationToken cancellationToken)
@@ -248,11 +253,11 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
 
         protected async Task HandleDeleteConnectionMessage(ConnectionDeleteDto connectionDeleteDto, CancellationToken cancellationToken)
         {
-            var res = _mediator.Send(new DisableSchedulerCommand()
-            {
-                ConnectionId = connectionDeleteDto.Id,
-                Path = connectionDeleteDto.Path,
-            });
+            //var res = _mediator.Send(new DisableSchedulerCommand()
+            //{
+            //    ConnectionId = connectionDeleteDto.Id,
+            //    Path = connectionDeleteDto.Path,
+            //});
         }
 
         protected async Task LoadConnections(CancellationToken cancellationToken)

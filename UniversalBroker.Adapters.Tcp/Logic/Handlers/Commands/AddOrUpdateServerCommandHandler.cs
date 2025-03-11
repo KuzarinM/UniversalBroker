@@ -31,6 +31,18 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
                     // Перезапускать смысла нет, достаточно просто обновить конфиги и всё
                     serverModel.TcpConfiguration.SetValueFromAttributes(request.ConnectionDto.Attributes);
 
+                    if(!serverModel.Connection.IsInput && request.ConnectionDto.IsInput)
+                    {
+                        foreach (var item in serverModel.Clients)
+                        {
+                            item.StartListen();
+                        }
+                    }
+
+                    request.ConnectionDto.IsInput = request.ConnectionDto.IsInput || serverModel.Connection.IsInput;
+
+                    serverModel.Connection = request.ConnectionDto;
+
                     return true;
                 }
 

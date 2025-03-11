@@ -34,13 +34,14 @@ namespace UniversalBroker.Adapters.Tcp.Extentions
         public static IServiceCollection AddSingletons(this IServiceCollection services)
         {
             services.AddSingleton<IInitService, InitService>();
-            services.AddSingleton<ISchedulerManager, SchedulerManager>();
+            services.AddSingleton<TcpManager>();
             return services;
         }
 
         public static IServiceCollection AddScopeds(this IServiceCollection services)
         {
             services.AddScoped<IMainService, MainService>();
+            services.AddScoped<TcpClientService>();
             return services;
         }
 

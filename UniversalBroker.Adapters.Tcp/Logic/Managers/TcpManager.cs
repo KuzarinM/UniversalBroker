@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using UniversalBroker.Adapters.Tcp.Configurations;
 using UniversalBroker.Adapters.Tcp.Logic.Services;
 using UniversalBroker.Adapters.Tcp.Models.Internal;
 
@@ -17,13 +18,13 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
 
         private readonly ConcurrentDictionary<Task<TcpClient>, TcpServerModel> _tcpListeners = new();
         private readonly ConcurrentDictionary<string, TcpServerModel> _tcpServers = new();
-
-        private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeServers;
+        private readonly ConcurrentDictionary<string, TcpClientModel> _tcpClients = new();
 
         private CancellationTokenSource _stopListeningTokenSource = new();
 
         public ConcurrentDictionary<Task<TcpClient>, TcpServerModel> GetTcpListeners => _tcpListeners;
         public ConcurrentDictionary<string, TcpServerModel> GetTcpServers => _tcpServers;
+        public ConcurrentDictionary<string, TcpClientModel> GetTcpClients => _tcpClients;
 
         public async Task RestartListeners()
         {
@@ -31,7 +32,16 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
 
             _stopListeningTokenSource = new();
 
-            await StartServerListening();
+            _= Task.Run(()=>StartServerListening());
+        }
+
+        public async Task<TcpClientService> StartService(TcpClient client, TcpConfiguration tcpConfiguration, string path, bool needRead = true )
+        {
+            var clientService = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<TcpClientService>();
+
+            await clientService.StartWork(client, tcpConfiguration, path, needRead);
+
+            return clientService;
         }
 
         private async Task StartServerListening()
@@ -51,11 +61,9 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
 
                 var serverModel = _tcpListeners[tcpClientTask];
 
-                var clientService = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<TcpClientService>();
+                var clientService = await StartService(tcpClientTask.Result, serverModel.TcpConfiguration, serverModel.Connection.Path, serverModel.Connection.IsInput);
 
                 serverModel.Clients.Add(clientService);
-
-                await clientService.StartWork(tcpClientTask.Result, serverModel.TcpConfiguration, serverModel.Connection.Path);
 
                 _tcpListeners.TryRemove(tcpClientTask, out _);
 

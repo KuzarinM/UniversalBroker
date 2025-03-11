@@ -22,16 +22,28 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly List<byte> _buffer = new();
         protected SemaphoreSlim SendSemaphore = new(1, 1);
+        private bool _listening = false;
 
         private TcpConfiguration _tcpConfiguration { get; set; }
         private string _path {  get; set; }
         private TcpClient _tcpClient { get; set; }
 
-        public async Task StartWork(TcpClient tcpClient, TcpConfiguration tcpConfiguration, string path)
+        public async Task StartWork(TcpClient tcpClient, TcpConfiguration tcpConfiguration, string path, bool needRead = true)
         {
             _tcpClient = tcpClient;
             _tcpConfiguration = tcpConfiguration;
+            _path = path;
 
+            if (needRead)
+                StartListen();
+        }
+
+        public void StartListen()
+        {
+            if (_listening)
+                return;
+
+            _listening = true;
             _ = Task.Run(ListenMessages, _cancellationTokenSource.Token);
         }
 
@@ -51,6 +63,11 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
             }
             catch (IOException)
             {
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.LogWarning("Клиент разорвал подключение, расходимся");
                 return false;
             }
             finally
