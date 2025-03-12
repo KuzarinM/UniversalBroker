@@ -13,6 +13,7 @@ using System;
 using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Logic.Managers;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace UniversalBroker.Core.Extentions
 {
@@ -71,10 +72,12 @@ namespace UniversalBroker.Core.Extentions
 
         public static IServiceCollection AddDatabase(this IServiceCollection services)
         {
-            services.AddDbContextPool<BrockerContext>(cfg =>
+            services.AddDbContext<BrockerContext>(cfg =>
             {
                 cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.254.121");
-            });
+                cfg.EnableServiceProviderCaching();
+            }, ServiceLifetime.Transient);
+
             return services;
         }
 
