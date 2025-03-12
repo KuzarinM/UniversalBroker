@@ -2,7 +2,6 @@
 const ApiMixines = {
     data(){
         return {
-            _baseUrl:"",
             _token:""
         }
     },

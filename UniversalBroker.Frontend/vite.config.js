@@ -6,11 +6,12 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
+      // Проксируем все запросы с таким вот префиксом
       '^/proxy/.*': {
-        target: 'https://localhost:7071',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/proxy/, '')
+        target: 'https://localhost:7071', // Целевой url
+        changeOrigin: true, // меняем origin. Возможно оно нам надо
+        secure: false, // Отключаем проверки сертификата
+        rewrite: (path) => path.replace(/^\/proxy/, '') // Вырезаем слово proxy
       }
     }
   }
