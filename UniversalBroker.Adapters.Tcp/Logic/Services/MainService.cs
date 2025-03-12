@@ -253,11 +253,19 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
 
         protected async Task HandleDeleteConnectionMessage(ConnectionDeleteDto connectionDeleteDto, CancellationToken cancellationToken)
         {
-            //var res = _mediator.Send(new DisableSchedulerCommand()
-            //{
-            //    ConnectionId = connectionDeleteDto.Id,
-            //    Path = connectionDeleteDto.Path,
-            //});
+            var res = _mediator.Send(new RemoveClientCommand()
+            {
+                ConnectionId = connectionDeleteDto.Id,
+                Path = connectionDeleteDto.Path,
+                IsInput = connectionDeleteDto.IsInput,
+            });
+
+            res = _mediator.Send(new RemoveServerCommand()
+            {
+                ConnectionId = connectionDeleteDto.Id,
+                Path = connectionDeleteDto.Path,
+                IsInput = connectionDeleteDto.IsInput,
+            });
         }
 
         protected async Task LoadConnections(CancellationToken cancellationToken)

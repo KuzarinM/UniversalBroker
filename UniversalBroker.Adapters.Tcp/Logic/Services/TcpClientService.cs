@@ -5,21 +5,26 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using UniversalBroker.Adapters.Tcp.Configurations;
 using UniversalBroker.Adapters.Tcp.Extentions;
 using UniversalBroker.Adapters.Tcp.Logic.Interfaces;
+using UniversalBroker.Adapters.Tcp.Models.Commands;
 using UniversalBroker.Adapters.Tcp.Models.Internal;
 
 namespace UniversalBroker.Adapters.Tcp.Logic.Services
 {
     public class TcpClientService(
         ILogger<TcpClientService> logger, 
-        IInitService initService
+        IInitService initService,
+        IMediator mediator
         )
     {
         private readonly ILogger _logger = logger;
         private readonly IInitService _initService = initService;
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
+        private readonly IMediator _mediator = mediator;
+
+        private CancellationTokenSource _cancellationTokenSource = new();
         private readonly List<byte> _buffer = new();
         protected SemaphoreSlim SendSemaphore = new(1, 1);
         private bool _listening = false;
@@ -47,9 +52,28 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
             _ = Task.Run(ListenMessages, _cancellationTokenSource.Token);
         }
 
+        public void StopListen() 
+        {
+            if(_listening) 
+                _cancellationTokenSource.Cancel();
+
+            _cancellationTokenSource = new();
+            _listening = false;
+        }
+
         public async Task StopWork()
         {
             await _cancellationTokenSource.CancelAsync();
+
+            try
+            {
+                _tcpClient.Close();
+                _tcpClient.Dispose();
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Ошика при отключение клиента");
+            }
         }
 
         public async Task<bool> SendMessage(List<byte> message)
@@ -68,6 +92,11 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
             catch (InvalidOperationException)
             {
                 _logger.LogWarning("Клиент разорвал подключение, расходимся");
+                await _mediator.Send(new ClientDisconectCommand()
+                {
+                    Client = this,
+                    Path = _path
+                });
                 return false;
             }
             finally
@@ -88,6 +117,16 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
 
                         messages.ForEach(async messages => await HandleIncommingMessage(messages));
                     }
+                }
+                catch (InvalidOperationException)
+                {
+                    _logger.LogWarning("Клиент разорвал подключение, расходимся");
+                    await _mediator.Send(new ClientDisconectCommand()
+                    {
+                        Client = this,
+                        Path = _path
+                    });
+                    return;
                 }
                 catch (Exception ex) 
                 {

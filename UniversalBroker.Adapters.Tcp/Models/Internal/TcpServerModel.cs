@@ -8,7 +8,8 @@ namespace UniversalBroker.Adapters.Tcp.Models.Internal
 {
     public class TcpServerModel
     {
-        public ConnectionDto Connection { get; set; }
+        public ConnectionDto? InConnection { get; set; }
+        public ConnectionDto? OutConnection { get; set; }
 
         public TcpListener TcpListener { get; set; }
 
@@ -16,6 +17,6 @@ namespace UniversalBroker.Adapters.Tcp.Models.Internal
 
         public Task<TcpClient> ReceiveClientTask { get; set; }
 
-        public ConcurrentBag<TcpClientService> Clients { get; set; } = new();
+        public List<TcpClientService> Clients { get; set; } = new();
     }
 }

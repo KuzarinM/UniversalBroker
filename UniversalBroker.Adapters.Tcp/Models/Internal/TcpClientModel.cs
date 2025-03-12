@@ -8,7 +8,8 @@ namespace UniversalBroker.Adapters.Tcp.Models.Internal
 {
     public class TcpClientModel
     {
-        public ConnectionDto Connection { get; set; }
+        public ConnectionDto? InConnection { get; set; }
+        public ConnectionDto? OutConnection { get; set; }
 
         public TcpConfiguration TcpConfiguration { get; set; }
 

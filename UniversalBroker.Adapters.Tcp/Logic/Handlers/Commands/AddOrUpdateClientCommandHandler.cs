@@ -28,13 +28,23 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
             {
                 if (_tcpManager.GetTcpClients.TryGetValue(request.ConnectionDto.Path, out var clientModel))
                 {
-                    // Перезапускать смысла нет, достаточно просто обновить конфиги и всё
+                    // Обновляем конфиги
+                    if (request.ConnectionDto.IsInput)
+                    {
+                        if(clientModel.InConnection == null)
+                        {
+                            clientModel.InConnection = request.ConnectionDto;
+                            clientModel.Client.StartListen(); // Если раньше не слушали, то можем начать
+                        }
+                        else
+                            clientModel.InConnection = request.ConnectionDto;
+                    }
+                    else
+                    {
+                       clientModel.OutConnection = request.ConnectionDto;
+                    }
+
                     clientModel.TcpConfiguration.SetValueFromAttributes(request.ConnectionDto.Attributes);
-
-                    if (!clientModel.Connection.IsInput && request.ConnectionDto.IsInput)
-                        clientModel.Client.StartListen();
-
-                    clientModel.Connection = request.ConnectionDto;
 
                     return true;
                 }
@@ -52,10 +62,14 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
 
                 var model = new TcpClientModel()
                 {
-                    Connection = request.ConnectionDto,
                     TcpConfiguration = tcpConfig,
                     Client = service!
                 };
+
+                if (request.ConnectionDto.IsInput)
+                    model.InConnection = request.ConnectionDto;
+                else
+                    model.OutConnection = request.ConnectionDto;
 
                 _tcpManager.GetTcpClients.AddOrUpdate(request.ConnectionDto.Path, model, (_, old) =>
                 {

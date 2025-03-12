@@ -28,20 +28,25 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
             {
                 if(_tcpManager.GetTcpServers.TryGetValue(request.ConnectionDto.Path, out var serverModel))
                 {
-                    // Перезапускать смысла нет, достаточно просто обновить конфиги и всё
-                    serverModel.TcpConfiguration.SetValueFromAttributes(request.ConnectionDto.Attributes);
-
-                    if(!serverModel.Connection.IsInput && request.ConnectionDto.IsInput)
+                    // Обновляем конфиги
+                    if (request.ConnectionDto.IsInput)
                     {
-                        foreach (var item in serverModel.Clients)
+                        if (serverModel.InConnection == null)
                         {
-                            item.StartListen();
+                            serverModel.InConnection = request.ConnectionDto;
+                            // Если раньше не слушали, то можем начать
+                            foreach (var item in serverModel.Clients)
+                            {
+                                item.StartListen();
+                            }
                         }
+                        else
+                            serverModel.InConnection = request.ConnectionDto;
                     }
-
-                    request.ConnectionDto.IsInput = request.ConnectionDto.IsInput || serverModel.Connection.IsInput;
-
-                    serverModel.Connection = request.ConnectionDto;
+                    else
+                    {
+                        serverModel.OutConnection = request.ConnectionDto;
+                    }
 
                     return true;
                 }
@@ -58,11 +63,15 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
 
                 var model = new TcpServerModel()
                 {
-                    Connection = request.ConnectionDto,
                     TcpListener = tcpListener,
                     ReceiveClientTask = tcpListener.AcceptTcpClientAsync(),
                     TcpConfiguration = tcpConfig
                 };
+
+                if (request.ConnectionDto.IsInput)
+                    model.InConnection = request.ConnectionDto; // Тут запускать случшателей не у кого, так как сервак ещй не поднят
+                else
+                    model.OutConnection = request.ConnectionDto;
 
                 _tcpManager.GetTcpServers.AddOrUpdate(request.ConnectionDto.Path, model, (_, old) =>
                 {
@@ -75,7 +84,7 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
 
                 _tcpManager.GetTcpListeners.AddOrUpdate(model.ReceiveClientTask, model, (_, _) => model);
 
-                await _tcpManager.RestartListeners();
+                await _tcpManager.RestartListeners(); // Вот тут сервак поднят
 
                 return true;
             }

@@ -61,7 +61,9 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
 
                 var serverModel = _tcpListeners[tcpClientTask];
 
-                var clientService = await StartService(tcpClientTask.Result, serverModel.TcpConfiguration, serverModel.Connection.Path, serverModel.Connection.IsInput);
+                var path = serverModel.InConnection?.Path ?? serverModel.OutConnection!.Path;
+
+                var clientService = await StartService(tcpClientTask.Result, serverModel.TcpConfiguration, path, serverModel.InConnection != null);
 
                 serverModel.Clients.Add(clientService);
 
