@@ -18,7 +18,7 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Services
         ILogger<TcpClientService> logger, 
         IInitService initService,
         IMediator mediator
-        )
+        ): ITcpClientService
     {
         private readonly ILogger _logger = logger;
         private readonly IInitService _initService = initService;

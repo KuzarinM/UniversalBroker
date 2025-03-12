@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using UniversalBroker.Adapters.Tcp.Configurations;
+using UniversalBroker.Adapters.Tcp.Logic.Interfaces;
 using UniversalBroker.Adapters.Tcp.Logic.Services;
 using UniversalBroker.Adapters.Tcp.Models.Internal;
 
@@ -11,7 +12,7 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
     public class TcpManager(
         ILogger<TcpManager> logger,
         IServiceProvider serviceProvider
-        )
+        ): ITcpManager
     {
         private readonly ILogger _logger = logger;
         private readonly IServiceProvider _serviceProvider = serviceProvider;
@@ -23,7 +24,9 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
         private CancellationTokenSource _stopListeningTokenSource = new();
 
         public ConcurrentDictionary<Task<TcpClient>, TcpServerModel> GetTcpListeners => _tcpListeners;
+
         public ConcurrentDictionary<string, TcpServerModel> GetTcpServers => _tcpServers;
+
         public ConcurrentDictionary<string, TcpClientModel> GetTcpClients => _tcpClients;
 
         public async Task RestartListeners()
@@ -35,9 +38,9 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Managers
             _= Task.Run(()=>StartServerListening());
         }
 
-        public async Task<TcpClientService> StartService(TcpClient client, TcpConfiguration tcpConfiguration, string path, bool needRead = true )
+        public async Task<ITcpClientService> StartService(TcpClient client, TcpConfiguration tcpConfiguration, string path, bool needRead = true )
         {
-            var clientService = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<TcpClientService>();
+            var clientService = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<ITcpClientService>();
 
             await clientService.StartWork(client, tcpConfiguration, path, needRead);
 

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using System.Net.Sockets;
+using UniversalBroker.Adapters.Tcp.Logic.Interfaces;
 using UniversalBroker.Adapters.Tcp.Logic.Managers;
 using UniversalBroker.Adapters.Tcp.Models.Commands;
 
@@ -7,11 +8,11 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
 {
     public class ClientDisconectCommandHandler(
         ILogger<ClientDisconectCommandHandler> logger,
-        TcpManager tcpManager
+        ITcpManager tcpManager
         ) : IRequestHandler<ClientDisconectCommand>
     {
         private readonly ILogger _logger = logger;
-        private readonly TcpManager _tcpManager = tcpManager;
+        private readonly ITcpManager _tcpManager = tcpManager;
 
         public async Task Handle(ClientDisconectCommand request, CancellationToken cancellationToken)
         {

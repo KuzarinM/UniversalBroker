@@ -8,12 +8,12 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
     public class RemoveClientCommandHandler(
         ILogger<RemoveClientCommandHandler> logger, 
         IInitService initService,
-        TcpManager tcpManager
+        ITcpManager tcpManager
         ) : IRequestHandler<RemoveClientCommand, bool>
     {
         private readonly ILogger _logger = logger;
         private readonly IInitService _initService = initService;
-        private readonly TcpManager _tcpManager = tcpManager;
+        private readonly ITcpManager _tcpManager = tcpManager;
 
         public async Task<bool> Handle(RemoveClientCommand request, CancellationToken cancellationToken)
         {

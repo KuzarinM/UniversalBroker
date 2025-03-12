@@ -13,13 +13,13 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
     public class AddOrUpdateClientCommandHandler(
         ILogger<AddOrUpdateServerCommandHandler> logger,
         IMediator mediator, 
-        TcpManager tcpManager,
+        ITcpManager tcpManager,
         IInitService initService
         ) : IRequestHandler<AddOrUpdateClientCommand, bool>
     { 
         private readonly ILogger _logger = logger;
         private readonly IMediator _mediator = mediator;
-        private readonly TcpManager _tcpManager = tcpManager;
+        private readonly ITcpManager _tcpManager = tcpManager;
         private readonly IInitService _initService = initService;
 
         public async Task<bool> Handle(AddOrUpdateClientCommand request, CancellationToken cancellationToken)

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using UniversalBroker.Adapters.Tcp.Configurations;
+using UniversalBroker.Adapters.Tcp.Logic.Interfaces;
 using UniversalBroker.Adapters.Tcp.Logic.Services;
 
 namespace UniversalBroker.Adapters.Tcp.Models.Internal
@@ -17,6 +18,6 @@ namespace UniversalBroker.Adapters.Tcp.Models.Internal
 
         public Task<TcpClient> ReceiveClientTask { get; set; }
 
-        public List<TcpClientService> Clients { get; set; } = new();
+        public List<ITcpClientService> Clients { get; set; } = new();
     }
 }
