@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Models.Dtos;
 using UniversalBroker.Core.Models.Dtos.Communications;
 using UniversalBroker.Core.Models.Queries.Communications;
 
@@ -18,13 +19,13 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Communication
         ILogger<GetAllCommunicationsQueryHandler> logger,
         IMapper mapper,
         BrockerContext brockerContext
-        ) : IRequestHandler<GetAllCommunicationsQuery, List<CommunicationDto>>
+        ) : IRequestHandler<GetAllCommunicationsQuery, PaginationModel<CommunicationDto>>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _brockerContext = brockerContext;
 
-        public async Task<List<CommunicationDto>> Handle(GetAllCommunicationsQuery request, CancellationToken cancellationToken)
+        public async Task<PaginationModel<CommunicationDto>> Handle(GetAllCommunicationsQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -37,7 +38,20 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Communication
                     .Skip(request.PageNumber * request.PageSize).Take(request.PageSize)
                     .ToListAsync();
 
-                return _mapper.Map<List<CommunicationDto>>(rawList);
+                var totalPages = (await _brockerContext.Communications
+                    .Where(x =>
+                            (!request.Status.HasValue || x.Status == request.Status) &&
+                            (string.IsNullOrEmpty(request.NameSearch) || x.Name.Contains(request.NameSearch))
+                    )
+                    .CountAsync()) * 1f / request.PageSize;
+
+                return new()
+                {
+                    Page = _mapper.Map<List<CommunicationDto>>(rawList),
+                    CurrentPage = request.PageNumber,
+                    PageSize = request.PageSize,
+                    TotalPages = (int)Math.Ceiling(totalPages)
+                };
             }
             catch (Exception ex)
             {

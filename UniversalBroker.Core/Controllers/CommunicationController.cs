@@ -56,6 +56,17 @@ namespace UniversalBroker.Core.Controllers
             });
         }
 
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteCommunication(
+            [FromRoute]
+            Guid id)
+        {
+            return await ControllerSimpleRequest(new DeleteCommunicationCommand()
+            {
+                Id = id
+            });
+        }
+
         [HttpPatch("{id:guid}")]
         public async Task<IActionResult> UpdateCommunicationAttribute(
             [FromRoute]

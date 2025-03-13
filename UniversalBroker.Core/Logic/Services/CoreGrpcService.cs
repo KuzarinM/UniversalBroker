@@ -99,7 +99,7 @@ namespace UniversalBroker.Core.Logic.Services
 
             return new ConnectionsList
             {
-                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes) }
+                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes.Page) }
             };
         }
 
@@ -117,7 +117,7 @@ namespace UniversalBroker.Core.Logic.Services
 
             return new ConnectionsList
             {
-                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes) }
+                Connections = { _mapper.Map<List<ConnectionDto>>(rawRes.Page) }
             };
         }
 

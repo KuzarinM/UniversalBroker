@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      // Проксируем все запросы с таким вот префиксом
+      // Проксируем все запросы с таким вот
       '^/proxy/.*': {
         target: 'https://localhost:7071', // Целевой url
         changeOrigin: true, // меняем origin. Возможно оно нам надо
