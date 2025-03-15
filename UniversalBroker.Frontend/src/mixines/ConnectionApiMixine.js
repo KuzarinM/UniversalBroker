@@ -6,7 +6,7 @@ const ConnectionApiMixine = {
     ],
     methods:{
         async GetConnectionsList(pageSize, pageIndex, communicationId, inputOnly, iearch){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 "/api/Connection", 
                 null, 
@@ -18,46 +18,46 @@ const ConnectionApiMixine = {
                     "inputOnly": inputOnly,
                     "iearch": iearch == null? "" : iearch
                 }
-            );
+            ));
         },
         async CreateConnection(connectionDto){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "POST", 
                 "/api/Connection", 
                 connectionDto, 
                 null, 
                 null
-            );
+            ));
         },
         async GetConnection(id){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "DELETE", 
                 `/api/Connection/${id}`, 
                 null, 
                 null, 
                 null
-            );
+            ));
         },
         async DeleteConnection(id){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "DELETE", 
                 `/api/Connection/${id}`, 
                 null, 
                 null, 
                 null
-            );
+            ));
         },
         async UpdateConnection(id, connectionDto){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "PUT", 
                 `/api/Connection/${id}`, 
                 connectionDto, 
                 null, 
                 null
-            );
+            ));
         },
         async GetMessages(id, pageSize, pageIndex, startInterval, stopInterval){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 `/api/Connection/${id}/messages`, 
                 null, 
@@ -68,7 +68,7 @@ const ConnectionApiMixine = {
                     startInterval: startInterval,
                     stopInterval: stopInterval
                 }
-            );
+            ));
         }
     }
 }

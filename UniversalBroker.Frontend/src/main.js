@@ -1,15 +1,16 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createMemoryHistory, createWebHistory, createRouter } from 'vue-router'
 
 const routes = [
-    // { path: '/', component: HomeView },
+    { path: '/'},
     // { path: '/about', component: AboutView }
   ]
 
 const router = createRouter({
-    history: createMemoryHistory(),
+    //history: createMemoryHistory(),
+    history: createWebHistory(),
     routes
   })
 

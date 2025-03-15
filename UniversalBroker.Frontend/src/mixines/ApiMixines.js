@@ -23,7 +23,7 @@ export default {
             }
                 
             Object.keys(queries).forEach(key => {
-                if (queries[key] === undefined) {
+                if (queries[key] === undefined || queries[key] === null) {
                   delete queries[key];
                 }
               });
@@ -31,6 +31,26 @@ export default {
             var url = `${window.location.origin}/proxy${path}?${new URLSearchParams(queries).toString()}`
 
             return await fetch(url, request)
+        },
+        async __CreateResponce(rawResponce){
+            var res = {
+                code: rawResponce.status,
+                body: null,
+                headers: null
+            }
+
+            try{
+                if(res.code !== 204){
+                    res.body = await rawResponce.json()
+                }
+                
+                res.headers = await rawResponce.headers
+            }
+            catch(ex){
+                
+            }
+
+            return res;
         }
     }
 }

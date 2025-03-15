@@ -6,7 +6,7 @@ const ChanelApiMixine = {
     ],
     methods:{
         async GetChanelsList(pageSize, pageIndex, search){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 "/api/Chanel", 
                 null, 
@@ -16,55 +16,55 @@ const ChanelApiMixine = {
                     pageIndex: pageIndex? 0 : pageIndex,
                     search: search == null? "" : search
                 }
-            );
+            ));
         },
         async CreateChanel(createChanelDto){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "POST", 
                 "/api/Chanel", 
                 createChanelDto, 
                 null, 
                 null
-            );
+            ));
         },
         async GetChanel(id){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 `/api/Chanel/${id}`, 
                 null, 
                 null, 
                 null
-            );
+            ));
         },
         async DeleteChanel(id){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "DELETE", 
                 `/api/Chanel/${id}`, 
                 null, 
                 null, 
                 null
-            );
+            ));
         },
         async UpdateChanel(id, UpdateChanelDto){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "PUT", 
                 `/api/Chanel/${id}`, 
                 UpdateChanelDto, 
                 null, 
                 null
-            );
+            ));
         },
         async UpdateChanelScript(id, script){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "PUT", 
                 `/api/Chanel/${id}/script`, 
                 script, 
                 null, 
                 null
-            );
+            ));
         },
         async GetChanelLogs(id, pageSize, pageIndex, startInterval, stopInterval, lavels){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 `/api/Chanel/${id}/logs`, 
                 null, 
@@ -76,10 +76,10 @@ const ChanelApiMixine = {
                     stopInterval: stopInterval,
                     lavels: lavels
                 }
-            );
+            ));
         },
         async GetChanelMessages(id, pageSize, pageIndex, startInterval, stopInterval){
-            return await this.__makeRequest(
+            return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 `/api/Chanel/${id}/messages`, 
                 null, 
@@ -90,7 +90,7 @@ const ChanelApiMixine = {
                     startInterval: startInterval,
                     stopInterval: stopInterval
                 }
-            );
+            ));
         },
     }
 }
