@@ -25,27 +25,35 @@ export default{
         }
     },
     props:{
-        FiltersData:[]
+        FiltersData:[],
+        UseQueries:{ 
+            type: Boolean, 
+            required: false, 
+            default: true 
+        }
     },
     methods:{
-        async applyFilter(){    
-            console.log(this.$route.query)
-            var quries = JSON.parse(JSON.stringify(this.$route.query));
+        async applyFilter(){  
+            
+            if(this.UseQueries){
+                console.log(this.$route.query)
+                var quries = JSON.parse(JSON.stringify(this.$route.query));
 
-            for (let index = 0; index < this.filters.length; index++) {
-                const element = this.filters[index];
-                
-                var value = JSON.parse(JSON.stringify(element.value)) // Получаем значение из прокси
+                for (let index = 0; index < this.filters.length; index++) {
+                    const element = this.filters[index];
+                    
+                    var value = JSON.parse(JSON.stringify(element.value)) // Получаем значение из прокси
 
-                if(value != null){
-                    quries[element.filterName] = value
+                    if(value != null){
+                        quries[element.filterName] = value
+                    }
+                    else if (quries[element.filterName] != null){
+                    delete quries[element.filterName]
+                    }
                 }
-                else if (quries[element.filterName] != null){
-                   delete quries[element.filterName]
-                }
+
+                this.$router.push({path: this.$route.fullPath, query: quries, params: this.$route.params });
             }
-
-            this.$router.push({path: this.$route.fullPath, query: quries, params: this.$route.params });
 
             this.$emit("applyFilter")
         },
@@ -63,22 +71,26 @@ export default{
         }
     },
     async mounted(){
-        await this.$router.isReady()
+        if(this.UseQueries){
+            await this.$router.isReady()
         
-        for (let index = 0; index < this.filters.length; index++) {
-            const element = this.filters[index];
-            
-            if(this.$route.query[element.filterName] != null ){
-                element.value = this.$route.query[element.filterName]
+            for (let index = 0; index < this.filters.length; index++) {
+                const element = this.filters[index];
+                
+                if(this.$route.query[element.filterName] != null ){
+                    element.value = this.$route.query[element.filterName]
 
-                if(element.type === 'checkbox' && (typeof element.value === 'string' || element.value instanceof String)){
-                    element.value = element.value == 'true'
-                }
+                    if(element.type === 'checkbox' && (typeof element.value === 'string' || element.value instanceof String)){
+                        element.value = element.value == 'true'
+                    }
 
-                if(element.type === 'multi-select' && !(typeof element.value === 'array' || element.value instanceof Array)){
-                    element.value = [element.value]
+                    if(element.type === 'multi-select' && !(typeof element.value === 'array' || element.value instanceof Array)){
+                        element.value = [element.value]
+                    }
                 }
             }
+
+            this.$emit("applyFilter")
         }
     }
 }
@@ -141,7 +153,7 @@ export default{
                 />
                 <Multiselect
                     v-model="item.value"
-                    :close-on-select="false"
+                    :close-on-select="true"
                     :searchable="true"
                     :create-option="true"
                     :options="item.options"

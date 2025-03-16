@@ -12,21 +12,25 @@ export default {
                 headers: new Headers()
             }
             request.headers.append("Authorization", `Bearer_${this.__token}`)
+            request.headers.append("Content-Type", "application/json")
 
             if(data !== null)
                 request.body = JSON.stringify(data)
 
             if(headers !== null){
-                Object.keys(queries).forEach(key => {
+                Object.keys(headers).forEach(key => {
                     request.headers.append(key, headers[key])
                 });
             }
-                
-            Object.keys(queries).forEach(key => {
-                if (queries[key] === undefined || queries[key] === null) {
-                  delete queries[key];
-                }
-              });
+            
+            if(queries != null)
+                Object.keys(queries).forEach(key => {
+                    if (queries[key] === undefined || queries[key] === null) {
+                    delete queries[key];
+                    }
+                });
+            else
+                queries = {}
 
             var url = `${window.location.origin}/proxy${path}?${new URLSearchParams(queries).toString()}`
 

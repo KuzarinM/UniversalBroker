@@ -13,6 +13,11 @@ export default{
             default: {} 
         }
     },
+    watch:{
+        AttributesDict(oldAttributesDict, newAttributesDict){
+            this.UpdateAttributes();
+        }
+    },
     emits:[ 
         "update:AttributesDict"
     ],

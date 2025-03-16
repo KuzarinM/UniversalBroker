@@ -62,7 +62,7 @@ export default{
                     second:false,
                     third:"Очень очень очень очень длинный текст"
                 }
-            ]
+            ],
         }
     },
     props:{
@@ -124,7 +124,6 @@ export default{
                 <tr 
                     class="" 
                     v-for="item in this.records"
-                    
                 >
                     <td  
                         v-for="structure in this.structure"

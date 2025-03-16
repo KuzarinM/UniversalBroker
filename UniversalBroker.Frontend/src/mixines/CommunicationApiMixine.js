@@ -46,7 +46,7 @@ const CommunicationApiMixine = {
                 null
             ))
         },
-        async DeleteCommunication(id, headers){
+        async UpdateCommunication(id, headers){
             return await this.__CreateResponce(await this.__makeRequest(
                 "PATCH", 
                 `/api/Communication/${id}`,

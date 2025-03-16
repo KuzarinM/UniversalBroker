@@ -27,6 +27,7 @@ export default{
                 return this.PageNumber
             },
             set(value) {
+                console.log(value)
                 this.$emit('update:PageNumber', value)
             }
         },
@@ -48,7 +49,12 @@ export default{
     props:{
         TotalPages:Number,
         PageNumber:Number,
-        PageSize:Number
+        PageSize:Number,
+        UseQueries:{ 
+            type: Boolean, 
+            required: false, 
+            default: true 
+        }
     },
     emits: [
         'update:TotalPages', 
@@ -75,6 +81,10 @@ export default{
             this._goToPage=null
         },
         SaveParams(){
+
+            if(!this.UseQueries)
+            return
+
             var quries = JSON.parse(JSON.stringify(this.$route.query));
 
             var params = {
@@ -96,13 +106,15 @@ export default{
         }
     },
     async mounted(){
-        await this.$router.isReady()
+        if(this.UseQueries){
+            await this.$router.isReady()
 
-        if(this.$route.query.pageSize != null)
-            this.pageSize = parseInt(this.$route.query.pageSize)
+            if(this.$route.query.pageSize != null)
+                this.pageSize = parseInt(this.$route.query.pageSize)
 
-        if(this.$route.query.pageNumber != null)
-            this.currentPage = parseInt(this.$route.query.pageNumber)
+            if(this.$route.query.pageNumber != null)
+                this.currentPage = parseInt(this.$route.query.pageNumber)
+        }
     }
 }
 </script>

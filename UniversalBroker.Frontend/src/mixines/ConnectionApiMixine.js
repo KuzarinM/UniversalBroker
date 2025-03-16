@@ -31,7 +31,7 @@ const ConnectionApiMixine = {
         },
         async GetConnection(id){
             return await this.__CreateResponce(await this.__makeRequest(
-                "DELETE", 
+                "GET", 
                 `/api/Connection/${id}`, 
                 null, 
                 null, 

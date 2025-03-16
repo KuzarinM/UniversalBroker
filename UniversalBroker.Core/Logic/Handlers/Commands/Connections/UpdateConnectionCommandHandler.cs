@@ -20,19 +20,21 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
         IMapper mapper,
         BrockerContext brockerContext,
         AbstractAdaptersManager abstractAdaptersManager
-        ) : IRequestHandler<UpdateConnectionCommand, ConnectionDto>
+        ) : IRequestHandler<UpdateConnectionCommand, ConnectionFullDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
         private readonly AbstractAdaptersManager _adaptersManager = abstractAdaptersManager;
 
-        public async Task<ConnectionDto> Handle(UpdateConnectionCommand request, CancellationToken cancellationToken)
+        public async Task<ConnectionFullDto> Handle(UpdateConnectionCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var existingModel = await _context.Connections
                                         .Include(x => x.ConnectionAttributes).ThenInclude(x => x.Attribute)
+                                        .Include(x=>x.Communication)
+                                        .Include(x=>x.Chanels)
                                         .FirstOrDefaultAsync(x => x.Id == request.ConnectionId);
                 if (existingModel == null)
                     throw new ControllerException("Не найдено подключения с такмим Id");
@@ -67,6 +69,9 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                     await _context.Attributes.AddAsync(newAttrtinuteObj.Attribute);
                 }
 
+                // Обновялем каналы (список)
+                existingModel.Chanels = await _context.Chanels.Where(x => request.UpdateDto.ChannelsIds.Contains(x.Id)).ToListAsync();
+
                 await _context.SaveChangesAsync();
 
                 if (request.NeedNotifyAdapter)
@@ -81,7 +86,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                         await sendTask;
                 }
 
-                return _mapper.Map<ConnectionDto>(existingModel);
+                return _mapper.Map<ConnectionFullDto>(existingModel);
 
             }
             catch (ControllerException ex)

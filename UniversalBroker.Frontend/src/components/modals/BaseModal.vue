@@ -7,7 +7,8 @@ export default{
         }
     },
     emits:[
-        "modalClose"
+        "modalClose",
+        "modalOpen"
     ],
     props:{
         modalSize:{ 
@@ -25,12 +26,19 @@ export default{
             required: false, 
             default: "true"  // static для скрытия
         },
+        withoutFooter:{
+            type: Boolean, 
+            required: false, 
+            default: false 
+        }
     },
     methods:{
         OpenModal(){
+            this.$emit("modalOpen")
            this.modal.show()
         },
         CloseModal(){
+            this.$emit("modalClose")
             this.modal.hide()
         }
     },
@@ -75,9 +83,8 @@ export default{
                 <button
                     type="button"
                     class="btn-close"
-                    data-bs-dismiss="modal"
                     aria-label="Close"
-                    @click="this.$emit('modalClose')"
+                    @click="this.CloseModal"
                 ></button>
             </div>
             <div class="modal-body">
@@ -85,15 +92,14 @@ export default{
                     <div class="container-fluid">Модальное окно пусто</div>
                 </slot>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" v-if="!this.withoutFooter">
                 <slot name="footer">
 
                 </slot>
                 <button
                     type="button"
                     class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                    @click="this.$emit('modalClose')"
+                    @click="this.CloseModal"
                 >
                     Закрыть
                 </button>

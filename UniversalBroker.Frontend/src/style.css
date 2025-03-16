@@ -61,7 +61,7 @@ button:focus-visible {
 
 #app {
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   text-align: center;
   display: flex;
   flex-direction: column;

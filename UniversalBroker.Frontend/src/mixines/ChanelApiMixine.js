@@ -13,7 +13,7 @@ const ChanelApiMixine = {
                 null, 
                 {
                     pageSize: pageSize == null? 10 : pageSize,
-                    pageIndex: pageIndex? 0 : pageIndex,
+                    pageIndex: pageIndex == null? 0 : pageIndex,
                     search: search == null? "" : search
                 }
             ));
@@ -71,10 +71,10 @@ const ChanelApiMixine = {
                 null, 
                 {
                     pageSize: pageSize == null? 10 : pageSize,
-                    pageIndex: pageIndex? 0 : pageIndex,
+                    pageIndex: pageIndex == null? 0 : pageIndex,
                     startInterval: startInterval,
                     stopInterval: stopInterval,
-                    lavels: lavels
+                    lavels: lavels == null || lavels.length == 0 ? null : lavels
                 }
             ));
         },
@@ -86,7 +86,7 @@ const ChanelApiMixine = {
                 null, 
                 {
                     pageSize: pageSize == null? 10 : pageSize,
-                    pageIndex: pageIndex? 0 : pageIndex,
+                    pageIndex: pageIndex == null? 0 : pageIndex,
                     startInterval: startInterval,
                     stopInterval: stopInterval
                 }

@@ -44,6 +44,10 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                     await _context.Attributes.AddAsync(item.Attribute);
                     await _context.ConnectionAttributes.AddAsync(item);
                 }
+
+                // Добавляем каналы
+                model.Chanels = await _context.Chanels.Where(x=>request.ConnectionDto.ChannelsIds.Contains(x.Id)).ToListAsync();
+
                 await _context.AddAsync(model);
 
                 await _context.SaveChangesAsync();
