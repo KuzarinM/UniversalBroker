@@ -32,10 +32,20 @@ export default{
                     value: null
                 },
                 {
-                    filterName:"lavels",
+                    filterName:"limits",
+                    type:"number",
+                    displayName:"Длина текста",
+                    discription:"Ограничение на длину текста для отображения",
+                    placeholder:"",
+                    options: [],
+                    weight:"20%",
+                    value: []
+                },
+                {
+                    filterName:"direction",
                     type:"multi-select",
-                    displayName:"Уровень",
-                    discription:"Уровни логирования, которые будут запрашиваться",
+                    displayName:"Направление",
+                    discription:"Указывает откуда и куда передавалось сообщение",
                     placeholder:"",
                     options: [],
                     weight:"20%",
@@ -45,16 +55,22 @@ export default{
             ],
             TableStructure:[
                 {
-                    ProperyName: "dateTime",
+                    ProperyName: "datetime",
                     DisplayName:"Дата",
                     Type:"text",
                     CharLimit:null
                 },
                 {
-                    ProperyName: "lavelText",
-                    DisplayName:"Уровень",
+                    ProperyName: "directionText",
+                    DisplayName:"Направление",
                     Type:"text",
-                    CharLimit:null
+                    CharLimit:null,
+                },
+                {
+                    ProperyName: "hex",
+                    DisplayName:"Hex",
+                    Type:"text",
+                    CharLimit:null,
                 },
                 {
                     ProperyName: "text",
@@ -70,15 +86,37 @@ export default{
                     name: null,
                     propertyes:[
                         {
-                            fieldName:"dateTime",
+                            fieldName:"datetime",
                             type:"text",
                             displayName:"Дата и время",
                             description:"описание"
                         },
                         {
-                            fieldName:"lavelText",
+                            fieldName: "directionText",
+                            directionTextype:"text",
+                            displayName:"Направление",
+                            CharLimit:null,
+                        },
+                        {
+                            fieldName: "sourceName",
+                            type:"a",
+                            displayName:"Источник",
+                            emit:"OpenSource",
+                            CharLimit:null,
+                            getHref: (item) => item.direction == 0 ? `/connections?id=${item.sourceId}` : `/chanels?id=${item.sourceId}`
+                        },
+                        {
+                            fieldName: "targetName",
+                            type:"a",
+                            displayName:"Цель",
+                            emit:"OpenTarget",
+                            CharLimit:null,
+                            getHref: (item) => item.direction == 2 ? `/connections?id=${item.targetId}` : `/chanels?id=${item.targetId}`
+                        },
+                        {
+                            fieldName:"hex",
                             type:"text",
-                            displayName:"Уровень",
+                            displayName:"Hex",
                             description:"описание"
                         },
                         {
@@ -86,19 +124,32 @@ export default{
                             type:"text",
                             displayName:"Текст лога",
                             description:"описание"
+                        },
+                        {
+                            fieldName:"headersEntities",
+                            type:"table",
+                            displayName:"Заголоки",
+                            description:"описание",
+                            structure:[
+                                {
+                                    title:"Ключ",
+                                    field:"key",
+                                },
+                                {
+                                    title:"Значение",
+                                    field:"value",
+                                },
+                            ]
                         }
                     ]
                 }
             ],
             ViewedLog:{},
             NeedBeOpened:false,
-            LogLavelMapping:[
-                "Trace",
-                "Debug",
-                "Information",
-                "Warning",
-                "Error",
-                "Critical"
+            DirectionMapping:[
+                "Подключение-Канал",
+                "Канал-Канал",
+                "Канал-Подключение"
             ],
             channelId: "0a73478d-f462-4ff5-870d-d31095b6cef3" 
         }
@@ -129,23 +180,31 @@ export default{
 
             this.$emit("StartLoading")
 
-            var res = await this.GetChanelLogs(
+            var res = await this.GetChanelMessages(
                 this.channelId,
                 this.PageSize, 
-                this.PageNumber -1, 
-                this.filters[0].value, 
+                this.PageNumber -1,
+                this.filters[0].value,
                 this.filters[1].value,
-                JSON.parse(JSON.stringify(this.filters[2].value))
+                this.filters[3].value
             )
 
             if(res.code == 200){
                 this.records = res.body.page.map(x=>(
                     {
                         ...x, 
-                        lavelText:this.LogLavelMapping[x.lavel]
-                    }));
+                        hex: this.toHexString(x.data),
+                        headersEntities: Object.entries(x.headers).map(y=>({
+                            key:y[0],
+                            value:y[1]
+                        })),
+                        directionText:this.DirectionMapping[x.direction]
+                    })
+                );
                 
-
+                this.TableStructure[2].CharLimit = this.filters[2].value
+                this.TableStructure[3].CharLimit = this.filters[2].value
+                    
                 this.TotalPages = res.body.totalPages
 
                 if(this.PageNumber > this.TotalPages)
@@ -158,6 +217,11 @@ export default{
             this.$forceUpdate()
 
             this.$emit("StopLoading")
+        },
+        toHexString(byteArray) {
+            return Array.from(byteArray, function(byte) {
+                    return ('0' + (byte & 0xFF).toString(16)).slice(-2) + ' ';
+                }).join('')
         },
         SelfOpen(){
             if(this.NeedBeOpened){
@@ -183,10 +247,10 @@ export default{
 
             console.log(this.channelId)
             this.NeedBeOpened = false;
-        }
+        },
     },
     mounted(){
-        this.filters[2].options = this.LogLavelMapping.map((currElement, index)=>({
+        this.filters[3].options = this.DirectionMapping.map((currElement, index)=>({
             "value": index,
             "label": currElement
             })
@@ -198,7 +262,7 @@ export default{
 <template>
     <BaseModal
         modalSize="xl"
-        title="Логи скрипта канала"
+        title="Сообщения прошедшие по Каналу"
         ref="baseModal"
         modalId="topLavelModal"
     >
@@ -232,6 +296,8 @@ export default{
         :withoutFooter="true"
         v-model:viewedEntity="this.ViewedLog"
         @modalClose="this.SelfOpen"
+        @OpenSource="this.OpenSource"
+        @OpenTarget="this.OpenTarget"
         ref="viewModal"
     />
 </template>

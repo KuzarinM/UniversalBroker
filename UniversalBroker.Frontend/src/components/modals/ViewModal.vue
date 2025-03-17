@@ -63,6 +63,12 @@ export default{
                             description:"описание"
                         },
                         {
+                            fieldName:"ref",
+                            type:"ref",
+                            displayName:"Ссылка",
+                            description:"описание"
+                        },
+                        {
                             fieldName:"connections",
                             type:"table",
                             displayName:"Таблица",
@@ -169,7 +175,19 @@ export default{
                                 </tr>
                             </tbody>
                         </table>
-                    </div>                
+                    </div>    
+                    <a
+                        v-else-if="item.type == 'ref'"
+                        @click="this.$emit(item.emit, this.viewedEntity)"
+                    >
+                        {{ this.viewedEntity[item.fieldName] }}
+                    </a>       
+                    <a
+                        v-else-if="item.type == 'a'"
+                        :href="item.getHref(this.viewedEntity)"
+                    >
+                        {{ this.viewedEntity[item.fieldName] }}
+                    </a>       
                     <p 
                      v-else   
                     >

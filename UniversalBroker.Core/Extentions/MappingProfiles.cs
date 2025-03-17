@@ -146,7 +146,17 @@ namespace UniversalBroker.Core.Extentions
             CreateMap<Message, MessageViewDto>()
                 .ForMember(x => x.Direction, opt => opt.MapFrom(x => GetDirectionByMessage(x)))
                 .ForMember(x => x.SourceId, opt => opt.MapFrom(x => x.Connection != null && x.Connection.Isinput ? x.ConnectionId : x.SourceChannelId))
+                .ForMember(x => x.SourceName, opt => opt.MapFrom(x => 
+                                                                    x.Connection != null && x.Connection.Isinput ? 
+                                                                        (x.Connection != null ? x.Connection.Name : string.Empty) : 
+                                                                        (x.SourceChannel != null ? x.SourceChannel.Name : string.Empty)
+                                                                ))
                 .ForMember(x => x.TargetId, opt => opt.MapFrom(x => x.Connection != null && !x.Connection.Isinput ? x.ConnectionId : x.TargetChannelId))
+                .ForMember(x => x.TargetName, opt => opt.MapFrom(x => 
+                                                                    x.Connection != null && !x.Connection.Isinput ? 
+                                                                    (x.Connection != null ? x.Connection.Name : string.Empty) :
+                                                                    (x.TargetChannel != null ? x.TargetChannel.Name : string.Empty)
+                                                                ))
                 .ForMember(x => x.Headers, opt => opt.MapFrom(x => x.Headers.ToDictionary(y => y.Name, y => y.Value)));
         }
 

@@ -29,9 +29,19 @@ namespace UniversalBroker.Core.Models.Dtos.Chanels
         public Guid SourceId { get; set; }
 
         /// <summary>
+        /// Имя того, откуда
+        /// </summary>
+        public string SourceName { get; set; }
+
+        /// <summary>
         /// Куда
         /// </summary>
         public Guid TargetId { get; set; }
+
+        /// <summary>
+        /// Имя того, куда
+        /// </summary>
+        public string TargetName { get; set; }
 
         /// <summary>
         /// Какой тип передачи

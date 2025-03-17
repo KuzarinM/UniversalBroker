@@ -23,16 +23,27 @@ export default {
                 });
             }
             
+            var out = [];
+
             if(queries != null)
                 Object.keys(queries).forEach(key => {
-                    if (queries[key] === undefined || queries[key] === null) {
-                    delete queries[key];
+                    if (queries[key] === undefined || queries[key] === null || queries[key] === '') {
+                        delete queries[key];
                     }
-                });
-            else
-                queries = {}
+                    else if(Array.isArray(queries[key])){
+                        for (let index = 0; index < queries[key].length; index++) {
+                            const element = queries[key][index];
+                            out.push(`${key}=${element}`)
+                        }
+                    }
+                    else{
+                        out.push(`${key}=${queries[key]}`)
+                    }
+                }); 
+                
+            console.log(out)
 
-            var url = `${window.location.origin}/proxy${path}?${new URLSearchParams(queries).toString()}`
+            var url = `${window.location.origin}/proxy${path}?${out.join('&')}`
 
             return await fetch(url, request)
         },

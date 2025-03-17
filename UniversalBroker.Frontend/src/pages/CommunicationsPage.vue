@@ -112,6 +112,9 @@ export default{
     },
     methods:{
         async LoadData(){
+
+            this.$emit("StartLoading")
+
             var res = await this.GetCommunicationList(
                 this.PageSize, 
                 this.PageNumber -1 , 
@@ -130,8 +133,11 @@ export default{
                     this.PageNumber = 1
             }
 
+            this.$emit("StopLoading")
         },
         async OpenCommunication(item){
+            this.$emit("StartLoading")
+
             var res = await this.GetCommunication(item.id)
 
             if(res.code == 200){
@@ -142,6 +148,7 @@ export default{
                 alert('Не удалось загрузить данные о соединении')
             }
 
+            this.$emit("StopLoading")
         },
         async DeleteCommunication(item){
             if(!confirm(`Вы уверены, что хотите удалить подключение ${item.name}`))
@@ -150,6 +157,7 @@ export default{
             alert("Для теста функцию заблокировал")
             return
 
+            this.$emit("StartLoading")
             var res = await this.DeleteCommunication(item.id)
 
             if(res.code == 200){
@@ -161,6 +169,8 @@ export default{
             }
 
             await this.LoadData();
+
+            this.$emit("StopLoading")
         },
         async SaveCommunication(item){
             console.log("Сохраняем", item)
@@ -178,6 +188,16 @@ export default{
         }
     },
      async mounted(){
+
+        await this.$router.isReady()
+
+        var id = this.$route.query.id
+
+        if(id != null && id != undefined){
+            await this.OpenCommunication({
+                id:id
+            })
+        }
         //await this.LoadData();
     }
 }

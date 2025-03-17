@@ -32,6 +32,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
             {
                 var list = await _context.Messages
                                     .Include(x=>x.Connection)
+                                    .Include(x=>x.SourceChannel)
+                                    .Include(x=>x.TargetChannel)
                                     .Include(x=>x.Headers)
                                     .Where(x =>
                                         (x.TargetChannelId == request.ChanelId || x.SourceChannelId == request.ChanelId) &&

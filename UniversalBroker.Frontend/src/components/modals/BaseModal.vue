@@ -49,14 +49,14 @@ export default{
 </script>
 
 <template>
-<!-- Button trigger modal -->
-<button
+<!-- Использовалась для отладки. Так что пока в комменте -->
+<!-- <button
     type="button"
     class="btn btn-primary btn-lg"
     @click="this.OpenModal()"
 >
     Launch
-</button>
+</button> -->
 
 <!-- Modal -->
 <div

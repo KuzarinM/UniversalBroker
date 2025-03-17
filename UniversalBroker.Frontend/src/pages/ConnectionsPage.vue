@@ -221,6 +221,8 @@ export default{
     },
     methods:{
         async LoadData(){
+            this.$emit("StartLoading")
+
             var connectionTask = this.LoadCommunications()
             var channelTask = this.LoadChannels()
 
@@ -246,6 +248,8 @@ export default{
 
             await connectionTask
             await channelTask
+
+            this.$emit("StopLoading")
         },
         async LoadChannels(){
             var channels = await this.GetChanelsList(100,0)
@@ -275,6 +279,8 @@ export default{
             }
         },
         async Open(item){
+            this.$emit("StartLoading")
+
             var res = await this.GetConnection(item.id)
 
             if(res.code == 200){
@@ -284,6 +290,8 @@ export default{
             else{
                 alert("Не удлось открыть Подключение")
             }
+
+            this.$emit("StopLoading")
         },
         async OpenAddConnection(){
             this.$refs.createModal.Open()
@@ -309,6 +317,8 @@ export default{
                 return;
             }
 
+            this.$emit("StartLoading")
+
             var res = await this.CreateConnection(item)
 
             if(res.code == 200){
@@ -328,10 +338,14 @@ export default{
             else{
                 alert("Не удалось создать Подключение")
             }
+
+            this.$emit("StopLoading")
         },
         async Delete(item){
             if(!confirm(`Вы уверены, что хотите удалить Подключение ${item.name}`))
                 return
+            
+            this.$emit("StartLoading")
             
             var res = await this.DeleteConnection(item.id)
 
@@ -358,6 +372,16 @@ export default{
     },
      async mounted(){
         //await this.LoadData(); // Фильтратор вызовет
+
+        await this.$router.isReady()
+
+        var id = this.$route.query.id
+
+        if(id != null && id != undefined){
+            await this.Open({
+                id:id
+            })
+        }
     }
 }
 </script>

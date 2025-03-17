@@ -7,6 +7,8 @@ import TableComponent from '../components/modules/TableComponent.vue';
 import EntityModal from '../components/modals/EntityModal.vue';
 import ViewModal from '../components/modals/ViewModal.vue'
 import ChanelLogsModal from '../components/modals/ChanelLogsModal.vue';
+import ChanelMessagesModal from '../components/modals/ChanelMessagesModal.vue';
+
 
 export default{
     data(){
@@ -170,7 +172,8 @@ export default{
         TableComponent,
         EntityModal,
         ViewModal,
-        ChanelLogsModal
+        ChanelLogsModal,
+        ChanelMessagesModal
     },
     watch:{
         async filters(oldFilters, newFilters){
@@ -186,6 +189,7 @@ export default{
     methods:{
         async LoadData(){
 
+            this.$emit("StartLoading")
             var connectionTask = this.LoadConnections()
             var channelsTask = this.LoadChannels()
 
@@ -208,25 +212,27 @@ export default{
 
             await connectionTask
             await channelsTask
+
+            this.$emit("StopLoading")
         },
         async LoadConnections(){
             var connections = await this.GetConnectionsList(100,0)
 
-        if(connections.code == 200){
-            this.connections = connections.body.page.map(x=> ({
-                "value": x.id,
-                "label": x.name,
-                "isInput":x.isInput
-            }))
+            if(connections.code == 200){
+                this.connections = connections.body.page.map(x=> ({
+                    "value": x.id,
+                    "label": x.name,
+                    "isInput":x.isInput
+                }))
 
-            console.log(this.connections)
+                console.log(this.connections)
 
-            this.editorFields["Связи"][0].options = this.connections.filter(x=>x.isInput)
-            this.editorFields["Связи"][1].options = this.connections.filter(x=>!x.isInput)
+                this.editorFields["Связи"][0].options = this.connections.filter(x=>x.isInput)
+                this.editorFields["Связи"][1].options = this.connections.filter(x=>!x.isInput)
 
-            this.creatorFields["Связи"][0].options = this.connections.filter(x=>x.isInput)
-            this.creatorFields["Связи"][1].options = this.connections.filter(x=>!x.isInput)
-        }
+                this.creatorFields["Связи"][0].options = this.connections.filter(x=>x.isInput)
+                this.creatorFields["Связи"][1].options = this.connections.filter(x=>!x.isInput)
+            }
         },
         async LoadChannels(){
             var channels = await this.GetChanelsList(100,0)
@@ -244,6 +250,8 @@ export default{
             }
         },
         async OpenEdit(item){
+
+            this.$emit("StartLoading")
             var res = await this.GetChanel(item.id)
 
             if(res.code == 200){
@@ -262,6 +270,8 @@ export default{
             else{
                 alert('Не удалось загрузить данные о соединении')
             }
+
+            this.$emit("StopLoading")
         },
         OpenAdd(){
             this.$refs.createModal.Open()
@@ -271,6 +281,8 @@ export default{
                 alert("Имя канала явялется обязательным")
                 return
             }
+
+            this.$emit("StartLoading")
 
             var res = await this.CreateChanel(item)
 
@@ -290,11 +302,15 @@ export default{
             else{
                 alert("Не удалось создать Канал")
             }
+
+            this.$emit("StopLoading")
         },
         async Delete(item){
             if(!confirm(`Вы уверены, что хотите удалить Канал ${item.name}`))
                 return
-            
+
+            this.$emit("StartLoading")
+
             var res = await this.DeleteChanel(item.id)
 
             if(res.code == 200){
@@ -319,12 +335,31 @@ export default{
         },
         async OpenLogs(item){
             await this.$refs.logsModal.Open(item.id)
+        },
+        async OpenMessages(item){
+            await this.$refs.messagesModal.Open(item.id)
+        },
+        async OpenFromQuery(){
+            await this.$router.isReady()
+
+            var id = this.$route.query.id
+            console.log(this.$route.query)
+            if(id != null && id != undefined){
+                await this.OpenEdit({
+                    id:id
+                })
+            }
         }
+    },
+    async mounted(){
+        this.$emit("StartLoading")
+        this.OpenFromQuery();
     }
 }
 </script>
 
 <template>
+
 <h2 class="text-start">Cписок Каналов</h2>
 
 <SearchComponent
@@ -341,6 +376,7 @@ export default{
     @AddRow="this.OpenAdd"
     @DeleteRow="this.Delete"
     @OpenLogs = "this.OpenLogs"
+    @OpenMessages = "this.OpenMessages"
 />
 
 <EntityModal
@@ -368,6 +404,14 @@ export default{
 
 <ChanelLogsModal 
     ref="logsModal"
+    @StartLoading="this.$emit('StartLoading')"
+    @StopLoading="this.$emit('StopLoading')"
+/>
+
+<ChanelMessagesModal 
+    ref="messagesModal"
+    @StartLoading="this.$emit('StartLoading')"
+    @StopLoading="this.$emit('StopLoading')"
 />
 
 <PaginationComponent 

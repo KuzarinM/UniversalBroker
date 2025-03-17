@@ -130,6 +130,19 @@ export default{
         Codemirror,
         AttributesComponent
     },
+    watch:{
+        displayObject(newDisplayObject, oldDisplayObject){
+            if(newDisplayObject.id != null && newDisplayObject.id != undefined){
+                var quries = JSON.parse(JSON.stringify(this.$route.query));
+
+                quries.id = this.displayObject.id
+
+                console.log(quries)
+
+                this.$router.push({path: this.$route.fullPath, query: quries, params: this.$route.params });
+            }
+        }
+    },
     methods:{
         Create(){
             console.log(this.displayObject)
@@ -149,6 +162,15 @@ export default{
         },
         Close(){
             this.$refs.baseModal.CloseModal()
+
+            this.RemoveReomQuery()
+        },
+        RemoveReomQuery(){
+            var quries = JSON.parse(JSON.stringify(this.$route.query));
+
+            delete quries.id
+
+            this.$router.push({path: this.$route.fullPath, query: quries, params: this.$route.params });
         }
     }
 }
@@ -157,7 +179,9 @@ export default{
 <template>
     <BaseModal 
         ref="baseModal"
-        modalSize="lg">
+        modalSize="lg"
+        @modalClose="this.RemoveReomQuery"
+    >
         <template v-slot:header>
             <h5 class="modal-title" id="modalTitleId">
                 {{ this.entityName }}
