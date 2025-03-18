@@ -74,7 +74,7 @@ export default{
                         displayName:"Название Соединения",
                         description:"Имя даного соединия",
                         type:"string",
-                        readoly:false,
+                        readoly:true,
                     }   
                 ],
                 "Дополнительные сведения":[

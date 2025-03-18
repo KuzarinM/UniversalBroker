@@ -11,7 +11,9 @@ export default{
         return{
             extensions:[
                 javascript(), 
-                javascriptLanguage
+                javascriptLanguage.data.of({
+                    autocomplete: this.myCompletions
+                })
             ]
         }
     },
@@ -171,6 +173,94 @@ export default{
             delete quries.id
 
             this.$router.push({path: this.$route.fullPath, query: quries, params: this.$route.params });
+        },
+        myCompletions(context) {
+            let word = context.matchBefore(/\w*/)
+            if (word.from == word.to && !context.explicit)
+                return null
+            return {
+                from: word.from,
+                // https://codemirror.net/docs/ref/#autocomplete.Completion
+                options: [
+                    {
+                        label: "senderId", 
+                        type: "variable", 
+                        apply: "Context.SenderId", 
+                        detail: "macro", 
+                        info:"Id скрипта, где мы сейчас"
+                    },
+                    {
+                        label: "chanels", 
+                        type: "variable", 
+                        apply: "Context.Chanels[]", 
+                        detail: "macro", 
+                        info:"Список каналов, которые были указаны"
+                    },
+                    {
+                        label: "connections", 
+                        type: "variable", 
+                        apply: "Context.Connections[]", 
+                        detail: "macro", 
+                        info:"Список подключений, которые были указаны"
+                    },
+                    {
+                        label: "sendToChanel", 
+                        type: "method", 
+                        apply: "Context.SendMessageToChanel(Id, data, headers)", 
+                        detail: "macro", 
+                        info:"Отправка сообщения в канал"
+                    },
+                    {
+                        label: "sendToCommunication", 
+                        type: "method", 
+                        apply: "Context.SendMessageToConnection(Id, data, headers)", 
+                        detail: "macro", 
+                        info:"Отправка сообщения в Подключение"
+                    },
+                    {
+                        label: "logError", 
+                        type: "method", 
+                        apply: "Context.LogError(message)", 
+                        detail: "macro", 
+                        info:"Логируем ошибки"
+                    },
+                    {
+                        label: "logWarning", 
+                        type: "method", 
+                        apply: "Context.LogWarning(message)", 
+                        detail: "macro", 
+                        info:"Логируем предупреждения"
+                    },
+                    {
+                        label: "logInfo", 
+                        type: "method", 
+                        apply: "Context.LogInfo(message)", 
+                        detail: "macro", 
+                        info:"Логируем информацию"
+                    },
+                    {
+                        label: "storageContains", 
+                        type: "function", 
+                        apply: "Context.CheckContainsInStorage(key)", 
+                        detail: "macro", 
+                        info:"Проверить наличие значения в хранилище"
+                    },
+                    {
+                        label: "storageWrite", 
+                        type: "method", 
+                        apply: "Context.WriteIntoStorage(key, value)", 
+                        detail: "macro", 
+                        info:"Записать в хранилище по ключу"
+                    },
+                    {
+                        label: "storageRead", 
+                        type: "function", 
+                        apply: "Context.ReadFromStorage(string key)", 
+                        detail: "macro", 
+                        info:"Прочитать из хранилища по ключу"
+                    },
+                ]
+            }
         }
     }
 }
@@ -245,6 +335,7 @@ export default{
                         :indent-with-tab="true"
                         :extensions="extensions"
                         :readonly="item.readoly"
+                        doc="function mx(a){}"
                         v-else-if="item.type == 'codeeditor'"
                     />
                     <AttributesComponent 

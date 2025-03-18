@@ -40,7 +40,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                                         (request.FromDate == null || x.Datetime >= request.FromDate) &&
                                         (request.ToDate == null || x.Datetime <= request.ToDate)
                                     )
-                                    .OrderBy(x => x.Datetime)
+                                    .OrderByDescending(x => x.Datetime)
                                     .Skip(request.PageSize * request.PageNumber).Take(request.PageSize)
                                     .ToListAsync();
 

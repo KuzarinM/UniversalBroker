@@ -37,6 +37,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                                 (request.FromDate == null || x.Datetime >= request.FromDate) &&
                                 (request.ToDate == null || x.Datetime <= request.ToDate) &&
                                 (request.OnlyLavels == null || request.OnlyLavels.Count == 0 || request.OnlyLavels.Select(x=>x.ToString()).Contains(x.Lavel)))
+                                .OrderByDescending(x=>x.Datetime)
                                 .Skip(request.PageSize*request.PageNumber).Take(request.PageSize)
                                 .ToListAsync();
 
