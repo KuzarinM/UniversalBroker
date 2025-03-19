@@ -21,7 +21,7 @@ export default{
                     filterName:"isInput",
                     type:"checkbox",
                     displayName:"Тип",
-                    discription:"Описание статуса",
+                    discription:"Является ли данное Подключение входящим(true) или исходящим(false)",
                     placeholder:"",
                     weight: "fit-content",
                     value: null
@@ -30,7 +30,7 @@ export default{
                     filterName:"communicationId",
                     type:"select",
                     displayName:"Выбор соединения",
-                    discription:"Описание фильра",
+                    discription:"Соединение, к оторому относится Подключение",
                     placeholder:"Все",
                     options:this.communications,
                     weight: "30%",
@@ -40,7 +40,7 @@ export default{
                     filterName:"search",
                     type:"text",
                     displayName:"Поиск",
-                    discription:"Описание фильра",
+                    discription:"Поиск по имени Подключения",
                     placeholder:"Введите поиск",
                     weight: "30%",
                     value: null
@@ -77,28 +77,28 @@ export default{
                     {
                         propertyName:"id",
                         displayName:"Id подключения",
-                        description:"Идентифкатор сущности",
+                        description:"Идентифкатор Подключения",
                         type:"string",
                         readoly:true,
                     },
                     {
                         propertyName:"isInput",
                         displayName:"Тип подключения",
-                        description:"Идентифкатор сущности",
+                        description:"Является ли данное Подключение входящим(true) или исходящим(false)",
                         type:"checkbox",
                         readoly:true,
                     },
                     {
                         propertyName:"path",
                         displayName:"Путь подключения",
-                        description:"Идентифкатор сущности",
+                        description:"Основной способ идентифицировать Подключение в адаптере. Это имя топика в Kafka или Ip адрес в случае TCP",
                         type:"string",
                         readoly:true,
                     }, 
                     {
                         propertyName:"name",
                         displayName:"Название подключения",
-                        description:"Идентифкатор сущности",
+                        description:"Имя подключения, по которому к нему можно обратиться",
                         type:"string",
                         readoly:false,
                     },
@@ -107,7 +107,7 @@ export default{
                     {
                         propertyName:"communicationId",
                         displayName:"Соединение",
-                        description:"Идентифкатор сущности",
+                        description:"Соединение, к которому относится Подключение",
                         type:"select",
                         options:this.communications,
                         readoly:true
@@ -115,7 +115,7 @@ export default{
                     {
                         propertyName:"channelsIds",
                         displayName:"Каналы",
-                        description:"Идентифкатор сущности",
+                        description:"Списко каналов, связанных с Подключением (куда отправляем для входного или откуда может прилететь для выходного)",
                         type:"multi-select",
                         options:[],
                         readoly:false
@@ -124,8 +124,8 @@ export default{
                 "Дополнительные сведения":[
                     {
                         propertyName:"attribues",
-                        displayName:"Атрибуты соединения",
-                        description:"Атттрибуты сущности",
+                        displayName:"Атрибуты Подключения",
+                        description:"Атттрибуты, служащие для настройки Подключения",
                         type:"attributes",
                         readoly:false,
                     }
