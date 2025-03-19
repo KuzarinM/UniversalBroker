@@ -72,7 +72,7 @@ export default{
                     {
                         propertyName:"name",
                         displayName:"Название Соединения",
-                        description:"Имя даного соединия",
+                        description:"Имя даного Соединия",
                         type:"string",
                         readoly:true,
                     }   

@@ -89,18 +89,20 @@ export default{
                             fieldName:"datetime",
                             type:"text",
                             displayName:"Дата и время",
-                            description:"описание"
+                            description:"Дата и время получения сообщения"
                         },
                         {
                             fieldName: "directionText",
                             directionTextype:"text",
                             displayName:"Направление",
+                            description:"Откуда и куда сообщение передавалось",
                             CharLimit:null,
                         },
                         {
                             fieldName: "sourceName",
                             type:"a",
                             displayName:"Источник",
+                            description:"Откуда пришло сообщение",
                             emit:"OpenSource",
                             CharLimit:null,
                             getHref: (item) => item.direction == 0 ? `/connections?id=${item.sourceId}` : `/chanels?id=${item.sourceId}`
@@ -109,6 +111,7 @@ export default{
                             fieldName: "targetName",
                             type:"a",
                             displayName:"Цель",
+                            description:"Куда ушло сообщение",
                             emit:"OpenTarget",
                             CharLimit:null,
                             getHref: (item) => item.direction == 2 ? `/connections?id=${item.targetId}` : `/chanels?id=${item.targetId}`
@@ -116,20 +119,20 @@ export default{
                         {
                             fieldName:"hex",
                             type:"text",
-                            displayName:"Hex",
-                            description:"описание"
+                            displayName:"Сообщение в HEX виде",
+                            description:"Байты сообщение в 16-ричной системе"
                         },
                         {
                             fieldName:"text",
                             type:"text",
-                            displayName:"Текст лога",
-                            description:"описание"
+                            displayName:"Сообщение в текстовом виде",
+                            description:"Текст сообщения, полученый из байтов"
                         },
                         {
                             fieldName:"headersEntities",
                             type:"table",
                             displayName:"Заголоки",
-                            description:"описание",
+                            description:"Заголовки передаваемые вместе с сообщением",
                             structure:[
                                 {
                                     title:"Ключ",

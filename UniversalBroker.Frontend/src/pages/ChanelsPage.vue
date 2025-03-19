@@ -48,6 +48,10 @@ export default{
                     clickEmitName:"OpenLogs"
                 },
                 {
+                    IconCLass:"bi-bezier2",
+                    clickEmitName:"OpenRealConnections"
+                },
+                {
                     IconCLass:"bi-trash3",
                     clickEmitName:"DeleteRow"
                 },
@@ -73,7 +77,7 @@ export default{
                     {
                         propertyName:"inputConnections",
                         displayName:"Входные Подключения",
-                        description:"Список привязанных входных подключений",
+                        description:"Список привязанных входных Подключений",
                         type:"multi-select",
                         options:[],
                         readoly:false,
@@ -81,7 +85,7 @@ export default{
                     {
                         propertyName:"outputConnections",
                         displayName:"Выходные Подключения",
-                        description:"Список привязанных выходных подключений",
+                        description:"Список привязанных выходных Подключений",
                         type:"multi-select",
                         options:[],
                         readoly:false,
@@ -119,7 +123,7 @@ export default{
                     {
                         propertyName:"inputConnections",
                         displayName:"Входные Подключения",
-                        description:"Список привязанных входных подключений",
+                        description:"Список привязанных входных Подключений",
                         type:"multi-select",
                         options:[],
                         readoly:false,
@@ -127,7 +131,7 @@ export default{
                     {
                         propertyName:"outputConnections",
                         displayName:"Выходные Подключения",
-                        description:"Список привязанных выходных подключений",
+                        description:"Список привязанных выходных Подключений",
                         type:"multi-select",
                         options:[],
                         readoly:false,

@@ -73,19 +73,19 @@ export default{
                             fieldName:"dateTime",
                             type:"text",
                             displayName:"Дата и время",
-                            description:"описание"
+                            description:"Время лога"
                         },
                         {
                             fieldName:"lavelText",
                             type:"text",
                             displayName:"Уровень",
-                            description:"описание"
+                            description:"Уровень ошибки"
                         },
                         {
                             fieldName:"text",
                             type:"text",
                             displayName:"Текст лога",
-                            description:"описание"
+                            description:"Непосредственно сам тест"
                         }
                     ]
                 }
