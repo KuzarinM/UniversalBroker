@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+option csharp_namespace = "Protos";
+
+package Core;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service CoreService{
+
+	//Инициализация
+	rpc Init(CommunicationDto) returns (CommunicationFullDto){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/Init"};
+	};
+
+	// Основная коммуникация от ядра будет происходит тут
+	rpc Connect(CommunicationSmallDto) returns (stream CoreMessage){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/Connect"};
+	};
+
+	// Основная коммуникация в ядро
+	rpc SendAdapterMessage(AdapterMessage) returns (StatusDto){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/SendAdapterMessage"};
+	}
+
+	// Получение входов
+	rpc LoadInConnections(CommunicationSmallDto) returns (ConnectionsList){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/Connections/Inputs"};
+	};
+
+	// Получение выходов
+	rpc LoadOutConnections(CommunicationSmallDto) returns (ConnectionsList){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/Connections/Outputs"};
+	};
+
+	// Опциональный метод разрыва соединения
+	rpc Disconnect(CommunicationSmallDto) returns (google.protobuf.Empty){
+		option (google.api.http) = {post: "/v1/gRPC/CoreService/Disconnect"};
+	}
+}
+
+// Модельки сообщений
+
+message CoreMessage{
+	oneof Body{
+		StatusDto StatusDto = 1;
+		CommunicationFullDto Config = 2;
+		ConnectionDto Connection = 3;
+		MessageDto Message = 4;
+		ConnectionDeleteDto DeletedConnection = 5;
+	}
+}
+
+message AdapterMessage{
+	string adapterId = 1; 
+	CoreMessage Message = 2;
+}
+
+// Обёртка для списка
+message ConnectionsList {
+	repeated ConnectionDto Connections = 1;
+}
+
+// Статусное сообщение. Выстукает и запросов и ответом на него
+message StatusDto {
+	bool Status = 1;
+	string Data = 2;
+}
+
+// Модель атрибута
+message AttributeDto {
+	string Name = 1;
+	string Value = 2;
+}
+
+// DTO отправляемое в Init сообщении. С него начинается обмен Ядра и Адапатера
+message CommunicationDto {
+	string Name = 1;
+	string TypeIdentifier = 2;
+	string Description = 3;
+} 
+
+// Фактически это просто ID данного Соединения
+message CommunicationSmallDto{
+	string Id = 1;
+}
+
+// DTO полной инофрмации об адаптере. Его направлеят Ядро
+message CommunicationFullDto {
+	string Id = 1;
+	string Name = 2;
+	string TypeIdentifier = 3;
+	string Description = 4;
+	repeated AttributeDto Attributes = 5;
+} 
+
+// Сообщение, которое приходит при создании Поделючения
+message ConnectionDto{
+	string Id = 1;
+	string Name = 2;
+	string Path = 3;
+	bool isInput = 4;
+	repeated AttributeDto Attributes = 5;
+}
+
+//сообщение на удаление Соединения
+message ConnectionDeleteDto{
+	string Id = 1;
+	string Path = 2;
+	bool isInput = 3;
+}
+
+// Модель самого пересылаемого сообщения
+message MessageDto{
+	string Path = 1;
+	bytes Data = 2;
+	repeated AttributeDto Headers = 3; // Нет необходимости изобратать новую модель. Универсальность в данном случае уместна
+}

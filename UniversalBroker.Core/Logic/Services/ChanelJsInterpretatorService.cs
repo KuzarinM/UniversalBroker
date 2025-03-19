@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Text;
 using System.Threading.Channels;
 using UniversalBroker.Core.Database.Models;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Logic.Contexts;
 using UniversalBroker.Core.Logic.Interfaces;
 using UniversalBroker.Core.Models.Commands.Chanels;
@@ -29,7 +30,7 @@ namespace UniversalBroker.Core.Logic.Services
         private readonly BrockerContext _context;
         private readonly V8ScriptEngine _scriptEngine;
         private readonly JsContext _jsContext;
-        private readonly IDbLogingService _dbLogingService;
+        private readonly AbstractDbLogingService _dbLogingService;
 
         public static SemaphoreSlim semaphore = new(1, 1);
 
@@ -39,7 +40,7 @@ namespace UniversalBroker.Core.Logic.Services
             BrockerContext brockerContext,
             JsContext jsContext,
             IMediator mediator,
-            IDbLogingService dbLogingService
+            AbstractDbLogingService dbLogingService
             )
         {
             _logger = logger;

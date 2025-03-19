@@ -15,15 +15,21 @@ namespace UniversalBroker.Core.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommunications(
             [FromQuery]
-            int pageSize = 10, 
+            int pageSize = 10,
             [FromQuery]
-            int pageIndex = 0
+            int pageIndex = 0,
+            [FromQuery]
+            bool? Status = null,
+            [FromQuery]
+            string? Search = null
             )
         {
             return await ControllerSimpleRequest(new GetAllCommunicationsQuery()
             {
                 PageSize = pageSize,
                 PageNumber = pageIndex,
+                Status = Status,
+                NameSearch = Search
             });
         }
 
@@ -47,6 +53,17 @@ namespace UniversalBroker.Core.Controllers
             return await ControllerSimpleRequest(new AddOrUpdateCommunicationCommand()
             {
                 CreateCommunicationDto = createDto
+            });
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteCommunication(
+            [FromRoute]
+            Guid id)
+        {
+            return await ControllerSimpleRequest(new DeleteCommunicationCommand()
+            {
+                Id = id
             });
         }
 

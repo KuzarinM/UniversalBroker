@@ -1,0 +1,36 @@
+{
+  "name": "universalbroker-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.3",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@emmetio/codemirror6-plugin": "^0.4.0",
+    "@slim-select/vue": "^1.6.0",
+    "@types/codemirror": "^5.60.15",
+    "@vueform/multiselect": "^2.6.11",
+    "ace-builds": "^1.39.0",
+    "bootstrap": "^5.3.3",
+    "codemirror": "^6.0.1",
+    "codemirror-editor-vue3": "^2.8.0",
+    "simple-code-editor": "^2.0.9",
+    "vue": "^3.5.13",
+    "vue-codeditor": "^1.0.5",
+    "vue-codemirror": "^6.1.1",
+    "vue-loading-overlay": "^6.0.6",
+    "vue-monaco": "^1.2.2",
+    "vue-router": "^4.5.0",
+    "vue-tri-state-checkbox": "^1.0.0",
+    "vue3-ace-editor": "^2.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.2.0"
+  }
+}

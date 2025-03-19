@@ -1,14 +1,9 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NLog;
 using UniversalBroker.Core.Models.Commands.Chanels;
-using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Chanels;
-using UniversalBroker.Core.Models.Dtos.Connections;
 using UniversalBroker.Core.Models.Internals;
 using UniversalBroker.Core.Models.Queries.Chanels;
-using UniversalBroker.Core.Models.Queries.Connections;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 
@@ -23,13 +18,16 @@ namespace UniversalBroker.Core.Controllers
             [FromQuery]
             int pageSize = 10,
             [FromQuery]
-            int pageIndex = 0
+            int pageIndex = 0,
+            [FromQuery]
+            string? search = null
         )
         {
             return await ControllerSimpleRequest(new GetChanelListQuery()
             {
                 PageSize = pageSize,
                 PageNumber = pageIndex,
+                NameContatins = search
             });
         }
 
@@ -42,11 +40,11 @@ namespace UniversalBroker.Core.Controllers
             [FromQuery]
             int pageIndex = 0,
             [FromQuery]
-            DateTime? StartInterval = null,
+            DateTime? startInterval = null,
             [FromQuery]
-            DateTime? StopInterval = null,
+            DateTime? stopInterval = null,
             [FromQuery]
-            List<LogLevel>? Lavels = null
+            List<LogLevel>? lavels = null
         )
         {
             return await ControllerSimpleRequest(new GetChanelScriptLogsQuery()
@@ -54,9 +52,9 @@ namespace UniversalBroker.Core.Controllers
                 PageSize = pageSize,
                 PageNumber = pageIndex,
                 ChanelId = id,
-                FromDate = StartInterval,
-                ToDate = StopInterval,
-                OnlyLavels = Lavels
+                FromDate = startInterval,
+                ToDate = stopInterval,
+                OnlyLavels = lavels
             });
         }
 
@@ -69,9 +67,9 @@ namespace UniversalBroker.Core.Controllers
            [FromQuery]
             int pageIndex = 0,
            [FromQuery]
-            DateTime? StartInterval = null,
+            DateTime? startInterval = null,
            [FromQuery]
-            DateTime? StopInterval = null
+            DateTime? stopInterval = null
        )
         {
             return await ControllerSimpleRequest(new GetChanelMessagesQuery()
@@ -79,8 +77,8 @@ namespace UniversalBroker.Core.Controllers
                 PageSize = pageSize,
                 PageNumber = pageIndex,
                 ChanelId = id,
-                FromDate = StartInterval,
-                ToDate = StopInterval
+                FromDate = startInterval,
+                ToDate = stopInterval
             });
         }
 

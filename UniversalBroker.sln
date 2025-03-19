@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversalBroker.Core", "UniversalBroker.Core\UniversalBroker.Core.csproj", "{0AF99C80-6B52-46A3-B9DF-9755F7383595}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Core", "UniversalBroker.Core\UniversalBroker.Core.csproj", "{0AF99C80-6B52-46A3-B9DF-9755F7383595}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Common", "UniversalBroker.Common\UniversalBroker.Common.csproj", "{F699B689-D7C9-4C08-8E60-8F2C46ABD6FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Adapters.RabbitMq", "UniversalBroker.Adapters.RabbitMq\UniversalBroker.Adapters.RabbitMq.csproj", "{B6DD5078-E381-43C9-BC73-2DC3976F29F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversalBroker.Adapters.Scheduler", "UniversalBroker.Adapters.Scheduler\UniversalBroker.Adapters.Scheduler.csproj", "{FD892A8A-6BC1-4FCC-9C8B-AD7EF1D7467B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversalBroker.Adapters.Tcp", "UniversalBroker.Adapters.Tcp\UniversalBroker.Adapters.Tcp.csproj", "{11D42060-6B75-4ADF-8186-75C6B9D0A701}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{0AF99C80-6B52-46A3-B9DF-9755F7383595}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AF99C80-6B52-46A3-B9DF-9755F7383595}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AF99C80-6B52-46A3-B9DF-9755F7383595}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F699B689-D7C9-4C08-8E60-8F2C46ABD6FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F699B689-D7C9-4C08-8E60-8F2C46ABD6FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F699B689-D7C9-4C08-8E60-8F2C46ABD6FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F699B689-D7C9-4C08-8E60-8F2C46ABD6FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6DD5078-E381-43C9-BC73-2DC3976F29F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6DD5078-E381-43C9-BC73-2DC3976F29F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6DD5078-E381-43C9-BC73-2DC3976F29F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6DD5078-E381-43C9-BC73-2DC3976F29F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD892A8A-6BC1-4FCC-9C8B-AD7EF1D7467B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD892A8A-6BC1-4FCC-9C8B-AD7EF1D7467B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD892A8A-6BC1-4FCC-9C8B-AD7EF1D7467B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD892A8A-6BC1-4FCC-9C8B-AD7EF1D7467B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11D42060-6B75-4ADF-8186-75C6B9D0A701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11D42060-6B75-4ADF-8186-75C6B9D0A701}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11D42060-6B75-4ADF-8186-75C6B9D0A701}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11D42060-6B75-4ADF-8186-75C6B9D0A701}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

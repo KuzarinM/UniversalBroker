@@ -32,7 +32,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
 
                 var existingModel = await _context.Communications
                     .Include(x=>x.CommunicationAttributes).ThenInclude(x=>x.Attribute)
-                    .FirstOrDefaultAsync(x => x.Name == model.Name && x.TypeIdentifier == model.TypeIdentifier);
+                    .FirstOrDefaultAsync(x => /*x.Name == model.Name &&*/ x.TypeIdentifier == model.TypeIdentifier && !x.Status);
 
                 if (existingModel == null)
                 {
@@ -40,12 +40,15 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
                 }
                 else
                 {
-                    existingModel.Description = model.Description ?? existingModel.Description;
+                    if(string.IsNullOrEmpty(existingModel.Description))
+                        existingModel.Description = model.Description;
+
                     existingModel.Status = true;
                 }
 
                 await _context.SaveChangesAsync();
 
+                // тут возможно надо сделать тут обновление адаптера
                 return _mapper.Map<CommunicationDto>(existingModel ?? model);
             }
             catch (Exception ex) 

@@ -19,5 +19,7 @@
         /// Аттрибуты
         /// </summary>
         public Dictionary<string, string> Attribues { get; set; } = new();
+
+        public List<Guid> ChannelsIds { get; set; } = new();
     }
 }

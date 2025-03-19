@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Text;
 using UniversalBroker.Core.Database.Models;
-using UniversalBroker.Core.Logic.Interfaces;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Chanels;
 using UniversalBroker.Core.Models.Enums;
 using UniversalBroker.Core.Models.Internals;
@@ -21,11 +21,11 @@ namespace UniversalBroker.Core.Logic.Contexts
     /// <param name="dbLogingService"></param>
     public class JsContext(
         ILogger<JsContext> logger,
-        IDbLogingService dbLogingService)
+        AbstractDbLogingService dbLogingService)
     {
         private readonly ILogger _logger = logger;
-        private readonly IDbLogingService _dbLogingService = dbLogingService;
-        private static ConcurrentDictionary<string, string?> _internalStorage = new(); //TODO поменять на что-то более стабильное
+        private readonly AbstractDbLogingService _dbLogingService = dbLogingService;
+        private static ConcurrentDictionary<string, object?> _internalStorage = new(); //TODO поменять на что-то более стабильное
 
         /// <summary>
         /// Id скрипта, где мы сейчас
@@ -57,7 +57,11 @@ namespace UniversalBroker.Core.Logic.Contexts
         /// <param name="Id"></param>
         /// <param name="data"></param>
         /// <param name="headers"></param>
-        public void SendMessageToChanel(object Id, byte[] data, ScriptObject? headers = null)
+        public void SendMessageToChanel(object Id, IList<byte> data, ScriptObject? headers = null) 
+            => SendMessageToChanel(Id, data.ToArray(), headers);
+
+
+        private void SendMessageToChanel(object Id, byte[] data, ScriptObject? headers = null)
         {
             var headersDict = new Dictionary<string, string>();
             if ( headers!=null)
@@ -102,7 +106,10 @@ namespace UniversalBroker.Core.Logic.Contexts
         /// <param name="Id"></param>
         /// <param name="data"></param>
         /// <param name="headers"></param>
-        public void SendMessageToConnection(object Id, byte[] data, ScriptObject? headers = null)
+        public void SendMessageToConnection(object Id, IList<byte> data, ScriptObject? headers = null)
+            => SendMessageToConnection(Id, data.ToArray(), headers);
+
+        private void SendMessageToConnection(object Id, byte[] data, ScriptObject? headers = null)
         {
             var headersDict = new Dictionary<string, string>();
             if (headers != null)
@@ -217,7 +224,7 @@ namespace UniversalBroker.Core.Logic.Contexts
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void WriteIntoStorage(string key, string? value)
+        public void WriteIntoStorage(string key, object value)
         {
             _internalStorage.AddOrUpdate(key, value, (k, v) => value);
         }
@@ -227,9 +234,9 @@ namespace UniversalBroker.Core.Logic.Contexts
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string? ReadFromStorage(string key)
+        public object? ReadFromStorage(string key)
         {
-            return _internalStorage.TryGetValue(key, out string res) ? res : null;
+            return _internalStorage.TryGetValue(key, out object? res) ? res : null;
         }
         #endregion Методы работы с хранилищем
     }

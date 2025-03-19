@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
+using UniversalBroker.Core.Logic.Abstracts;
 using UniversalBroker.Core.Models.Commands.Connections;
 using UniversalBroker.Core.Models.Dtos.Connections;
 
@@ -17,19 +18,23 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
     public class UpdateConnectionCommandHandler(
         ILogger<UpdateConnectionCommandHandler> logger,
         IMapper mapper,
-        BrockerContext brockerContext
-        ) : IRequestHandler<UpdateConnectionCommand, ConnectionDto>
+        BrockerContext brockerContext,
+        AbstractAdaptersManager abstractAdaptersManager
+        ) : IRequestHandler<UpdateConnectionCommand, ConnectionFullDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
+        private readonly AbstractAdaptersManager _adaptersManager = abstractAdaptersManager;
 
-        public async Task<ConnectionDto> Handle(UpdateConnectionCommand request, CancellationToken cancellationToken)
+        public async Task<ConnectionFullDto> Handle(UpdateConnectionCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var existingModel = await _context.Connections
                                         .Include(x => x.ConnectionAttributes).ThenInclude(x => x.Attribute)
+                                        .Include(x=>x.Communication)
+                                        .Include(x=>x.Chanels)
                                         .FirstOrDefaultAsync(x => x.Id == request.ConnectionId);
                 if (existingModel == null)
                     throw new ControllerException("Не найдено подключения с такмим Id");
@@ -49,6 +54,10 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                         connectionAttribute.Attribute.Value = request.UpdateDto.Attribues[connectionAttribute.Attribute.Key];
                         request.UpdateDto.Attribues.Remove(connectionAttribute.Attribute.Key);
                     }
+                    else
+                    {
+                        request.UpdateDto.Attribues.Remove(connectionAttribute.Attribute.Key);
+                    }
                 }
 
                 foreach (var newAttribute in request.UpdateDto.Attribues)
@@ -60,9 +69,24 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
                     await _context.Attributes.AddAsync(newAttrtinuteObj.Attribute);
                 }
 
+                // Обновялем каналы (список)
+                existingModel.Chanels = await _context.Chanels.Where(x => request.UpdateDto.ChannelsIds.Contains(x.Id)).ToListAsync();
+
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<ConnectionDto>(existingModel);
+                if (request.NeedNotifyAdapter)
+                {
+                    var sendTask = _adaptersManager.GetAdapterById(existingModel.CommunicationId)?.SendMessage(new()
+                    {
+                        Connection = _mapper.Map<Protos.ConnectionDto>(existingModel)
+                    },
+                    cancellationToken);
+
+                    if (sendTask != null)
+                        await sendTask;
+                }
+
+                return _mapper.Map<ConnectionFullDto>(existingModel);
 
             }
             catch (ControllerException ex)

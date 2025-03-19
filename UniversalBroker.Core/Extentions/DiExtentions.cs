@@ -10,6 +10,10 @@ using UniversalBroker.Core.Logic.Services;
 using NLog.Config;
 using UniversalBroker.Core.Logic.Contexts;
 using System;
+using UniversalBroker.Core.Logic.Abstracts;
+using UniversalBroker.Core.Logic.Managers;
+using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace UniversalBroker.Core.Extentions
 {
@@ -26,6 +30,9 @@ namespace UniversalBroker.Core.Extentions
 
             services.AddGrpc();
 
+            services.AddHostedService(p => p.GetRequiredService<AbstractDbLogingService>());
+            services.AddHostedService(p => p.GetRequiredService<AbstractAdaptersManager>());
+
             services.AddSwaggerStaf();
 
             services.AddDatabase();
@@ -34,14 +41,17 @@ namespace UniversalBroker.Core.Extentions
 
         public static IServiceCollection AddSingletons(this IServiceCollection services)
         {
-            services.AddSingleton<IDbLogingService, DbLogingService>();
+            services.AddSingleton<AbstractDbLogingService, DbLogingService>();
+            services.AddSingleton<AbstractAdaptersManager, AdaptersManager>();
             services.AddSingleton<Func<BrockerContext>>(sp => () => sp.CreateAsyncScope().ServiceProvider.GetService<BrockerContext>()!);
+            services.AddSingleton<Func<IMediator>>(sp => () => sp.CreateAsyncScope().ServiceProvider.GetService<IMediator>()!);
             return services;
         }
 
         public static IServiceCollection AddScopeds(this IServiceCollection services)
         {
             services.AddTransient<IChanelJsInterpretatorService, ChanelJsInterpretatorService>();
+            services.AddScoped<IAdapterCoreService, AdapterCoreService>();
             services.AddTransient<JsContext>();
 
             return services;
@@ -56,15 +66,18 @@ namespace UniversalBroker.Core.Extentions
         {
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+            services.AddGrpcSwagger();
             return services;
         }
 
         public static IServiceCollection AddDatabase(this IServiceCollection services)
         {
-            services.AddDbContextPool<BrockerContext>(cfg =>
+            services.AddDbContext<BrockerContext>(cfg =>
             {
                 cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.254.121");
-            });
+                cfg.EnableServiceProviderCaching();
+            }, ServiceLifetime.Transient);
+
             return services;
         }
 
