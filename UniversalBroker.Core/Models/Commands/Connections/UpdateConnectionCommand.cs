@@ -3,7 +3,7 @@ using UniversalBroker.Core.Models.Dtos.Connections;
 
 namespace UniversalBroker.Core.Models.Commands.Connections
 {
-    public class UpdateConnectionCommand: IRequest<ConnectionDto>
+    public class UpdateConnectionCommand: IRequest<ConnectionFullDto>
     {
         public Guid ConnectionId { get; set; }
         public UpdateConnectionDto UpdateDto { get; set; }

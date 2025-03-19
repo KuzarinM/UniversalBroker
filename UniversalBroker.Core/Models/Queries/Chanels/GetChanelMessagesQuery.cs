@@ -1,9 +1,10 @@
 ﻿using MediatR;
+using UniversalBroker.Core.Models.Dtos;
 using UniversalBroker.Core.Models.Dtos.Chanels;
 
 namespace UniversalBroker.Core.Models.Queries.Chanels
 {
-    public class GetChanelMessagesQuery: IRequest<List<MessageViewDto>>
+    public class GetChanelMessagesQuery: IRequest<PaginationModel<MessageViewDto>>
     {
         public int PageSize { get; set; }
 

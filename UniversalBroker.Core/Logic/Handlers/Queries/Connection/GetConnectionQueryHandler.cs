@@ -31,6 +31,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
                 var list = await _context.Connections
                                 .Include(x => x.ConnectionAttributes).ThenInclude(x => x.Attribute)
                                 .Include(x=>x.Communication)
+                                .Include(x=>x.Chanels)
                                 .FirstOrDefaultAsync(x => x.Id == request.Id);
 
                 return _mapper.Map<ConnectionFullDto>(list);

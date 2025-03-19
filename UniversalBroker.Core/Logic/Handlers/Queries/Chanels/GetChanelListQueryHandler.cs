@@ -5,6 +5,7 @@ using UniversalBroker.Core.Database.Models;
 using UniversalBroker.Core.Exceptions;
 using UniversalBroker.Core.Logic.Handlers.Commands.Chanels;
 using UniversalBroker.Core.Models.Commands.Chanels;
+using UniversalBroker.Core.Models.Dtos;
 using UniversalBroker.Core.Models.Dtos.Chanels;
 using UniversalBroker.Core.Models.Queries.Chanels;
 
@@ -20,13 +21,13 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
         ILogger<GetChanelListQueryHandler> logger,
         IMapper mapper,
         BrockerContext brockerContext
-    ) : IRequestHandler<GetChanelListQuery, List<ChanelDto>>
+    ) : IRequestHandler<GetChanelListQuery, PaginationModel<ChanelDto>>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
 
-        public async Task<List<ChanelDto>> Handle(GetChanelListQuery request, CancellationToken cancellationToken)
+        public async Task<PaginationModel<ChanelDto>> Handle(GetChanelListQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -40,7 +41,17 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                                 .Skip(request.PageNumber*request.PageSize).Take(request.PageSize)
                                 .ToListAsync();
 
-                return _mapper.Map<List<ChanelDto>>(list);
+                var totalPages = (await _context.Chanels.Where(x =>
+                                    (string.IsNullOrEmpty(request.NameContatins) || x.Name.Contains(request.NameContatins))
+                                ).CountAsync()) * 1f / request.PageSize;
+
+                return new()
+                {
+                    Page = _mapper.Map<List<ChanelDto>>(list),
+                    PageSize = request.PageSize,
+                    CurrentPage = request.PageNumber,
+                    TotalPages = (int)Math.Ceiling(totalPages)
+                };
 
             }
             catch (ControllerException ex)

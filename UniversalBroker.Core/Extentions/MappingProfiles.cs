@@ -80,7 +80,8 @@ namespace UniversalBroker.Core.Extentions
             CreateMap<Connection, Protos.ConnectionDeleteDto>();
 
             CreateMap<Connection, ConnectionFullDto>()
-                .ForMember(x => x.Attribues, opt => opt.MapFrom(x => x.ConnectionAttributes.ToDictionary(x => x.Attribute.Key, x => x.Attribute.Value)));
+                .ForMember(x => x.Attribues, opt => opt.MapFrom(x => x.ConnectionAttributes.ToDictionary(x => x.Attribute.Key, x => x.Attribute.Value)))
+                .ForMember(x=>x.ChannelsIds, opt => opt.MapFrom(x=>x.Chanels.Select(x=>x.Id).ToList()));
 
             CreateMap<Connection, Protos.ConnectionDto>()
                .ForMember(x => x.Attributes, opt => opt.MapFrom(x => x.ConnectionAttributes.ToDictionary(x => x.Attribute.Key, x => x.Attribute.Value)));
@@ -145,7 +146,17 @@ namespace UniversalBroker.Core.Extentions
             CreateMap<Message, MessageViewDto>()
                 .ForMember(x => x.Direction, opt => opt.MapFrom(x => GetDirectionByMessage(x)))
                 .ForMember(x => x.SourceId, opt => opt.MapFrom(x => x.Connection != null && x.Connection.Isinput ? x.ConnectionId : x.SourceChannelId))
+                .ForMember(x => x.SourceName, opt => opt.MapFrom(x => 
+                                                                    x.Connection != null && x.Connection.Isinput ? 
+                                                                        (x.Connection != null ? x.Connection.Name : string.Empty) : 
+                                                                        (x.SourceChannel != null ? x.SourceChannel.Name : string.Empty)
+                                                                ))
                 .ForMember(x => x.TargetId, opt => opt.MapFrom(x => x.Connection != null && !x.Connection.Isinput ? x.ConnectionId : x.TargetChannelId))
+                .ForMember(x => x.TargetName, opt => opt.MapFrom(x => 
+                                                                    x.Connection != null && !x.Connection.Isinput ? 
+                                                                    (x.Connection != null ? x.Connection.Name : string.Empty) :
+                                                                    (x.TargetChannel != null ? x.TargetChannel.Name : string.Empty)
+                                                                ))
                 .ForMember(x => x.Headers, opt => opt.MapFrom(x => x.Headers.ToDictionary(y => y.Name, y => y.Value)));
         }
 

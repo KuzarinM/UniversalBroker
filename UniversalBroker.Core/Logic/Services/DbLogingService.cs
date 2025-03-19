@@ -21,7 +21,7 @@ namespace UniversalBroker.Core.Logic.Services
         private readonly ConcurrentQueue<MessageLog> messageLogs = new();
         private readonly ConcurrentQueue<ScriptExecutionLog> scriptExecutionLogs = new();
 
-        public override Task LogMessage(MessageLog log)
+        public override async Task LogMessage(MessageLog log)
         {
             try
             {
@@ -31,8 +31,6 @@ namespace UniversalBroker.Core.Logic.Services
             {
                 _logger.LogError(ex, "Ошибка при внесении сообщения в лог");
             }
-
-            return Task.CompletedTask;
         }
 
         public override Task LogScriptExecution(ScriptExecutionLog log)
@@ -51,16 +49,45 @@ namespace UniversalBroker.Core.Logic.Services
 
         private async Task SaveMessageToDb(MessageLog messageLog)
         {
-            var message = _mapper.Map<Message>(messageLog);
+            try
+            {
+                var message = _mapper.Map<Message>(messageLog);
 
-            await _context.Messages.AddAsync(message);
+                await _context.Messages.AddAsync(message);
+
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Не удалось сохранить сообщение");
+
+                // Если кто-то попытался отправить что-то не то и не в туда, то мы залогируем. Прицидент был
+                if (messageLog.Direction != Models.Enums.MessageDirection.ConnectionToChanel)
+                    await LogScriptExecution(new()
+                    {
+                        ScriptId = messageLog.Message.SourceId,
+                        LogLevel = LogLevel.Error,
+                        MessageText = ex.Message,
+                    });
+            }
+
         }
 
         private async Task SaveExecutionToDb(ScriptExecutionLog executionLog)
         {
-            var log = _mapper.Map<ExecutionLog>(executionLog);
+            try
+            {
+                var log = _mapper.Map<ExecutionLog>(executionLog);
 
-            await _context.ExecutionLogs.AddAsync(log);
+                await _context.ExecutionLogs.AddAsync(log);
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Не удалось сохранить лог");
+            }
+
         }
 
         private async Task StartWorking(CancellationToken stoppingToken)
@@ -73,19 +100,24 @@ namespace UniversalBroker.Core.Logic.Services
                 {
                     stopper = 100;
 
-                    while (messageLogs.Count > 0 || scriptExecutionLogs.Count > 0)
+                    try
                     {
-                        if (messageLogs.TryDequeue(out MessageLog messageLog))
-                            await SaveMessageToDb(messageLog);
-                        if (scriptExecutionLogs.TryDequeue(out ScriptExecutionLog scriptLog))
-                            await SaveExecutionToDb(scriptLog);
+                        while (messageLogs.Count > 0 || scriptExecutionLogs.Count > 0)
+                        {
+                            if (messageLogs.TryDequeue(out MessageLog messageLog))
+                                await SaveMessageToDb(messageLog);
+                            if (scriptExecutionLogs.TryDequeue(out ScriptExecutionLog scriptLog))
+                                await SaveExecutionToDb(scriptLog);
 
-                        stopper--;
-                        if (stopper < 0)
-                            break;
+                            stopper--;
+                            if (stopper < 0)
+                                break;
+                        }
                     }
-
-                    await _context.SaveChangesAsync();
+                    catch (Exception ex) 
+                    {
+                        _logger.LogError(ex, "Ошибка при итерации по очереди");
+                    }
                 }
             }
         }

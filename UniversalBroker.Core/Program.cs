@@ -18,6 +18,8 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 app.AddMiddlewares();
 
 app.AddSwagger();
