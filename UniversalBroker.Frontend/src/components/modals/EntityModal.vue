@@ -259,6 +259,48 @@ export default{
                         detail: "macro", 
                         info:"Прочитать из хранилища по ключу"
                     },
+                    {
+                        label: "messageId", 
+                        type: "variable", 
+                        apply: "Message.InternalId", 
+                        detail: "macro", 
+                        info:"Уникальный идентификатор для внутреннего сообщения"
+                    },
+                    {
+                        label: "messageIsFromConnection", 
+                        type: "variable", 
+                        apply: "Message.IsFromConnection", 
+                        detail: "macro", 
+                        info:"Указывает, является ли сообщение исходящим от соединения"
+                    },
+                    {
+                        label: "messageSourceId", 
+                        type: "variable", 
+                        apply: "Message.SourceId", 
+                        detail: "macro", 
+                        info:"Идентификатор источника, который отправил сообщение"
+                    },
+                    {
+                        label: "messageData", 
+                        type: "variable", 
+                        apply: "Message.Data", 
+                        detail: "macro", 
+                        info:"Данные сообщения в формате байтов"
+                    },
+                    {
+                        label: "messageText", 
+                        type: "variable", 
+                        apply: "Message.Text", 
+                        detail: "macro", 
+                        info:"Данные сообщения, декодированные в виде строки UTF-8"
+                    },
+                    {
+                        label: "messageHeaders", 
+                        type: "variable", 
+                        apply: "Message.Headers", 
+                        detail: "macro", 
+                        info:"Словарь, содержащий информацию заголовков, связанную с сообщением"
+                    },
                 ]
             }
         }

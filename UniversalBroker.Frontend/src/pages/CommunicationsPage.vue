@@ -87,7 +87,8 @@ export default{
                     }
                 ]
             },
-            editedCommunication:{}
+            editedCommunication:{},
+            savedConnunication:{}
         }
     },
     mixins:[
@@ -142,6 +143,10 @@ export default{
 
             if(res.code == 200){
                 this.editedCommunication = res.body
+
+                // Сохраняем модель старую
+                this.savedConnunication = JSON.parse(JSON.stringify(res.body))
+
                 this.$refs.updateModal.Open()
             }
             else{
@@ -173,12 +178,23 @@ export default{
             this.$emit("StopLoading")
         },
         async SaveCommunication(item){
-            console.log("Сохраняем", item)
+            var attributes = JSON.parse(JSON.stringify(item.attributes))
 
-            var res = await this.UpdateCommunication(item.id, item.attributes)
+            for (let key in this.savedConnunication.attributes) {
+                if(attributes[key] == undefined){
+                    attributes[key] = null
+                }
+
+                if(attributes[key] == this.savedConnunication.attributes[key]){
+                    delete attributes[key]
+                }
+            }
+
+            var res = await this.UpdateCommunication(item.id, attributes)
 
             if(res.code == 200){
                 this.editedCommunication = res.body
+                this.savedConnunication = JSON.parse(JSON.stringify(res.body))
             }
             else{
                 alert("Не удалось сохранить изменения Соединения")
