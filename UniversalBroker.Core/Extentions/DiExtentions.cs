@@ -75,6 +75,8 @@ namespace UniversalBroker.Core.Extentions
             services.AddDbContext<BrockerContext>(cfg =>
             {
                 cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.254.121");
+
+                //cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.0.102");
                 cfg.EnableServiceProviderCaching();
             }, ServiceLifetime.Transient);
 

@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using UniversalBroker.Core.Models.Commands.Chanels;
+using UniversalBroker.Core.Models.Dtos;
 using UniversalBroker.Core.Models.Dtos.Chanels;
 using UniversalBroker.Core.Models.Internals;
 using UniversalBroker.Core.Models.Queries.Chanels;
@@ -14,6 +16,9 @@ namespace UniversalBroker.Core.Controllers
     public class ChanelController(IMediator mediator) : CustomControllerBase(mediator)
     {
         [HttpGet]
+        [SwaggerOperation(summary:"Получение списка каналов")]
+        [SwaggerResponse(200, description:"Список каналов", type:typeof(PaginationModel<ChanelDto>))]
+        [SwaggerResponse(400, description:"Ошибка", type:typeof(string))]
         public async Task<IActionResult> GetChannels(
             [FromQuery]
             int pageSize = 10,
@@ -32,6 +37,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpGet("{id:guid}/logs")]
+        [SwaggerOperation(summary: "Получение логов канала")]
+        [SwaggerResponse(200, description: "Список логов", type: typeof(PaginationModel<ChanelScriptLogDto>))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetChannelLogs(
             [FromRoute]
             Guid id,
@@ -59,6 +67,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpGet("{id:guid}/messages")]
+        [SwaggerOperation(summary: "Получение сообщений канала")]
+        [SwaggerResponse(200, description: "Список логов", type: typeof(PaginationModel<MessageViewDto>))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetChannelMessages(
            [FromRoute]
             Guid id,
@@ -83,6 +94,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [SwaggerOperation(summary: "Получение информации по каналу")]
+        [SwaggerResponse(200, description: "Канал", type: typeof(ChanelFullDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetChanel(
             [FromRoute]
             Guid id
@@ -95,6 +109,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(summary: "Создание канала")]
+        [SwaggerResponse(200, description: "Канал успешно создан", type: typeof(ChanelDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> CreateChanel(
             [FromBody]
             CreateChanelDto chanel
@@ -107,6 +124,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPost("{id:guid}/sendMessage")]
+        [SwaggerOperation(summary: "Отправить сообщение в канал (тестовый)")]
+        [SwaggerResponse(204, description: "Сообщение отправлено")]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> SendMessageToChanel(
             [FromRoute]
             Guid id,
@@ -122,6 +142,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [SwaggerOperation(summary: "Изменение инфомрации о канале")]
+        [SwaggerResponse(200, description: "Изменённый канал", type: typeof(ChanelDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> UpdateChanel(
             [FromRoute]
             Guid id,
@@ -137,6 +160,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPut("{id:guid}/script")]
+        [SwaggerOperation(summary: "Изменение отдельно скрипта канала")]
+        [SwaggerResponse(200, description: "Изменённый канал", type: typeof(ChanelFullDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> UpdateChanelScript(
             [FromRoute]
             Guid id,
@@ -152,6 +178,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [SwaggerOperation(summary: "Удаление канала и возврат его модели")]
+        [SwaggerResponse(204, description: "Канал успешно удалён")]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> DeleteChanel(
             [FromRoute]
             Guid id

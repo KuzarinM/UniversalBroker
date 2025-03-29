@@ -1,7 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using UniversalBroker.Core.Models.Commands.Communications;
+using UniversalBroker.Core.Models.Dtos;
+using UniversalBroker.Core.Models.Dtos.Chanels;
 using UniversalBroker.Core.Models.Dtos.Communications;
 using UniversalBroker.Core.Models.Queries.Communications;
 
@@ -13,6 +16,9 @@ namespace UniversalBroker.Core.Controllers
     {
 
         [HttpGet]
+        [SwaggerOperation(summary: "Получение Соединений с фильтрами")]
+        [SwaggerResponse(200, description: "Список Соединений", type: typeof(PaginationModel<CommunicationDto>))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetCommunications(
             [FromQuery]
             int pageSize = 10,
@@ -34,6 +40,10 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [SwaggerOperation(summary: "Получение Соединения")]
+        [SwaggerResponse(200, description: "Соединениt", type: typeof(CommunicationDto))]
+        [SwaggerResponse(204, description: "Не удалось найти Соединение")]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetCommunication(
             [FromRoute]
             Guid id
@@ -46,6 +56,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(summary: "Обновление Соединения, если есть, если нет - добавление")]
+        [SwaggerResponse(200, description: "Модель Соединения", type: typeof(CommunicationDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> AddOrUpdateCommunication(
             [FromBody]
             CreateCommunicationDto createDto)
@@ -57,6 +70,10 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [SwaggerOperation(summary: "Удаление Соединения")]
+        [SwaggerResponse(200, description: "Модель Соединения, если оно было удалено", type: typeof(CommunicationDto))]
+        [SwaggerResponse(204, description: "Не найдено Соединения на удаление")]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> DeleteCommunication(
             [FromRoute]
             Guid id)
@@ -68,6 +85,9 @@ namespace UniversalBroker.Core.Controllers
         }
 
         [HttpPatch("{id:guid}")]
+        [SwaggerOperation(summary: "Обновление атрибутов Соединения")]
+        [SwaggerResponse(200, description: "Модель Соединения, если оно было изменено", type: typeof(CommunicationDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> UpdateCommunicationAttribute(
             [FromRoute]
             Guid id,
