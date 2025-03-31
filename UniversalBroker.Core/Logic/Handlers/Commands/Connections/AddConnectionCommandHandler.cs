@@ -20,14 +20,14 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
         IMapper mapper,
         BrockerContext brockerContext,
         AbstractAdaptersManager abstractAdaptersManager
-        ) : IRequestHandler<AddConnectionCommand, ConnectionDto>
+        ) : IRequestHandler<AddConnectionCommand, ConnectionViewDto>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private readonly BrockerContext _context = brockerContext;
         private readonly AbstractAdaptersManager _abstractAdaptersManager = abstractAdaptersManager;
 
-        public async Task<ConnectionDto> Handle(AddConnectionCommand request, CancellationToken cancellationToken)
+        public async Task<ConnectionViewDto> Handle(AddConnectionCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Connections
 
                 await _context.SaveChangesAsync();
 
-                var res = _mapper.Map<ConnectionDto>(model);
+                var res = _mapper.Map<ConnectionViewDto>(model);
 
                 var sendTask = _abstractAdaptersManager.GetAdapterById(request.ConnectionDto.CommunicationId)?.SendMessage(new()
                 {

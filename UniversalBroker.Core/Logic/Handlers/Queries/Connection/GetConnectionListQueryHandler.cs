@@ -19,13 +19,13 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
         ILogger<GetConnectionListQueryHandler> logger,
         IMapper mapper,
         BrockerContext context
-        ) : IRequestHandler<GetConnectionListQuery, PaginationModel<ConnectionDto>>
+        ) : IRequestHandler<GetConnectionListQuery, PaginationModel<ConnectionViewDto>>
     {
         private readonly ILogger _logger = logger;
         private readonly IMapper _mapper = mapper;
         private BrockerContext _context = context;
 
-        public async Task<PaginationModel<ConnectionDto>> Handle(GetConnectionListQuery request, CancellationToken cancellationToken)
+        public async Task<PaginationModel<ConnectionViewDto>> Handle(GetConnectionListQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
                 return new()
                 {
                     PageSize = request.PageSize,
-                    Page = _mapper.Map<List<ConnectionDto>>(list),
+                    Page = _mapper.Map<List<ConnectionViewDto>>(list),
                     CurrentPage = request.PageNumber,
                     TotalPages = (int)Math.Ceiling(totalPages)
                 };

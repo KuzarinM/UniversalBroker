@@ -5,7 +5,7 @@ namespace UniversalBroker.Core.Models.Dtos.Connections
     /// <summary>
     /// Полное Dto подключения
     /// </summary>
-    public class ConnectionFullDto: ConnectionDto
+    public class ConnectionFullDto: ConnectionViewDto
     {
         /// <summary>
         /// Модель подключения

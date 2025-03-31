@@ -16,9 +16,9 @@ namespace UniversalBroker.Core.Controllers
     public class ChanelController(IMediator mediator) : CustomControllerBase(mediator)
     {
         [HttpGet]
-        [SwaggerOperation(summary:"Получение списка каналов")]
-        [SwaggerResponse(200, description:"Список каналов", type:typeof(PaginationModel<ChanelDto>))]
-        [SwaggerResponse(400, description:"Ошибка", type:typeof(string))]
+        [SwaggerOperation(summary: "Получение списка каналов")]
+        [SwaggerResponse(200, description: "Список каналов", type: typeof(PaginationModel<ChanelDto>))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
         public async Task<IActionResult> GetChannels(
             [FromQuery]
             int pageSize = 10,
@@ -33,6 +33,18 @@ namespace UniversalBroker.Core.Controllers
                 PageSize = pageSize,
                 PageNumber = pageIndex,
                 NameContatins = search
+            });
+        }
+
+        [HttpGet("{id:guid}/relations")]
+        [SwaggerOperation(summary: "Получение списка реасльных связей")]
+        [SwaggerResponse(200, description: "Список реальных свяей", type: typeof(СhannelRelationsDto))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
+        public async Task<IActionResult> GetChannelRelations([FromRoute] Guid id)
+        {
+            return await ControllerSimpleRequest(new GetChanelRelationsQuery()
+            {
+                ChanelId = id
             });
         }
 
@@ -168,7 +180,7 @@ namespace UniversalBroker.Core.Controllers
             Guid id,
             [FromBody]
             string newScript
-)
+        )
         {
             return await ControllerSimpleRequest(new ChangeChanelScriptCommand()
             {
