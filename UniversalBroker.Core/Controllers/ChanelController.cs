@@ -48,6 +48,17 @@ namespace UniversalBroker.Core.Controllers
             });
         }
 
+        [HttpGet("relations")]
+        [SwaggerOperation(summary: "Получение списка всей системы")]
+        [SwaggerResponse(200, description: "Список реальных свяей", type: typeof(List<NodeDto>))]
+        [SwaggerResponse(400, description: "Ошибка", type: typeof(string))]
+        public async Task<IActionResult> GetSystemRelations()
+        {
+            return await ControllerSimpleRequest(new GetSystemRelationQuery()
+            {
+            });
+        }
+
         [HttpGet("{id:guid}/logs")]
         [SwaggerOperation(summary: "Получение логов канала")]
         [SwaggerResponse(200, description: "Список логов", type: typeof(PaginationModel<ChanelScriptLogDto>))]

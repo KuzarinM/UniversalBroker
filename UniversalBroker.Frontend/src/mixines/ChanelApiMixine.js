@@ -93,6 +93,24 @@ const ChanelApiMixine = {
                 }
             ));
         },
+        async GetChanelRelations(id){
+            return await this.__CreateResponce(await this.__makeRequest(
+                "GET", 
+                `/api/Chanel/${id}/relations`, 
+                null, 
+                null, 
+                null
+            ));
+        },
+        async GetSystemRelations(){
+            return await this.__CreateResponce(await this.__makeRequest(
+                "GET", 
+                `/api/Chanel/relations`, 
+                null, 
+                null, 
+                null
+            ));
+        }
     }
 }
 

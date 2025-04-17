@@ -50,7 +50,11 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                                                 : (x.First().Connection.Isinput 
                                                             ? MessageDirection.ConnectionToChanel 
                                                             : MessageDirection.ChanelToConnection
-                                                    )
+                                                    ),
+                        IsInput = x.First().Connection != null
+                                                ? x.First().Connection.Isinput
+                                                : x.Key.SourceChannelId != request.ChanelId
+,
                     })
                     .ToListAsync();
 
@@ -70,7 +74,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                     RelationId = x.Id,
                     RelationName = x.Name,
                     Status = RelationUsageStatus.NotUsed,
-                    Direction = x.Isinput ? MessageDirection.ConnectionToChanel : MessageDirection.ChanelToConnection
+                    Direction = x.Isinput ? MessageDirection.ConnectionToChanel : MessageDirection.ChanelToConnection,
+                    IsInput = x.Isinput
                 }));
 
                 declaredRelations.AddRange(chanel.FromChanels.Select(x => new СhanelRelationDto()
@@ -78,7 +83,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                     RelationId = x.Id,
                     RelationName = x.Name,
                     Status = RelationUsageStatus.NotUsed,
-                    Direction = MessageDirection.ChanelToChanel
+                    Direction = MessageDirection.ChanelToChanel,
+                    IsInput = true,
                 }));
 
                 declaredRelations.AddRange(chanel.ToChanels.Select(x => new СhanelRelationDto()
@@ -86,7 +92,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                     RelationId = x.Id,
                     RelationName = x.Name,
                     Status = RelationUsageStatus.NotUsed,
-                    Direction = MessageDirection.ChanelToChanel
+                    Direction = MessageDirection.ChanelToChanel,
+                    IsInput = false,
                 }));
                 
                 foreach (var item in relations)

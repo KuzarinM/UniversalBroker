@@ -27,5 +27,10 @@ namespace UniversalBroker.Core.Models.Dtos.Chanels
         /// </summary>
         public RelationUsageStatus Status { get; set; }
 
+        /// <summary>
+        /// Является ли данная связь входом или выходом
+        /// </summary>
+        public bool IsInput { get; set; }
+
     }
 }
