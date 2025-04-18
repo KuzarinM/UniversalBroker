@@ -72,15 +72,11 @@ export default{
                 "Не используется", 
                 "Не отмечено"
             ],
-            nodes: [
-                { id: 1, label: 'Node 1' },
-                { id: 2, label: 'Node 2' },
-                { id: 3, label: 'Node 3' }
-            ],
+            nodes: [],
             edges: [
-                { from: 1, to: 2, label: 'Relation' },
-                { from: 2, to: 3, arrows: 'to' },
-                { from: 3, to: 1 }
+                // { from: 1, to: 2, label: 'Relation' },
+                // { from: 2, to: 3, arrows: 'to' },
+                // { from: 3, to: 1 }
             ],
             options: {
                 nodes: {
@@ -106,12 +102,12 @@ export default{
                         springLength: 80,                  // Еще короче связи
                         springConstant: 0.04,
                         damping: 0.5,
-                        avoidOverlap: 0.5   
+                        avoidOverlap: 0.7   
                     }
                 },
-        height: "400px",
-        locales:"ru"
-      }
+                height: "400px",
+                locales:"ru"
+            }
         }
     },
     mixins:[
@@ -124,79 +120,109 @@ export default{
     },
     methods:{
         async Open(id){
-            var relations = await this.GetSystemRelations()
 
-            if(relations.code === 200){
+            this.$emit("StartLoading")
 
-                this.viewedRelationsModel = relations.body;
+            var container = this.$refs.network_container
 
-                var idDict = {}
-                var lastId = 0;
+            this.options.height = container.height
 
-                function GetIdByGuid(guid){
-                    if(idDict[guid] != null && idDict[guid] != undefined)
-                        return idDict[guid]
-                    lastId++;
-                    idDict[guid] = lastId
-                    return lastId
-                }
+            try{
+                var relations = await this.GetSystemRelations()
 
-                this.nodes = []
-                this.edges = []
+                if(relations.code === 200){
 
-                var allNodes = []
-                var allEges = []
+                    this.viewedRelationsModel = relations.body;
 
-                for (let index = 0; index < this.viewedRelationsModel.length; index++) {
-                    const element = this.viewedRelationsModel[index];
+                    var allNodes = []
+                    var allEges = []
 
-                    var node = {
-                         id: element.objectId, 
-                         label: element.objectName,
+                    for (let i = 0; i < this.viewedRelationsModel.length; i++) {
+                        const element = this.viewedRelationsModel[i];
+
+                        allNodes.push(this.AddNode(element, id))
+
+                        for (let j = 0; j < element.outputIds.length; j++) {
+                            const egeDto = element.outputIds[j];
+                            allEges.push(this.AddEge(egeDto, element))
                         }
-
-                    if(!element.isChanel){
-                        node.shape = "ellipse"
                     }
 
-                    node.color= {
-                            background: element.objectId == id ? "#198754": '#D2E5FF'
-                        } 
+                    this.nodes = allNodes
+                    this.edges = allEges
 
-
-                    allNodes.push(node)
-
-                    for (let j = 0; j < element.outputIds.length; j++) {
-                        const egeDto = element.outputIds[j];
-
-                        var ege = { 
-                            from: element.objectId, 
-                            to: egeDto.targetId 
-                        }
-
-                        ege.color = {
-                                color: egeDto.status != 0 ? "#dc3545": '#848484'
-                            }
-
-
-                        allEges.push(ege)
-                    }
+                    console.log(this.edges)
+                    console.log(this.nodes)
                 }
 
-                this.nodes = allNodes
-                this.edges = allEges
-
-                console.log(this.edges)
-                console.log(this.nodes)
+                await this.$refs.baseModal.OpenModal()
+            }
+            finally{
+                this.$emit("StopLoading")
+            }
+        },
+        AddNode(element, currentId){
+            var node = {
+                id: element.objectId, 
+                label: element.objectName,
+                href: this.GetRelationUrl(element.isChanel, element.objectId)
             }
 
-            await this.$refs.baseModal.OpenModal()
+            if(!element.isChanel){
+                node.shape = "ellipse"
+            }
+
+            var color = element.objectId == currentId 
+                        ? this.GetColorFromClass("success") 
+                        : (element.isChanel 
+                            ? this.GetColorFromClass("info")
+                            : this.GetColorFromClass("light")
+                        )
+
+            node.color = {
+                background: color,
+                highlight: {
+                    background:color
+                }
+            } 
+            return node
         },
-        GetRelationUrl(row){
-            if(row.direction==1)
-                return `/chanels?id=${row.relationId}`
+        AddEge(egeDto, element){
+            var ege = { 
+                from: element.objectId, 
+                to: egeDto.targetId 
+            }
+
+            var color = this.GetColorFromClass("danger");
+
+            switch(egeDto.status){
+                case 0:
+                    color = this.GetColorFromClass("primary")
+                    break;
+                case 1:
+                    color = this.GetColorFromClass("warning")
+                    break;
+            }
+
+            ege.color = {
+                color: color,
+                highlight: color
+            }        
+
+            return ege
+        },
+        GetColorFromClass(colorName){
+            const root = document.documentElement;
+
+            return getComputedStyle(root)
+                    .getPropertyValue(`--bs-${colorName}`)
+                    .trim();
+        },
+        GetRelationUrl(isChanel, id){
+            if(isChanel==1)
+                return `/chanels?id=${id}`
             else
-                return `/connections?id=${row.relationId}`
+                return `/connections?id=${id}`
         },
         GetRowClass(row){
             if(row.status != 0)
@@ -211,18 +237,27 @@ export default{
         var network = this.$refs.network
 
         network.once('afterDrawing', function () {
-            // Assuming 'container' is the DOM element where the network is rendered
-            var containerWidth = container.offsetWidth;
-            var containerHeight = container.offsetHeight;
             var scale = 1.5;
-            console.log(containerWidth, containerHeight)
             network.moveTo({
                 offset: {
-                    x: (0.5 * containerWidth) * scale,
-                    y: (0.5 * containerHeight) * scale
+                    x: (0.5 * container.offsetWidth) * scale,
+                    y: (0.5 * container.offsetHeight) * scale
                 },
                 scale: scale
             });
+        });
+
+        network.on('doubleClick', (opts) => {
+
+            if(opts.nodes.length >0){
+                var nodeId = opts.nodes[0]
+
+                var node = network.nodes.find(x=> x.id == nodeId)
+
+                window.open(node.href, '_blank');
+            }
+
+            //network.unselectAll();
         });
     }
 }
@@ -254,15 +289,4 @@ export default{
         <template v-slot:footer>
         </template>
     </BaseModal>
-
-
-
-
-<!-- <ViewModal
-
-    entityName=""
-    :struncture="this.relationViewStruecture"
-    v-model:viewedEntity="this.viewedRelationsModel"
-/> -->
-
 </template>

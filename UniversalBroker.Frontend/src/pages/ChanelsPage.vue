@@ -432,6 +432,8 @@ export default{
 
 <RealRelationsModal 
     ref="realRelationModal"
+    @StartLoading="this.$emit('StartLoading')"
+    @StopLoading="this.$emit('StopLoading')"
 />
 
 </template>
