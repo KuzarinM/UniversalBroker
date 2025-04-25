@@ -37,8 +37,10 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
 
                 var dto = _mapper.Map<CommunicationDto>(communication);
 
+                var communicationAttributesId = communication.CommunicationAttributes.Select(y => y.Attribute.Id).ToList();
+
                 await _brockerContext.Attributes
-                    .Where(x => communication.CommunicationAttributes.Select(y => y.Attribute.Id).Contains(x.Id))
+                    .Where(x => communicationAttributesId.Contains(x.Id))
                     .ExecuteDeleteAsync();
 
                 await _brockerContext.Communications
@@ -50,7 +52,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Communications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при удалении Соединения по его id");
-                throw new ControllerException("Ошибка при удалении Соединения по его id");
+                throw new ControllerException("Ошибка при удалении Соединения по его id",ex);
             }
         }
     }
