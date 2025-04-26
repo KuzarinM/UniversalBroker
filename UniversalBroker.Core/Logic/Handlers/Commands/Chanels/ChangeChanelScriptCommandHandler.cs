@@ -15,7 +15,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
     /// <param name="mapper"></param>
     /// <param name="brockerContext"></param>
     public class ChangeChanelScriptCommandHandler(
-   ILogger<AddChanelCommandHandler> logger,
+        ILogger<ChangeChanelScriptCommandHandler> logger,
         IMapper mapper,
         BrockerContext brockerContext
     ) : IRequestHandler<ChangeChanelScriptCommand, ChanelFullDto>

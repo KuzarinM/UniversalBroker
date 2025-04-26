@@ -35,7 +35,9 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
                 if (model == null)
                     return;
                
-                _context.Scripts.Remove(model.Script);
+                if(model.Script != null)
+                    _context.Scripts.Remove(model.Script);
+
                 _context.Chanels.Remove(model);
 
                 await _context.SaveChangesAsync();
