@@ -18,7 +18,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
     /// <param name="mapper"></param>
     /// <param name="context"></param>
     public class GetChanelScriptLogsQueryHandler(
-        ILogger<DbLogingService> logger,
+        ILogger<GetChanelScriptLogsQueryHandler> logger,
         IMapper mapper,
         BrockerContext context
         ) : IRequestHandler<GetChanelScriptLogsQuery, PaginationModel<ChanelScriptLogDto>>
