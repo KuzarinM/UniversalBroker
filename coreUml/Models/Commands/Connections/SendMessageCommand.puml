@@ -1,0 +1,7 @@
+@startuml
+class SendMessageCommand {
+}
+IRequest <|-- SendMessageCommand
+SendMessageCommand --> "ConnectionId" Guid
+SendMessageCommand o-> "Message" InternalMessage
+@enduml

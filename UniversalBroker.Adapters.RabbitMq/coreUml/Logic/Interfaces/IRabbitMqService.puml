@@ -1,0 +1,12 @@
+@startuml
+interface IRabbitMqService {
+    ConnectAsync(cancellationToken:CancellationToken) : Task
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+IRabbitMqService --> "GetConnection" IConnection
+IRabbitMqService --> "GetConnectionConfig" ConnectionFactory
+IRabbitMqService --> "InputConnections<string,ConnectionDto>" "ConcurrentDictionary`2"
+IRabbitMqService --> "Consumers<string,(CancellationTokenSource, IChannel)>" "ConcurrentDictionary`2"
+IRabbitMqService --> "OutputConnections<string,ConnectionDto>" "ConcurrentDictionary`2"
+@enduml

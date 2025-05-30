@@ -428,7 +428,7 @@ namespace UniversalBroker.Core.Tests.Handlers.Chanels
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AggregateException), "Удалось создать Канал с несуществующим подключением")]
+        [ExpectedException(typeof(AggregateException), "Удалось создать Канал с несуществующим каналом")]
         public void AddingWithNotExistingChannelTest()
         {
             // Создание всех моков

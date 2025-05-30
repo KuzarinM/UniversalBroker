@@ -1,0 +1,4 @@
+@startuml
+class "MapGrpcService`1"<T> {
+}
+@enduml

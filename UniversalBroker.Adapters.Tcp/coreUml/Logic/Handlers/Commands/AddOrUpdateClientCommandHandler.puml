@@ -1,0 +1,14 @@
+@startuml
+class AddOrUpdateClientCommandHandler {
+    + <<async>> Handle(request:AddOrUpdateClientCommand, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddOrUpdateClientCommand,bool>" <|-- AddOrUpdateClientCommandHandler
+AddOrUpdateClientCommandHandler o-> "_logger" ILogger
+AddOrUpdateClientCommandHandler o-> "_mediator" IMediator
+AddOrUpdateClientCommandHandler o-> "_tcpManager" ITcpManager
+AddOrUpdateClientCommandHandler o-> "_initService" IInitService
+@enduml

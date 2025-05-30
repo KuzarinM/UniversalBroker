@@ -1,0 +1,14 @@
+@startuml
+class InternalMessage <<record>> {
+    + IsFromConnection : bool <<get>> <<set>>
+    + Text : string <<get>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+InternalMessage --> "InternalId" Guid
+InternalMessage --> "SourceId" Guid
+InternalMessage --> "Data<byte>" "List`1"
+InternalMessage o-> "Headers<string,string>" "Dictionary`2"
+@enduml

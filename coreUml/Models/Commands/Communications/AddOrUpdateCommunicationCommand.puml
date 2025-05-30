@@ -1,0 +1,8 @@
+@startuml
+class AddOrUpdateCommunicationCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<CommunicationDto>" <|-- AddOrUpdateCommunicationCommand
+AddOrUpdateCommunicationCommand o-> "CreateCommunicationDto" CreateCommunicationDto
+@enduml

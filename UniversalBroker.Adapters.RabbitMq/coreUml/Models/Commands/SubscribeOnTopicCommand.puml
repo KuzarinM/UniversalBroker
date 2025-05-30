@@ -1,0 +1,6 @@
+@startuml
+class SubscribeOnTopicCommand {
+}
+IRequest <|-- SubscribeOnTopicCommand
+SubscribeOnTopicCommand --> "Connection" ConnectionDto
+@enduml

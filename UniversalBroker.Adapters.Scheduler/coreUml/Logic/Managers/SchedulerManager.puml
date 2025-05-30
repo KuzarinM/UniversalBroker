@@ -1,0 +1,12 @@
+@startuml
+class SchedulerManager {
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ISchedulerManager <|-- SchedulerManager
+SchedulerManager o-> "_logger" ILogger
+SchedulerManager o-> "_activeSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+SchedulerManager --> "GetActiveSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+@enduml

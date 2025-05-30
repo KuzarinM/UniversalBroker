@@ -1,0 +1,6 @@
+@startuml
+class RelationDto {
+}
+RelationDto --> "TargetId" Guid
+RelationDto --> "Status" RelationUsageStatus
+@enduml

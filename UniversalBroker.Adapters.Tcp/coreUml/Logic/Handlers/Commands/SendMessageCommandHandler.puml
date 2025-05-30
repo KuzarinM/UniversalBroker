@@ -1,0 +1,13 @@
+@startuml
+class SendMessageCommandHandler {
+    + <<async>> Handle(request:SendMessageCommand, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<SendMessageCommand,bool>" <|-- SendMessageCommandHandler
+SendMessageCommandHandler o-> "_logger" ILogger
+SendMessageCommandHandler o-> "_initService" IInitService
+SendMessageCommandHandler o-> "_tcpManager" ITcpManager
+@enduml

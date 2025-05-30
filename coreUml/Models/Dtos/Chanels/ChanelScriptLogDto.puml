@@ -1,0 +1,7 @@
+@startuml
+class ChanelScriptLogDto {
+    + Text : string <<get>> <<set>>
+}
+ChanelScriptLogDto --> "DateTime" DateTime
+ChanelScriptLogDto --> "Lavel" LogLevel
+@enduml

@@ -1,0 +1,6 @@
+@startuml
+interface IInitService {
+}
+IHostedService <|-- IInitService
+IInitService --> "GetService" IMainService
+@enduml

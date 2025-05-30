@@ -1,0 +1,8 @@
+@startuml
+class MessageLog {
+}
+MessageLog --> "TargetId" Guid
+MessageLog o-> "Message" InternalMessage
+MessageLog --> "Direction" MessageDirection
+MessageLog o-> "Created" DateTime
+@enduml

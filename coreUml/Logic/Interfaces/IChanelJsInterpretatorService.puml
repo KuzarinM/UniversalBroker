@@ -1,0 +1,5 @@
+@startuml
+interface IChanelJsInterpretatorService {
+    ExecuteScript(chanel:Chanel, message:InternalMessage) : Task
+}
+@enduml

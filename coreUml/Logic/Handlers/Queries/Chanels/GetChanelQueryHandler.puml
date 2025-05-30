@@ -1,0 +1,13 @@
+@startuml
+class GetChanelQueryHandler {
+    + <<async>> Handle(request:GetChanelQuery, cancellationToken:CancellationToken) : Task<ChanelFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelQuery,ChanelFullDto>" <|-- GetChanelQueryHandler
+GetChanelQueryHandler o-> "_logger" ILogger
+GetChanelQueryHandler o-> "_mapper" IMapper
+GetChanelQueryHandler o-> "_context" BrockerContext
+@enduml

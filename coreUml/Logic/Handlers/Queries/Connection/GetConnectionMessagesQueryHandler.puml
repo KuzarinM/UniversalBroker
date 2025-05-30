@@ -1,0 +1,13 @@
+@startuml
+class GetConnectionMessagesQueryHandler {
+    + <<async>> Handle(request:GetConnectionMessagesQuery, cancellationToken:CancellationToken) : Task<List<MessageViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetConnectionMessagesQuery,List<MessageViewDto>>" <|-- GetConnectionMessagesQueryHandler
+GetConnectionMessagesQueryHandler o-> "_logger" ILogger
+GetConnectionMessagesQueryHandler o-> "_mapper" IMapper
+GetConnectionMessagesQueryHandler o-> "_context" BrockerContext
+@enduml

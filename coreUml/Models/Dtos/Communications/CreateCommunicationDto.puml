@@ -1,0 +1,7 @@
+@startuml
+class CreateCommunicationDto {
+    + Name : string <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+}
+CreateCommunicationDto --> "TypeIdentifier" Guid
+@enduml

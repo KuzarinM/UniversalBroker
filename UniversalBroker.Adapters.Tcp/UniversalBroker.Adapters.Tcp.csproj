@@ -22,4 +22,8 @@
 		<PackageReference Include="Grpc.Tools" Version="2.68.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="coreUml\" />
+	</ItemGroup>
+
 </Project>

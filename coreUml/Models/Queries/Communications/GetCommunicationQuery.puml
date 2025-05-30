@@ -1,0 +1,8 @@
+@startuml
+class GetCommunicationQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<CommunicationDto?>" <|-- GetCommunicationQuery
+GetCommunicationQuery --> "Id" Guid
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+class ChanelJsInterpretatorService {
+    + ChanelJsInterpretatorService(logger:ILogger<ChanelJsInterpretatorService>, mapper:IMapper, brockerContext:BrockerContext, jsContext:JsContext, mediator:IMediator, dbLogingService:AbstractDbLogingService)
+    + <<async>> ExecuteScript(chanel:Chanel, message:InternalMessage) : Task
+}
+IChanelJsInterpretatorService <|-- ChanelJsInterpretatorService
+ChanelJsInterpretatorService --> "_logger" ILogger
+ChanelJsInterpretatorService --> "_mapper" IMapper
+ChanelJsInterpretatorService --> "_mediator" IMediator
+ChanelJsInterpretatorService --> "_context" BrockerContext
+ChanelJsInterpretatorService --> "_scriptEngine" V8ScriptEngine
+ChanelJsInterpretatorService --> "_jsContext" JsContext
+ChanelJsInterpretatorService --> "_dbLogingService" AbstractDbLogingService
+ChanelJsInterpretatorService o-> "semaphore" SemaphoreSlim
+@enduml

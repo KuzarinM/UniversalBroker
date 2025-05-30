@@ -1,0 +1,10 @@
+@startuml
+class QueueConfiguration {
+    + NeedDeclare : bool <<get>> <<set>> = true
+    + Durable : bool <<get>> <<set>>
+    + Exclusive : bool <<get>> <<set>>
+    + AutoDelete : bool <<get>> <<set>>
+    + Passive : bool <<get>> <<set>> = false
+    + NoWait : bool <<get>> <<set>> = false
+}
+@enduml

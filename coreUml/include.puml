@@ -1,0 +1,1037 @@
+@startuml
+class "MapGrpcService`1"<T> {
+}
+class AdapterConfiguration {
+    + TimeToLiveSeconds : double <<get>> <<set>> = 20
+}
+class ChanelController {
+    + <<async>> GetChannels(pageSize:int, pageIndex:int, search:string?) : Task<IActionResult>
+    + <<async>> GetChannelRelations(id:Guid) : Task<IActionResult>
+    + <<async>> GetSystemRelations() : Task<IActionResult>
+    + <<async>> GetChannelLogs(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?, lavels:List<LogLevel>?) : Task<IActionResult>
+    + <<async>> GetChannelMessages(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?) : Task<IActionResult>
+    + <<async>> GetChanel(id:Guid) : Task<IActionResult>
+    + <<async>> CreateChanel(chanel:CreateChanelDto) : Task<IActionResult>
+    + <<async>> SendMessageToChanel(id:Guid, message:InternalMessage) : Task<IActionResult>
+    + <<async>> UpdateChanel(id:Guid, chanel:CreateChanelDto) : Task<IActionResult>
+    + <<async>> UpdateChanelScript(id:Guid, newScript:string) : Task<IActionResult>
+    + <<async>> DeleteChanel(id:Guid) : Task<IActionResult>
+}
+CustomControllerBase <|-- ChanelController
+class CommunicationController {
+    + <<async>> GetCommunications(pageSize:int, pageIndex:int, Status:bool?, Search:string?) : Task<IActionResult>
+    + <<async>> GetCommunication(id:Guid) : Task<IActionResult>
+    + <<async>> AddOrUpdateCommunication(createDto:CreateCommunicationDto) : Task<IActionResult>
+    + <<async>> DeleteCommunication(id:Guid) : Task<IActionResult>
+    + <<async>> UpdateCommunicationAttribute(id:Guid, attributeList:Dictionary<string,string?>) : Task<IActionResult>
+}
+CustomControllerBase <|-- CommunicationController
+class ConnectionController {
+    + <<async>> GetConnections(pageSize:int, pageIndex:int, communicationId:Guid?, inputOnly:bool?, iearch:string?) : Task<IActionResult>
+    + <<async>> GetChannelLogs(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?) : Task<IActionResult>
+    + <<async>> GetConnection(id:Guid) : Task<IActionResult>
+    + <<async>> CreateConnection(connection:CreateConnectionDto) : Task<IActionResult>
+    + <<async>> UpdateConnection(connectionId:Guid, connection:UpdateConnectionDto) : Task<IActionResult>
+    + <<async>> DeleteConnection(connectionId:Guid) : Task<IActionResult>
+    + <<async>> ReceiveMessage(connectionId:Guid, path:string, headers:Dictionary<string,string>, data:List<byte>) : Task<IActionResult>
+    + <<async>> ReceiveMessageString(connectionId:Guid, path:string, headers:Dictionary<string,string>, text:string) : Task<IActionResult>
+}
+CustomControllerBase <|-- ConnectionController
+class CustomControllerBase {
+    # <<async>> ControllerSimpleRequest(request:IRequest<T>, unexpectedErrorText:string) : Task<IActionResult>
+    # <<async>> ControllerSimpleRequest(request:IRequest, unexpectedErrorText:string) : Task<IActionResult>
+}
+ControllerBase <|-- CustomControllerBase
+CustomControllerBase o-> "_mediator" IMediator
+class BrockerContext <<partial>> {
+    + BrockerContext()
+    + BrockerContext(options:DbContextOptions<BrockerContext>)
+    # <<override>> OnModelCreating(modelBuilder:ModelBuilder) : void
+    <<partial>> - OnModelCreatingPartial(modelBuilder:ModelBuilder) : void
+}
+class "DbSet`1"<T> {
+}
+DbContext <|-- BrockerContext
+BrockerContext --> "Attributes<Attribute>" "DbSet`1"
+BrockerContext --> "Chanels<Chanel>" "DbSet`1"
+BrockerContext --> "Communications<Communication>" "DbSet`1"
+BrockerContext --> "CommunicationAttributes<CommunicationAttribute>" "DbSet`1"
+BrockerContext --> "Connections<Connection>" "DbSet`1"
+BrockerContext --> "ConnectionAttributes<ConnectionAttribute>" "DbSet`1"
+BrockerContext --> "ExecutionLogs<ExecutionLog>" "DbSet`1"
+BrockerContext --> "Headers<Header>" "DbSet`1"
+BrockerContext --> "Messages<Message>" "DbSet`1"
+BrockerContext --> "Scripts<Script>" "DbSet`1"
+class ControllerException {
+    - _statusCode : int = 400
+    + StatusCodeInt : int <<get>> <<set>>
+    + ControllerException(statusCode:int?)
+    + ControllerException(message:string, statusCode:int?)
+    + ControllerException(message:string, inner:Exception, statusCode:int?)
+}
+Exception <|-- ControllerException
+ControllerException --> "StatusCode" HttpStatusCode
+class AppExtentions <<static>> {
+    + {static} AddMiddlewares(app:WebApplication) : WebApplication
+    + {static} AddSwagger(app:WebApplication) : WebApplication
+    + {static} ClearCommunications(app:WebApplication) : WebApplication
+}
+class ConvertationExtention <<static>> {
+    + {static} GetModelFromAttributes(attributes:Dictionary<string, string>) : T
+    + {static} GetModelFromAttributes(attributes:RepeatedField<AttributeDto>) : T
+    + {static} SetValueFromAttributes(model:T, attributes:RepeatedField<AttributeDto>) : int
+    + {static} SetValueFromAttributes(model:T, attributes:Dictionary<string, string>) : int
+    + {static} GetAttributesFromModel(model:T, existing:RepeatedField<AttributeDto>) : int
+    + {static} GetAttributesFromModel(model:T, existing:Dictionary<string,string?>) : int
+    + {static} AddOrUpdateAttribute(attributes:RepeatedField<AttributeDto>, name:string, value:string) : int
+    + {static} AddOrUpdateAttribute(attributes:Dictionary<string, string?>, name:string, value:string) : int
+}
+class DiExtentions <<static>> {
+    + {static} AddServices(services:IServiceCollection) : IServiceCollection
+    + {static} AddSingletons(services:IServiceCollection) : IServiceCollection
+    + {static} AddScopeds(services:IServiceCollection) : IServiceCollection
+    + {static} AddGrpc(services:IServiceCollection) : IServiceCollection
+    + {static} AddSwaggerStaf(services:IServiceCollection) : IServiceCollection
+    + {static} AddDatabase(services:IServiceCollection) : IServiceCollection
+    + {static} AddLogger(builder:WebApplicationBuilder) : void
+}
+class MappingProfiles {
+    + MappingProfiles()
+    - AddCommunicationsMappings() : void
+    - AddConnectionsMappings() : void
+    - AssChannelsMappings() : void
+    - AddLoggsMappings() : void
+    - AddMessagesMappings() : void
+    + GetConnectionIdForMessage(message:MessageLog) : Guid?
+    + GetSourceChannelIdForMessage(message:MessageLog) : Guid?
+    + GetTargetChannelIdForMessage(message:MessageLog) : Guid?
+    + GetDirectionByMessage(message:Message) : MessageDirection
+}
+Profile <|-- MappingProfiles
+class SwaggerServerMiddleware {
+    + <<async>> InvokeAsync(context:HttpContext) : Task
+    - <<async>> ModifyResponseAsync(response:HttpResponse, context:HttpContext) : Task
+    - ProcessJson(context:HttpContext, responce:string) : string
+}
+SwaggerServerMiddleware o-> "_next" RequestDelegate
+class TimeMiddleware {
+    + TimeMiddleware(next:RequestDelegate)
+    + <<async>> InvokeAsync(context:HttpContext) : Task
+}
+TimeMiddleware --> "_next" RequestDelegate
+class Attribute <<partial>> {
+    + Key : string <<get>> <<set>>
+    + Value : string <<get>> <<set>>
+}
+Attribute --> "Id" Guid
+Attribute --> "CommunicationAttribute" CommunicationAttribute
+Attribute --> "ConnectionAttribute" ConnectionAttribute
+class Chanel <<partial>> {
+    + Name : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Chanel --> "Id" Guid
+Chanel o-> "MessageSourceChannels<Message>" "ICollection`1"
+Chanel o-> "MessageTargetChannels<Message>" "ICollection`1"
+Chanel --> "Script" Script
+Chanel o-> "Connections<Connection>" "ICollection`1"
+Chanel o-> "FromChanels<Chanel>" "ICollection`1"
+Chanel o-> "ToChanels<Chanel>" "ICollection`1"
+class Communication <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+    + Status : bool <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Communication --> "Id" Guid
+Communication --> "TypeIdentifier" Guid
+Communication o-> "CommunicationAttributes<CommunicationAttribute>" "ICollection`1"
+Communication o-> "Connections<Connection>" "ICollection`1"
+class CommunicationAttribute <<partial>> {
+}
+CommunicationAttribute --> "Id" Guid
+CommunicationAttribute --> "ConnectionId" Guid
+CommunicationAttribute --> "Connection" Communication
+CommunicationAttribute --> "Attribute" Attribute
+class Connection <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Isinput : bool <<get>> <<set>>
+    + Path : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Connection --> "Id" Guid
+Connection --> "CommunicationId" Guid
+Connection --> "Communication" Communication
+Connection o-> "ConnectionAttributes<ConnectionAttribute>" "ICollection`1"
+Connection o-> "Messages<Message>" "ICollection`1"
+Connection o-> "Chanels<Chanel>" "ICollection`1"
+class ConnectionAttribute <<partial>> {
+}
+ConnectionAttribute --> "Id" Guid
+ConnectionAttribute --> "ConnectionId" Guid
+ConnectionAttribute --> "Connection" Connection
+ConnectionAttribute --> "Attribute" Attribute
+class ExecutionLog <<partial>> {
+    + Lavel : string <<get>> <<set>>
+    + Text : string <<get>> <<set>>
+}
+ExecutionLog --> "Id" Guid
+ExecutionLog --> "Datetime" DateTime
+ExecutionLog --> "ScriptId" Guid
+ExecutionLog --> "Script" Script
+class Header <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Value : string <<get>> <<set>>
+}
+Header --> "Id" Guid
+Header --> "MessagesId" Guid
+Header --> "Messages" Message
+class Message <<partial>> {
+}
+class "ICollection`1"<T> {
+}
+Message --> "Id" Guid
+Message --> "Datetime" DateTime
+Message --> "ConnectionId" Guid
+Message --> "SourceChannelId" Guid
+Message --> "TargetChannelId" Guid
+Message --> "Connection" Connection
+Message o-> "Headers<Header>" "ICollection`1"
+Message --> "SourceChannel" Chanel
+Message --> "TargetChannel" Chanel
+class Script <<partial>> {
+    + Path : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Script --> "Id" Guid
+Script o-> "ExecutionLogs<ExecutionLog>" "ICollection`1"
+Script --> "Chanel" Chanel
+abstract class AbstractAdaptersManager {
+    + <<virtual>> TimeToLiveS : int <<get>>
+    + {abstract} RegisterNewAdapter(communicationId:Guid, coreService:IAdapterCoreService) : Task
+    + {abstract} DisregisterAdapter(communicationId:Guid) : Task
+    + {abstract} GetAdapterById(id:Guid) : IAdapterCoreService?
+}
+BackgroundService <|-- AbstractAdaptersManager
+AbstractAdaptersManager --> "CreateService" IAdapterCoreService
+abstract class AbstractDbLogingService {
+    + {abstract} LogMessage(log:MessageLog) : Task
+    + {abstract} LogScriptExecution(log:ScriptExecutionLog) : Task
+}
+BackgroundService <|-- AbstractDbLogingService
+class JsContext {
+    + SendMessageToChanel(Id:object, data:IList<byte>, headers:ScriptObject?) : void
+    - SendMessageToChanel(Id:object, data:byte[], headers:ScriptObject?) : void
+    + SendMessageToChanel(Id:object, data:string, headers:ScriptObject?) : void
+    + SendMessageToConnection(Id:object, data:IList<byte>, headers:ScriptObject?) : void
+    - SendMessageToConnection(Id:object, data:byte[], headers:ScriptObject?) : void
+    + SendMessageToConnection(Id:object, data:string, headers:ScriptObject?) : void
+    + LogError(message:object) : void
+    + LogWarning(message:object) : void
+    + LogInfo(message:object) : void
+    + CheckContainsInStorage(key:string) : bool
+    + WriteIntoStorage(key:string, value:object) : void
+    + ReadFromStorage(key:string) : object?
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+class "ConcurrentQueue`1"<T> {
+}
+class "List`1"<T> {
+}
+JsContext o-> "_logger" ILogger
+JsContext o-> "_dbLogingService" AbstractDbLogingService
+JsContext o-> "_internalStorage<string,object?>" "ConcurrentDictionary`2"
+JsContext --> "CurrentSenderId" Guid
+JsContext o-> "Chanels" PropertyBag
+JsContext o-> "Connections" PropertyBag
+JsContext o-> "_sending<MessageLog>" "ConcurrentQueue`1"
+JsContext --> "GetMessages<MessageLog>" "List`1"
+interface IAdapterCoreService {
+    Stop() : Task
+    StartWork(communication:Models.Dtos.Communications.CommunicationDto) : Task
+    ConnectAdapter(responseStream:IServerStreamWriter<CoreMessage>) : Task<SemaphoreSlim>
+    SendMessageToPath(message:InternalMessage, Path:string) : Task
+    ReceiveMessage(message:CoreMessage, cancellationToken:CancellationToken) : Task<Protos.StatusDto>
+    SendMessage(coreMessage:Protos.CoreMessage, cancellationToken:CancellationToken) : Task
+}
+IAdapterCoreService --> "SiliensInterval" TimeSpan
+interface IChanelJsInterpretatorService {
+    ExecuteScript(chanel:Chanel, message:InternalMessage) : Task
+}
+class AdaptersManager {
+    - _timeToLiveS : int = 120
+    + <<override>> TimeToLiveS : int <<get>>
+    + <<override>> <<async>> RegisterNewAdapter(communicationId:Guid, coreService:IAdapterCoreService) : Task
+    - <<async>> LifesignCheck() : Task
+    + <<override>> <<async>> DisregisterAdapter(communicationId:Guid) : Task
+    + <<override>> GetAdapterById(id:Guid) : IAdapterCoreService?
+    - <<async>> SetCommunicationStatus(communicationId:Guid, staus:bool) : Task
+    # <<override>> <<async>> ExecuteAsync(stoppingToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "Func`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+AbstractAdaptersManager <|-- AdaptersManager
+AdaptersManager o-> "_logger" ILogger
+AdaptersManager o-> "_mediatorFunc<IMediator>" "Func`1"
+AdaptersManager o-> "_contextFunc<BrockerContext>" "Func`1"
+AdaptersManager o-> "_serviceProvider" IServiceProvider
+AdaptersManager o-> "_activeServices<Guid,IAdapterCoreService>" "ConcurrentDictionary`2"
+AdaptersManager --> "CreateService" IAdapterCoreService
+class AdapterCoreService {
+    # _myCommunication : Models.Dtos.Communications.CommunicationDto?
+    + <<async>> Stop() : Task
+    + StartWork(communication:Models.Dtos.Communications.CommunicationDto) : Task
+    + ConnectAdapter(responseStream:IServerStreamWriter<CoreMessage>) : Task<SemaphoreSlim>
+    + <<async>> SendMessageToPath(message:InternalMessage, Path:string) : Task
+    + <<async>> ReceiveMessage(message:CoreMessage, cancellationToken:CancellationToken) : Task<Protos.StatusDto>
+    - <<async>> StartStatusCheker(cancellationToken:CancellationToken) : Task
+    # <<async>> HandleStatusMessage(statusMessage:Protos.StatusDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDataMessage(dataMessage:Protos.MessageDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConnectionMessage(connectionDto:Protos.ConnectionDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConfigMessage(communicationFullDto:Protos.CommunicationFullDto, cancellationToken:CancellationToken) : Task
+    + <<async>> SendMessage(coreMessage:Protos.CoreMessage, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IServerStreamWriter`1"<T> {
+}
+IAdapterCoreService <|-- AdapterCoreService
+AdapterCoreService o-> "_logger" ILogger
+AdapterCoreService o-> "_mediator" IMediator
+AdapterCoreService o-> "_mapper" IMapper
+AdapterCoreService o-> "_manager" AbstractAdaptersManager
+AdapterCoreService o-> "_cancellationTokenSource" CancellationTokenSource
+AdapterCoreService --> "_responseStream<CoreMessage>" "IServerStreamWriter`1"
+AdapterCoreService o-> "_lastSendMessage" DateTime
+AdapterCoreService o-> "_lastReceivedMessage" DateTime
+AdapterCoreService o-> "_workingSemaphore" SemaphoreSlim
+AdapterCoreService --> "SiliensInterval" TimeSpan
+class ChanelJsInterpretatorService {
+    + ChanelJsInterpretatorService(logger:ILogger<ChanelJsInterpretatorService>, mapper:IMapper, brockerContext:BrockerContext, jsContext:JsContext, mediator:IMediator, dbLogingService:AbstractDbLogingService)
+    + <<async>> ExecuteScript(chanel:Chanel, message:InternalMessage) : Task
+}
+IChanelJsInterpretatorService <|-- ChanelJsInterpretatorService
+ChanelJsInterpretatorService --> "_logger" ILogger
+ChanelJsInterpretatorService --> "_mapper" IMapper
+ChanelJsInterpretatorService --> "_mediator" IMediator
+ChanelJsInterpretatorService --> "_context" BrockerContext
+ChanelJsInterpretatorService --> "_scriptEngine" V8ScriptEngine
+ChanelJsInterpretatorService --> "_jsContext" JsContext
+ChanelJsInterpretatorService --> "_dbLogingService" AbstractDbLogingService
+ChanelJsInterpretatorService o-> "semaphore" SemaphoreSlim
+class CoreGrpcService {
+    + <<override>> <<async>> Init(request:Protos.CommunicationDto, context:ServerCallContext) : Task<CommunicationFullDto>
+    + <<override>> <<async>> Connect(request:CommunicationSmallDto, responseStream:IServerStreamWriter<CoreMessage>, context:ServerCallContext) : Task
+    + <<override>> <<async>> SendAdapterMessage(request:AdapterMessage, context:ServerCallContext) : Task<Protos.StatusDto>
+    + <<override>> <<async>> LoadInConnections(request:CommunicationSmallDto, context:ServerCallContext) : Task<ConnectionsList>
+    + <<override>> <<async>> LoadOutConnections(request:CommunicationSmallDto, context:ServerCallContext) : Task<ConnectionsList>
+    + <<override>> <<async>> Disconnect(request:CommunicationSmallDto, context:ServerCallContext) : Task<Empty>
+}
+class "ILogger`1"<T> {
+}
+CoreServiceBase <|-- CoreGrpcService
+CoreGrpcService o-> "_logger" ILogger
+CoreGrpcService o-> "_mediator" IMediator
+CoreGrpcService o-> "_mapper" IMapper
+CoreGrpcService o-> "_adaptersManager" AbstractAdaptersManager
+class DbLogingService {
+    + <<override>> <<async>> LogMessage(log:MessageLog) : Task
+    + <<override>> LogScriptExecution(log:ScriptExecutionLog) : Task
+    - <<async>> SaveMessageToDb(messageLog:MessageLog) : Task
+    - <<async>> SaveExecutionToDb(executionLog:ScriptExecutionLog) : Task
+    - <<async>> StartWorking(stoppingToken:CancellationToken) : Task
+    # <<override>> <<async>> ExecuteAsync(stoppingToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "Func`1"<T> {
+}
+class "ConcurrentQueue`1"<T> {
+}
+AbstractDbLogingService <|-- DbLogingService
+DbLogingService o-> "_logger" ILogger
+DbLogingService o-> "_mapper" IMapper
+DbLogingService o-> "_context" BrockerContext
+DbLogingService o-> "messageLogs<MessageLog>" "ConcurrentQueue`1"
+DbLogingService o-> "scriptExecutionLogs<ScriptExecutionLog>" "ConcurrentQueue`1"
+class NodeDto {
+    + ObjectName : string <<get>> <<set>>
+    + IsChanel : bool <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+NodeDto --> "ObjectId" Guid
+NodeDto o-> "OutputIds<RelationDto>" "List`1"
+class "PaginationModel`1"<T> {
+    + CurrentPage : int <<get>> <<set>>
+    + PageSize : int <<get>> <<set>>
+    + TotalPages : int <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+"PaginationModel`1" --> "Page<T>" "List`1"
+class RelationDto {
+}
+RelationDto --> "TargetId" Guid
+RelationDto --> "Status" RelationUsageStatus
+enum MessageDirection {
+    ConnectionToChanel,
+    ChanelToChanel,
+    ChanelToConnection,
+}
+enum RelationUsageStatus {
+    InUse= 0,
+    NotUsed= 1,
+    NotMarked= 2,
+}
+class InternalMessage <<record>> {
+    + IsFromConnection : bool <<get>> <<set>>
+    + Text : string <<get>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+InternalMessage --> "InternalId" Guid
+InternalMessage --> "SourceId" Guid
+InternalMessage --> "Data<byte>" "List`1"
+InternalMessage o-> "Headers<string,string>" "Dictionary`2"
+class MessageLog {
+}
+MessageLog --> "TargetId" Guid
+MessageLog o-> "Message" InternalMessage
+MessageLog --> "Direction" MessageDirection
+MessageLog o-> "Created" DateTime
+class ScriptExecutionLog {
+    + MessageText : string <<get>> <<set>>
+}
+ScriptExecutionLog --> "ScriptId" Guid
+ScriptExecutionLog o-> "Created" DateTime
+ScriptExecutionLog o-> "LogLevel" LogLevel
+class SendingMessage {
+    + IsChanel : bool <<get>> <<set>>
+}
+SendingMessage --> "Message" InternalMessage
+SendingMessage --> "TargerId" Guid
+class AttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Attribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Attribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Attribute>" <|-- AttributeConfiguration
+class ChanelConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Chanel>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Chanel>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Chanel>" <|-- ChanelConfiguration
+class CommunicationAttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<CommunicationAttribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<CommunicationAttribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<CommunicationAttribute>" <|-- CommunicationAttributeConfiguration
+class CommunicationConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Communication>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Communication>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Communication>" <|-- CommunicationConfiguration
+class ConnectionAttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<ConnectionAttribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<ConnectionAttribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<ConnectionAttribute>" <|-- ConnectionAttributeConfiguration
+class ConnectionConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Connection>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Connection>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Connection>" <|-- ConnectionConfiguration
+class ExecutionLogConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<ExecutionLog>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<ExecutionLog>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<ExecutionLog>" <|-- ExecutionLogConfiguration
+class HeaderConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Header>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Header>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Header>" <|-- HeaderConfiguration
+class MessageConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Message>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Message>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Message>" <|-- MessageConfiguration
+class ScriptConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Script>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Script>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Script>" <|-- ScriptConfiguration
+class AddChanelCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelDto>" <|-- AddChanelCommand
+AddChanelCommand o-> "CreateChanelDto" CreateChanelDto
+class ChangeChanelScriptCommand {
+    + ScriptText : string <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelFullDto>" <|-- ChangeChanelScriptCommand
+ChangeChanelScriptCommand --> "Id" Guid
+class DeleteChanelCommand {
+}
+IRequest <|-- DeleteChanelCommand
+DeleteChanelCommand --> "Id" Guid
+class ExecuteScriptCommand {
+}
+IRequest <|-- ExecuteScriptCommand
+ExecuteScriptCommand --> "ChanelId" Guid
+ExecuteScriptCommand o-> "Message" InternalMessage
+class UpdateChanelCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelDto>" <|-- UpdateChanelCommand
+UpdateChanelCommand --> "Id" Guid
+UpdateChanelCommand o-> "UpdateDto" CreateChanelDto
+class AddOrUpdateCommunicationCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<CommunicationDto>" <|-- AddOrUpdateCommunicationCommand
+AddOrUpdateCommunicationCommand o-> "CreateCommunicationDto" CreateCommunicationDto
+class CommunicationSetAttributeCommand {
+}
+class "IRequest`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+"IRequest`1" "<CommunicationDto>" <|-- CommunicationSetAttributeCommand
+CommunicationSetAttributeCommand --> "CommunicationId" Guid
+CommunicationSetAttributeCommand o-> "Attributes<string,string?>" "Dictionary`2"
+class DeleteCommunicationCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<CommunicationDto?>" <|-- DeleteCommunicationCommand
+DeleteCommunicationCommand --> "Id" Guid
+class AddConnectionCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ConnectionViewDto>" <|-- AddConnectionCommand
+AddConnectionCommand o-> "ConnectionDto" CreateConnectionDto
+class DeleteConnectionCommand {
+}
+IRequest <|-- DeleteConnectionCommand
+DeleteConnectionCommand --> "ConnectionId" Guid
+class ReceiveIncommingMessageCommand {
+    + Path : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+IRequest <|-- ReceiveIncommingMessageCommand
+ReceiveIncommingMessageCommand --> "CommunicationId" Guid
+ReceiveIncommingMessageCommand o-> "Data<byte>" "List`1"
+ReceiveIncommingMessageCommand o-> "Headers<string,string>" "Dictionary`2"
+class SendMessageCommand {
+}
+IRequest <|-- SendMessageCommand
+SendMessageCommand --> "ConnectionId" Guid
+SendMessageCommand o-> "Message" InternalMessage
+class UpdateConnectionCommand {
+    + NeedNotifyAdapter : bool <<get>> <<set>> = true
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ConnectionFullDto>" <|-- UpdateConnectionCommand
+UpdateConnectionCommand --> "ConnectionId" Guid
+UpdateConnectionCommand --> "UpdateDto" UpdateConnectionDto
+class ChanelDto {
+}
+CreateChanelDto <|-- ChanelDto
+ChanelDto --> "Id" Guid
+class ChanelFullDto {
+}
+class "List`1"<T> {
+}
+ChanelDto <|-- ChanelFullDto
+ChanelFullDto o-> "OutputChanels<ChanelDto>" "List`1"
+ChanelFullDto o-> "InputConnections<ConnectionViewDto>" "List`1"
+ChanelFullDto o-> "OutputConnections<ConnectionViewDto>" "List`1"
+class ChanelScriptLogDto {
+    + Text : string <<get>> <<set>>
+}
+ChanelScriptLogDto --> "DateTime" DateTime
+ChanelScriptLogDto --> "Lavel" LogLevel
+class CreateChanelDto {
+    + Name : string <<get>> <<set>>
+    + Script : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+CreateChanelDto o-> "InputConnections<Guid>" "List`1"
+CreateChanelDto o-> "OutputConnections<Guid>" "List`1"
+CreateChanelDto o-> "OutputChanels<Guid>" "List`1"
+class MessageViewDto {
+    + Text : string <<get>>
+    + SourceName : string <<get>> <<set>>
+    + TargetName : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+MessageViewDto o-> "Data<byte>" "List`1"
+MessageViewDto --> "Datetime" DateTime
+MessageViewDto --> "SourceId" Guid
+MessageViewDto --> "TargetId" Guid
+MessageViewDto --> "Direction" MessageDirection
+MessageViewDto o-> "Headers<string,string>" "Dictionary`2"
+class СhanelRelationDto {
+    + RelationName : string <<get>> <<set>>
+    + IsInput : bool <<get>> <<set>>
+}
+СhanelRelationDto --> "RelationId" Guid
+СhanelRelationDto --> "Direction" MessageDirection
+СhanelRelationDto --> "Status" RelationUsageStatus
+class СhannelRelationsDto {
+    + ChanelName : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+СhannelRelationsDto o-> "Relations<СhanelRelationDto>" "List`1"
+СhannelRelationsDto --> "ChanelId" Guid
+class CommunicationDto {
+    + Status : bool <<get>> <<set>>
+}
+class "Dictionary`2"<T1,T2> {
+}
+CreateCommunicationDto <|-- CommunicationDto
+CommunicationDto --> "Id" Guid
+CommunicationDto o-> "Attributes<string,string>" "Dictionary`2"
+class CreateCommunicationDto {
+    + Name : string <<get>> <<set>>
+    + Description : string? <<get>> <<set>>
+}
+CreateCommunicationDto --> "TypeIdentifier" Guid
+class ConnectionFullDto {
+}
+class "List`1"<T> {
+}
+ConnectionViewDto <|-- ConnectionFullDto
+ConnectionFullDto o-> "Communication" CommunicationDto
+ConnectionFullDto o-> "ChannelsIds<Guid>" "List`1"
+class ConnectionViewDto {
+}
+CreateConnectionDto <|-- ConnectionViewDto
+ConnectionViewDto --> "Id" Guid
+class CreateConnectionDto {
+    + IsInput : bool <<get>> <<set>>
+}
+UpdateConnectionDto <|-- CreateConnectionDto
+CreateConnectionDto --> "CommunicationId" Guid
+class UpdateConnectionDto {
+    + Name : string <<get>> <<set>>
+    + Path : string <<get>> <<set>>
+}
+class "Dictionary`2"<T1,T2> {
+}
+class "List`1"<T> {
+}
+UpdateConnectionDto o-> "Attribues<string,string>" "Dictionary`2"
+UpdateConnectionDto o-> "ChannelsIds<Guid>" "List`1"
+class GetChanelListQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+    + NameContatins : string? <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<ChanelDto>>" <|-- GetChanelListQuery
+class GetChanelMessagesQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<MessageViewDto>>" <|-- GetChanelMessagesQuery
+GetChanelMessagesQuery --> "ChanelId" Guid
+GetChanelMessagesQuery --> "FromDate" DateTime
+GetChanelMessagesQuery --> "ToDate" DateTime
+class GetChanelQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelFullDto>" <|-- GetChanelQuery
+GetChanelQuery --> "ChanelId" Guid
+class GetChanelRelationsQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<СhannelRelationsDto?>" <|-- GetChanelRelationsQuery
+GetChanelRelationsQuery --> "ChanelId" Guid
+class GetChanelScriptLogsQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<ChanelScriptLogDto>>" <|-- GetChanelScriptLogsQuery
+GetChanelScriptLogsQuery --> "ChanelId" Guid
+GetChanelScriptLogsQuery --> "FromDate" DateTime
+GetChanelScriptLogsQuery --> "ToDate" DateTime
+GetChanelScriptLogsQuery --> "OnlyLavels<LogLevel>" "List`1"
+class GetSystemRelationQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<List<NodeDto>>" <|-- GetSystemRelationQuery
+class GetAllCommunicationsQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+    + Status : bool? <<get>> <<set>>
+    + NameSearch : string? <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<CommunicationDto>>" <|-- GetAllCommunicationsQuery
+class GetCommunicationQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<CommunicationDto?>" <|-- GetCommunicationQuery
+GetCommunicationQuery --> "Id" Guid
+class GetConnectionListQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+    + InputOnly : bool? <<get>> <<set>> = null
+    + NameContains : string? <<get>> <<set>> = null
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<ConnectionViewDto>>" <|-- GetConnectionListQuery
+GetConnectionListQuery --> "CommunicationId" Guid
+class GetConnectionMessagesQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<List<MessageViewDto>>" <|-- GetConnectionMessagesQuery
+GetConnectionMessagesQuery --> "ConnectionId" Guid
+GetConnectionMessagesQuery --> "FromDate" DateTime
+GetConnectionMessagesQuery --> "ToDate" DateTime
+class GetConnectionQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ConnectionFullDto>" <|-- GetConnectionQuery
+GetConnectionQuery --> "Id" Guid
+class AddChanelCommandHandler {
+    + <<async>> Handle(request:AddChanelCommand, cancellationToken:CancellationToken) : Task<ChanelDto>
+    + <<async>> TestRelations(createChanelDto:CreateChanelDto) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddChanelCommand,ChanelDto>" <|-- AddChanelCommandHandler
+AddChanelCommandHandler o-> "_logger" ILogger
+AddChanelCommandHandler o-> "_mapper" IMapper
+AddChanelCommandHandler o-> "_context" BrockerContext
+class ChangeChanelScriptCommandHandler {
+    + <<async>> Handle(request:ChangeChanelScriptCommand, cancellationToken:CancellationToken) : Task<ChanelFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<ChangeChanelScriptCommand,ChanelFullDto>" <|-- ChangeChanelScriptCommandHandler
+ChangeChanelScriptCommandHandler o-> "_logger" ILogger
+ChangeChanelScriptCommandHandler o-> "_mapper" IMapper
+ChangeChanelScriptCommandHandler o-> "_context" BrockerContext
+class DeleteChanelCommandHandler {
+    + <<async>> Handle(request:DeleteChanelCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<DeleteChanelCommand>" <|-- DeleteChanelCommandHandler
+DeleteChanelCommandHandler o-> "_logger" ILogger
+DeleteChanelCommandHandler o-> "_mapper" IMapper
+DeleteChanelCommandHandler o-> "_context" BrockerContext
+class ExecuteScriptCommandHandler {
+    + <<async>> Handle(request:ExecuteScriptCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<ExecuteScriptCommand>" <|-- ExecuteScriptCommandHandler
+ExecuteScriptCommandHandler o-> "_logger" ILogger
+ExecuteScriptCommandHandler o-> "_mapper" IMapper
+ExecuteScriptCommandHandler o-> "_context" BrockerContext
+ExecuteScriptCommandHandler o-> "_interpretatorService" IChanelJsInterpretatorService
+class UpdateChanelCommandHandler {
+    + <<async>> Handle(request:UpdateChanelCommand, cancellationToken:CancellationToken) : Task<ChanelDto>
+    + <<async>> TestRelations(createChanelDto:CreateChanelDto) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<UpdateChanelCommand,ChanelDto>" <|-- UpdateChanelCommandHandler
+UpdateChanelCommandHandler o-> "_logger" ILogger
+UpdateChanelCommandHandler o-> "_mapper" IMapper
+UpdateChanelCommandHandler o-> "_context" BrockerContext
+class AddOrUpdateCommunicationCommandHandler {
+    + <<async>> Handle(request:AddOrUpdateCommunicationCommand, cancellationToken:CancellationToken) : Task<CommunicationDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddOrUpdateCommunicationCommand,CommunicationDto>" <|-- AddOrUpdateCommunicationCommandHandler
+AddOrUpdateCommunicationCommandHandler o-> "_logger" ILogger
+AddOrUpdateCommunicationCommandHandler o-> "_mapper" IMapper
+AddOrUpdateCommunicationCommandHandler o-> "_context" BrockerContext
+class CommunicationSetAttributeCommandHandler {
+    + <<async>> Handle(request:CommunicationSetAttributeCommand, cancellationToken:CancellationToken) : Task<CommunicationDto>
+    - <<async>> SetInternalAttributes(attributes:Dictionary<string, string?>, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<CommunicationSetAttributeCommand,CommunicationDto>" <|-- CommunicationSetAttributeCommandHandler
+CommunicationSetAttributeCommandHandler o-> "_logger" ILogger
+CommunicationSetAttributeCommandHandler o-> "_mapper" IMapper
+CommunicationSetAttributeCommandHandler o-> "_context" BrockerContext
+CommunicationSetAttributeCommandHandler o-> "_adaptersManager" AbstractAdaptersManager
+class DeleteCommunicationCommandHandler {
+    + <<async>> Handle(request:DeleteCommunicationCommand, cancellationToken:CancellationToken) : Task<CommunicationDto?>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<DeleteCommunicationCommand,CommunicationDto?>" <|-- DeleteCommunicationCommandHandler
+DeleteCommunicationCommandHandler o-> "_logger" ILogger
+DeleteCommunicationCommandHandler o-> "_mapper" IMapper
+DeleteCommunicationCommandHandler o-> "_brockerContext" BrockerContext
+class AddConnectionCommandHandler {
+    + <<async>> Handle(request:AddConnectionCommand, cancellationToken:CancellationToken) : Task<ConnectionViewDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddConnectionCommand,ConnectionViewDto>" <|-- AddConnectionCommandHandler
+AddConnectionCommandHandler o-> "_logger" ILogger
+AddConnectionCommandHandler o-> "_mapper" IMapper
+AddConnectionCommandHandler o-> "_context" BrockerContext
+AddConnectionCommandHandler o-> "_abstractAdaptersManager" AbstractAdaptersManager
+class DeleteConnectionCommandHandler {
+    + <<async>> Handle(request:DeleteConnectionCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<DeleteConnectionCommand>" <|-- DeleteConnectionCommandHandler
+DeleteConnectionCommandHandler o-> "_logger" ILogger
+DeleteConnectionCommandHandler o-> "_mapper" IMapper
+DeleteConnectionCommandHandler o-> "_context" BrockerContext
+DeleteConnectionCommandHandler o-> "_abstractAdaptersManager" AbstractAdaptersManager
+class ReceiveIncommingMessageCommandHandler {
+    + <<async>> Handle(request:ReceiveIncommingMessageCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<ReceiveIncommingMessageCommand>" <|-- ReceiveIncommingMessageCommandHandler
+ReceiveIncommingMessageCommandHandler o-> "_logger" ILogger
+ReceiveIncommingMessageCommandHandler o-> "_mapper" IMapper
+ReceiveIncommingMessageCommandHandler o-> "_mediator" IMediator
+ReceiveIncommingMessageCommandHandler o-> "_context" BrockerContext
+ReceiveIncommingMessageCommandHandler o-> "_dbLogingService" AbstractDbLogingService
+class SendMessageCommandHandler {
+    + <<async>> Handle(request:SendMessageCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<SendMessageCommand>" <|-- SendMessageCommandHandler
+SendMessageCommandHandler o-> "_logger" ILogger
+SendMessageCommandHandler o-> "_mapper" IMapper
+SendMessageCommandHandler o-> "_context" BrockerContext
+SendMessageCommandHandler o-> "_adaptersManager" AbstractAdaptersManager
+class UpdateConnectionCommandHandler {
+    + <<async>> Handle(request:UpdateConnectionCommand, cancellationToken:CancellationToken) : Task<ConnectionFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<UpdateConnectionCommand,ConnectionFullDto>" <|-- UpdateConnectionCommandHandler
+UpdateConnectionCommandHandler o-> "_logger" ILogger
+UpdateConnectionCommandHandler o-> "_mapper" IMapper
+UpdateConnectionCommandHandler o-> "_context" BrockerContext
+UpdateConnectionCommandHandler o-> "_adaptersManager" AbstractAdaptersManager
+class GetChanelListQueryHandler {
+    + <<async>> Handle(request:GetChanelListQuery, cancellationToken:CancellationToken) : Task<PaginationModel<ChanelDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelListQuery,PaginationModel<ChanelDto>>" <|-- GetChanelListQueryHandler
+GetChanelListQueryHandler o-> "_logger" ILogger
+GetChanelListQueryHandler o-> "_mapper" IMapper
+GetChanelListQueryHandler o-> "_context" BrockerContext
+class GetChanelMessagesQueryHandler {
+    + <<async>> Handle(request:GetChanelMessagesQuery, cancellationToken:CancellationToken) : Task<PaginationModel<MessageViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelMessagesQuery,PaginationModel<MessageViewDto>>" <|-- GetChanelMessagesQueryHandler
+GetChanelMessagesQueryHandler o-> "_logger" ILogger
+GetChanelMessagesQueryHandler o-> "_mapper" IMapper
+GetChanelMessagesQueryHandler o-> "_context" BrockerContext
+class GetChanelQueryHandler {
+    + <<async>> Handle(request:GetChanelQuery, cancellationToken:CancellationToken) : Task<ChanelFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelQuery,ChanelFullDto>" <|-- GetChanelQueryHandler
+GetChanelQueryHandler o-> "_logger" ILogger
+GetChanelQueryHandler o-> "_mapper" IMapper
+GetChanelQueryHandler o-> "_context" BrockerContext
+class GetChanelRelationsQueryHandler {
+    + <<async>> Handle(request:GetChanelRelationsQuery, cancellationToken:CancellationToken) : Task<СhannelRelationsDto?>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelRelationsQuery,СhannelRelationsDto?>" <|-- GetChanelRelationsQueryHandler
+GetChanelRelationsQueryHandler o-> "_logger" ILogger
+GetChanelRelationsQueryHandler o-> "_context" BrockerContext
+class GetChanelScriptLogsQueryHandler {
+    + <<async>> Handle(request:GetChanelScriptLogsQuery, cancellationToken:CancellationToken) : Task<PaginationModel<ChanelScriptLogDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelScriptLogsQuery,PaginationModel<ChanelScriptLogDto>>" <|-- GetChanelScriptLogsQueryHandler
+GetChanelScriptLogsQueryHandler o-> "_logger" ILogger
+GetChanelScriptLogsQueryHandler o-> "_mapper" IMapper
+GetChanelScriptLogsQueryHandler o-> "_context" BrockerContext
+class GetSustemRelationQueryHandler {
+    + <<async>> Handle(request:GetSystemRelationQuery, cancellationToken:CancellationToken) : Task<List<NodeDto>>
+    - GetOrAddNodeDto(dict:Dictionary<Guid, NodeDto>, id:Guid, dto:NodeDto) : NodeDto
+    - GetOrAddRelationDto(list:List<RelationDto>, id:Guid) : RelationDto
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetSystemRelationQuery,List<NodeDto>>" <|-- GetSustemRelationQueryHandler
+GetSustemRelationQueryHandler o-> "_logger" ILogger
+GetSustemRelationQueryHandler o-> "_context" BrockerContext
+class GetAllCommunicationsQueryHandler {
+    + <<async>> Handle(request:GetAllCommunicationsQuery, cancellationToken:CancellationToken) : Task<PaginationModel<CommunicationDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetAllCommunicationsQuery,PaginationModel<CommunicationDto>>" <|-- GetAllCommunicationsQueryHandler
+GetAllCommunicationsQueryHandler o-> "_logger" ILogger
+GetAllCommunicationsQueryHandler o-> "_mapper" IMapper
+GetAllCommunicationsQueryHandler o-> "_brockerContext" BrockerContext
+class GetCommunicationQueryHandler {
+    + <<async>> Handle(request:GetCommunicationQuery, cancellationToken:CancellationToken) : Task<CommunicationDto?>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetCommunicationQuery,CommunicationDto?>" <|-- GetCommunicationQueryHandler
+GetCommunicationQueryHandler o-> "_logger" ILogger
+GetCommunicationQueryHandler o-> "_mapper" IMapper
+GetCommunicationQueryHandler o-> "_brockerContext" BrockerContext
+class GetConnectionListQueryHandler {
+    + <<async>> Handle(request:GetConnectionListQuery, cancellationToken:CancellationToken) : Task<PaginationModel<ConnectionViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetConnectionListQuery,PaginationModel<ConnectionViewDto>>" <|-- GetConnectionListQueryHandler
+GetConnectionListQueryHandler o-> "_logger" ILogger
+GetConnectionListQueryHandler o-> "_mapper" IMapper
+GetConnectionListQueryHandler o-> "_context" BrockerContext
+class GetConnectionMessagesQueryHandler {
+    + <<async>> Handle(request:GetConnectionMessagesQuery, cancellationToken:CancellationToken) : Task<List<MessageViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetConnectionMessagesQuery,List<MessageViewDto>>" <|-- GetConnectionMessagesQueryHandler
+GetConnectionMessagesQueryHandler o-> "_logger" ILogger
+GetConnectionMessagesQueryHandler o-> "_mapper" IMapper
+GetConnectionMessagesQueryHandler o-> "_context" BrockerContext
+class GetConnectionQueryHandler {
+    + <<async>> Handle(request:GetConnectionQuery, cancellationToken:CancellationToken) : Task<ConnectionFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetConnectionQuery,ConnectionFullDto>" <|-- GetConnectionQueryHandler
+GetConnectionQueryHandler o-> "_logger" ILogger
+GetConnectionQueryHandler o-> "_mapper" IMapper
+GetConnectionQueryHandler o-> "_context" BrockerContext
+@enduml

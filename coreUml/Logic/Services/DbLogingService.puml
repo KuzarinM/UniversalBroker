@@ -1,0 +1,22 @@
+@startuml
+class DbLogingService {
+    + <<override>> <<async>> LogMessage(log:MessageLog) : Task
+    + <<override>> LogScriptExecution(log:ScriptExecutionLog) : Task
+    - <<async>> SaveMessageToDb(messageLog:MessageLog) : Task
+    - <<async>> SaveExecutionToDb(executionLog:ScriptExecutionLog) : Task
+    - <<async>> StartWorking(stoppingToken:CancellationToken) : Task
+    # <<override>> <<async>> ExecuteAsync(stoppingToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "Func`1"<T> {
+}
+class "ConcurrentQueue`1"<T> {
+}
+AbstractDbLogingService <|-- DbLogingService
+DbLogingService o-> "_logger" ILogger
+DbLogingService o-> "_mapper" IMapper
+DbLogingService o-> "_context" BrockerContext
+DbLogingService o-> "messageLogs<MessageLog>" "ConcurrentQueue`1"
+DbLogingService o-> "scriptExecutionLogs<ScriptExecutionLog>" "ConcurrentQueue`1"
+@enduml

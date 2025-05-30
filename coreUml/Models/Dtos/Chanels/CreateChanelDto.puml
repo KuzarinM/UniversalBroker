@@ -1,0 +1,11 @@
+@startuml
+class CreateChanelDto {
+    + Name : string <<get>> <<set>>
+    + Script : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+CreateChanelDto o-> "InputConnections<Guid>" "List`1"
+CreateChanelDto o-> "OutputConnections<Guid>" "List`1"
+CreateChanelDto o-> "OutputChanels<Guid>" "List`1"
+@enduml

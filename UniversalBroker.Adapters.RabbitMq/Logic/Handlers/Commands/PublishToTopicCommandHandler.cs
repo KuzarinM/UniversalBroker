@@ -48,7 +48,6 @@ namespace UniversalBroker.Adapters.RabbitMq.Logic.Handlers.Commands
 
                 if (publishConfig.UseExchenge)
                 {
-
                     var exchangeConfig = CreateConfig<ExchangeConfig>(ConnectionDto, request.Message.Headers);
 
                     if (exchangeConfig.NeedDeclare)

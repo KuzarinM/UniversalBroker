@@ -1,0 +1,9 @@
+@startuml
+class CommunicationAttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<CommunicationAttribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<CommunicationAttribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<CommunicationAttribute>" <|-- CommunicationAttributeConfiguration
+@enduml

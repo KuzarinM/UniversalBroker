@@ -1,0 +1,13 @@
+@startuml
+class GetCommunicationQueryHandler {
+    + <<async>> Handle(request:GetCommunicationQuery, cancellationToken:CancellationToken) : Task<CommunicationDto?>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetCommunicationQuery,CommunicationDto?>" <|-- GetCommunicationQueryHandler
+GetCommunicationQueryHandler o-> "_logger" ILogger
+GetCommunicationQueryHandler o-> "_mapper" IMapper
+GetCommunicationQueryHandler o-> "_brockerContext" BrockerContext
+@enduml

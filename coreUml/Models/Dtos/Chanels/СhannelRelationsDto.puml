@@ -1,0 +1,9 @@
+@startuml
+class СhannelRelationsDto {
+    + ChanelName : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+СhannelRelationsDto o-> "Relations<СhanelRelationDto>" "List`1"
+СhannelRelationsDto --> "ChanelId" Guid
+@enduml

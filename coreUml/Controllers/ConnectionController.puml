@@ -1,0 +1,13 @@
+@startuml
+class ConnectionController {
+    + <<async>> GetConnections(pageSize:int, pageIndex:int, communicationId:Guid?, inputOnly:bool?, iearch:string?) : Task<IActionResult>
+    + <<async>> GetChannelLogs(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?) : Task<IActionResult>
+    + <<async>> GetConnection(id:Guid) : Task<IActionResult>
+    + <<async>> CreateConnection(connection:CreateConnectionDto) : Task<IActionResult>
+    + <<async>> UpdateConnection(connectionId:Guid, connection:UpdateConnectionDto) : Task<IActionResult>
+    + <<async>> DeleteConnection(connectionId:Guid) : Task<IActionResult>
+    + <<async>> ReceiveMessage(connectionId:Guid, path:string, headers:Dictionary<string,string>, data:List<byte>) : Task<IActionResult>
+    + <<async>> ReceiveMessageString(connectionId:Guid, path:string, headers:Dictionary<string,string>, text:string) : Task<IActionResult>
+}
+CustomControllerBase <|-- ConnectionController
+@enduml

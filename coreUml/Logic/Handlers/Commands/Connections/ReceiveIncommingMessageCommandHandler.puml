@@ -1,0 +1,15 @@
+@startuml
+class ReceiveIncommingMessageCommandHandler {
+    + <<async>> Handle(request:ReceiveIncommingMessageCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<ReceiveIncommingMessageCommand>" <|-- ReceiveIncommingMessageCommandHandler
+ReceiveIncommingMessageCommandHandler o-> "_logger" ILogger
+ReceiveIncommingMessageCommandHandler o-> "_mapper" IMapper
+ReceiveIncommingMessageCommandHandler o-> "_mediator" IMediator
+ReceiveIncommingMessageCommandHandler o-> "_context" BrockerContext
+ReceiveIncommingMessageCommandHandler o-> "_dbLogingService" AbstractDbLogingService
+@enduml

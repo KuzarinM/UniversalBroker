@@ -1,0 +1,7 @@
+@startuml
+enum RelationUsageStatus {
+    InUse= 0,
+    NotUsed= 1,
+    NotMarked= 2,
+}
+@enduml

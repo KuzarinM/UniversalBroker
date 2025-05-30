@@ -1,0 +1,10 @@
+@startuml
+class NodeDto {
+    + ObjectName : string <<get>> <<set>>
+    + IsChanel : bool <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+NodeDto --> "ObjectId" Guid
+NodeDto o-> "OutputIds<RelationDto>" "List`1"
+@enduml

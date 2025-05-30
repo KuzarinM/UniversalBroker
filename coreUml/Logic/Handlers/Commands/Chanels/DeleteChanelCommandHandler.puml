@@ -1,0 +1,13 @@
+@startuml
+class DeleteChanelCommandHandler {
+    + <<async>> Handle(request:DeleteChanelCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<DeleteChanelCommand>" <|-- DeleteChanelCommandHandler
+DeleteChanelCommandHandler o-> "_logger" ILogger
+DeleteChanelCommandHandler o-> "_mapper" IMapper
+DeleteChanelCommandHandler o-> "_context" BrockerContext
+@enduml

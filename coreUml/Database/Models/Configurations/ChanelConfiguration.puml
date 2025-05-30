@@ -1,0 +1,9 @@
+@startuml
+class ChanelConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Chanel>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Chanel>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Chanel>" <|-- ChanelConfiguration
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+class GetConnectionListQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+    + InputOnly : bool? <<get>> <<set>> = null
+    + NameContains : string? <<get>> <<set>> = null
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<ConnectionViewDto>>" <|-- GetConnectionListQuery
+GetConnectionListQuery --> "CommunicationId" Guid
+@enduml

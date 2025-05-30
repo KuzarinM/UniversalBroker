@@ -1,0 +1,9 @@
+@startuml
+class UpdateChanelCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelDto>" <|-- UpdateChanelCommand
+UpdateChanelCommand --> "Id" Guid
+UpdateChanelCommand o-> "UpdateDto" CreateChanelDto
+@enduml

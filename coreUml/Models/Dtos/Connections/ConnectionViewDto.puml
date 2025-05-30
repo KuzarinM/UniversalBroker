@@ -1,0 +1,6 @@
+@startuml
+class ConnectionViewDto {
+}
+CreateConnectionDto <|-- ConnectionViewDto
+ConnectionViewDto --> "Id" Guid
+@enduml

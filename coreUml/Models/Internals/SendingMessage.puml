@@ -1,0 +1,7 @@
+@startuml
+class SendingMessage {
+    + IsChanel : bool <<get>> <<set>>
+}
+SendingMessage --> "Message" InternalMessage
+SendingMessage --> "TargerId" Guid
+@enduml

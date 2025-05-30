@@ -1,0 +1,10 @@
+@startuml
+class ExecutionLog <<partial>> {
+    + Lavel : string <<get>> <<set>>
+    + Text : string <<get>> <<set>>
+}
+ExecutionLog --> "Id" Guid
+ExecutionLog --> "Datetime" DateTime
+ExecutionLog --> "ScriptId" Guid
+ExecutionLog --> "Script" Script
+@enduml

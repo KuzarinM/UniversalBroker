@@ -1,0 +1,8 @@
+@startuml
+class GetChanelQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ChanelFullDto>" <|-- GetChanelQuery
+GetChanelQuery --> "ChanelId" Guid
+@enduml

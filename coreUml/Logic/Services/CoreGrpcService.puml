@@ -1,0 +1,17 @@
+@startuml
+class CoreGrpcService {
+    + <<override>> <<async>> Init(request:Protos.CommunicationDto, context:ServerCallContext) : Task<CommunicationFullDto>
+    + <<override>> <<async>> Connect(request:CommunicationSmallDto, responseStream:IServerStreamWriter<CoreMessage>, context:ServerCallContext) : Task
+    + <<override>> <<async>> SendAdapterMessage(request:AdapterMessage, context:ServerCallContext) : Task<Protos.StatusDto>
+    + <<override>> <<async>> LoadInConnections(request:CommunicationSmallDto, context:ServerCallContext) : Task<ConnectionsList>
+    + <<override>> <<async>> LoadOutConnections(request:CommunicationSmallDto, context:ServerCallContext) : Task<ConnectionsList>
+    + <<override>> <<async>> Disconnect(request:CommunicationSmallDto, context:ServerCallContext) : Task<Empty>
+}
+class "ILogger`1"<T> {
+}
+CoreServiceBase <|-- CoreGrpcService
+CoreGrpcService o-> "_logger" ILogger
+CoreGrpcService o-> "_mediator" IMediator
+CoreGrpcService o-> "_mapper" IMapper
+CoreGrpcService o-> "_adaptersManager" AbstractAdaptersManager
+@enduml

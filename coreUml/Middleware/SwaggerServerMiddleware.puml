@@ -1,0 +1,8 @@
+@startuml
+class SwaggerServerMiddleware {
+    + <<async>> InvokeAsync(context:HttpContext) : Task
+    - <<async>> ModifyResponseAsync(response:HttpResponse, context:HttpContext) : Task
+    - ProcessJson(context:HttpContext, responce:string) : string
+}
+SwaggerServerMiddleware o-> "_next" RequestDelegate
+@enduml

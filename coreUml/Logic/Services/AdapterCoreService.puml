@@ -1,0 +1,31 @@
+@startuml
+class AdapterCoreService {
+    # _myCommunication : Models.Dtos.Communications.CommunicationDto?
+    + <<async>> Stop() : Task
+    + StartWork(communication:Models.Dtos.Communications.CommunicationDto) : Task
+    + ConnectAdapter(responseStream:IServerStreamWriter<CoreMessage>) : Task<SemaphoreSlim>
+    + <<async>> SendMessageToPath(message:InternalMessage, Path:string) : Task
+    + <<async>> ReceiveMessage(message:CoreMessage, cancellationToken:CancellationToken) : Task<Protos.StatusDto>
+    - <<async>> StartStatusCheker(cancellationToken:CancellationToken) : Task
+    # <<async>> HandleStatusMessage(statusMessage:Protos.StatusDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDataMessage(dataMessage:Protos.MessageDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConnectionMessage(connectionDto:Protos.ConnectionDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConfigMessage(communicationFullDto:Protos.CommunicationFullDto, cancellationToken:CancellationToken) : Task
+    + <<async>> SendMessage(coreMessage:Protos.CoreMessage, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IServerStreamWriter`1"<T> {
+}
+IAdapterCoreService <|-- AdapterCoreService
+AdapterCoreService o-> "_logger" ILogger
+AdapterCoreService o-> "_mediator" IMediator
+AdapterCoreService o-> "_mapper" IMapper
+AdapterCoreService o-> "_manager" AbstractAdaptersManager
+AdapterCoreService o-> "_cancellationTokenSource" CancellationTokenSource
+AdapterCoreService --> "_responseStream<CoreMessage>" "IServerStreamWriter`1"
+AdapterCoreService o-> "_lastSendMessage" DateTime
+AdapterCoreService o-> "_lastReceivedMessage" DateTime
+AdapterCoreService o-> "_workingSemaphore" SemaphoreSlim
+AdapterCoreService --> "SiliensInterval" TimeSpan
+@enduml

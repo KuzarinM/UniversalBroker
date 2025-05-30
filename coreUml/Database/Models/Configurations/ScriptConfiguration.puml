@@ -1,0 +1,9 @@
+@startuml
+class ScriptConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Script>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Script>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Script>" <|-- ScriptConfiguration
+@enduml

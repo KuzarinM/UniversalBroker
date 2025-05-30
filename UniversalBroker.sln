@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Adapters.Sc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Adapters.Tcp", "UniversalBroker.Adapters.Tcp\UniversalBroker.Adapters.Tcp.csproj", "{11D42060-6B75-4ADF-8186-75C6B9D0A701}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversalBroker.Core.Tests", "UniversalBroker.Core.Tests\UniversalBroker.Core.Tests.csproj", "{787F4E3C-092B-475C-AD40-5EECBE6CE31A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalBroker.Core.Tests.Unit", "UniversalBroker.Core.Tests\UniversalBroker.Core.Tests.Unit.csproj", "{787F4E3C-092B-475C-AD40-5EECBE6CE31A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversalBroker.Tests.Performance", "UniversalBroker.Tests.Performance\UniversalBroker.Tests.Performance.csproj", "{7C736638-736D-4A9F-9A31-36B61B323BDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{787F4E3C-092B-475C-AD40-5EECBE6CE31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{787F4E3C-092B-475C-AD40-5EECBE6CE31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{787F4E3C-092B-475C-AD40-5EECBE6CE31A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C736638-736D-4A9F-9A31-36B61B323BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C736638-736D-4A9F-9A31-36B61B323BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C736638-736D-4A9F-9A31-36B61B323BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C736638-736D-4A9F-9A31-36B61B323BDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

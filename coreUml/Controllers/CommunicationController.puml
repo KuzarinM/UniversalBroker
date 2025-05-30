@@ -1,0 +1,10 @@
+@startuml
+class CommunicationController {
+    + <<async>> GetCommunications(pageSize:int, pageIndex:int, Status:bool?, Search:string?) : Task<IActionResult>
+    + <<async>> GetCommunication(id:Guid) : Task<IActionResult>
+    + <<async>> AddOrUpdateCommunication(createDto:CreateCommunicationDto) : Task<IActionResult>
+    + <<async>> DeleteCommunication(id:Guid) : Task<IActionResult>
+    + <<async>> UpdateCommunicationAttribute(id:Guid, attributeList:Dictionary<string,string?>) : Task<IActionResult>
+}
+CustomControllerBase <|-- CommunicationController
+@enduml

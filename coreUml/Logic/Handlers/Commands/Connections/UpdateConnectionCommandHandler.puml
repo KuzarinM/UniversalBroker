@@ -1,0 +1,14 @@
+@startuml
+class UpdateConnectionCommandHandler {
+    + <<async>> Handle(request:UpdateConnectionCommand, cancellationToken:CancellationToken) : Task<ConnectionFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<UpdateConnectionCommand,ConnectionFullDto>" <|-- UpdateConnectionCommandHandler
+UpdateConnectionCommandHandler o-> "_logger" ILogger
+UpdateConnectionCommandHandler o-> "_mapper" IMapper
+UpdateConnectionCommandHandler o-> "_context" BrockerContext
+UpdateConnectionCommandHandler o-> "_adaptersManager" AbstractAdaptersManager
+@enduml

@@ -1,0 +1,9 @@
+@startuml
+class DiExtention <<static>> {
+    + {static} AddServices(services:IServiceCollection) : IServiceCollection
+    + {static} AddSingletons(services:IServiceCollection) : IServiceCollection
+    + {static} AddScopeds(services:IServiceCollection) : IServiceCollection
+    + {static} AddGrpc(services:IServiceCollection) : IServiceCollection
+    + {static} AddLogger(builder:WebApplicationBuilder) : void
+}
+@enduml

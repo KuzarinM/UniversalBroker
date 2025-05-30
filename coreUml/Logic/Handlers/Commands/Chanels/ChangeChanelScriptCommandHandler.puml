@@ -1,0 +1,13 @@
+@startuml
+class ChangeChanelScriptCommandHandler {
+    + <<async>> Handle(request:ChangeChanelScriptCommand, cancellationToken:CancellationToken) : Task<ChanelFullDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<ChangeChanelScriptCommand,ChanelFullDto>" <|-- ChangeChanelScriptCommandHandler
+ChangeChanelScriptCommandHandler o-> "_logger" ILogger
+ChangeChanelScriptCommandHandler o-> "_mapper" IMapper
+ChangeChanelScriptCommandHandler o-> "_context" BrockerContext
+@enduml

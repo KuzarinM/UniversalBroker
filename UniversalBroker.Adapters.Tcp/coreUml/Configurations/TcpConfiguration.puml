@@ -1,0 +1,8 @@
+@startuml
+class TcpConfiguration {
+    + IsClient : bool = true
+    + MessageDeviderRegex : string? = "\n"
+    + MessageFixSize : int? = null
+    + MessageDevicerByte : byte? = null
+}
+@enduml

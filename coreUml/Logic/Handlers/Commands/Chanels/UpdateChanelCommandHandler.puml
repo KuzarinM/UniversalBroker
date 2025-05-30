@@ -1,0 +1,14 @@
+@startuml
+class UpdateChanelCommandHandler {
+    + <<async>> Handle(request:UpdateChanelCommand, cancellationToken:CancellationToken) : Task<ChanelDto>
+    + <<async>> TestRelations(createChanelDto:CreateChanelDto) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<UpdateChanelCommand,ChanelDto>" <|-- UpdateChanelCommandHandler
+UpdateChanelCommandHandler o-> "_logger" ILogger
+UpdateChanelCommandHandler o-> "_mapper" IMapper
+UpdateChanelCommandHandler o-> "_context" BrockerContext
+@enduml

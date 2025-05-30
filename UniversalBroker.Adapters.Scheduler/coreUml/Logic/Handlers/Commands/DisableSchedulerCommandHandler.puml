@@ -1,0 +1,15 @@
+@startuml
+class DisableSchedulerCommandHandler {
+    + <<async>> Handle(request:DisableSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+    - <<async>> DisposeScheduler(model:SchedulerInstanceModel, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<DisableSchedulerCommand,bool>" <|-- DisableSchedulerCommandHandler
+DisableSchedulerCommandHandler o-> "_logger" ILogger
+DisableSchedulerCommandHandler o-> "_mediator" IMediator
+DisableSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+DisableSchedulerCommandHandler o-> "_initService" IInitService
+@enduml

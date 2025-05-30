@@ -1,0 +1,15 @@
+@startuml
+class MappingProfiles {
+    + MappingProfiles()
+    - AddCommunicationsMappings() : void
+    - AddConnectionsMappings() : void
+    - AssChannelsMappings() : void
+    - AddLoggsMappings() : void
+    - AddMessagesMappings() : void
+    + GetConnectionIdForMessage(message:MessageLog) : Guid?
+    + GetSourceChannelIdForMessage(message:MessageLog) : Guid?
+    + GetTargetChannelIdForMessage(message:MessageLog) : Guid?
+    + GetDirectionByMessage(message:Message) : MessageDirection
+}
+Profile <|-- MappingProfiles
+@enduml

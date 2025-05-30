@@ -1,0 +1,32 @@
+@startuml
+class JsContext {
+    + SendMessageToChanel(Id:object, data:IList<byte>, headers:ScriptObject?) : void
+    - SendMessageToChanel(Id:object, data:byte[], headers:ScriptObject?) : void
+    + SendMessageToChanel(Id:object, data:string, headers:ScriptObject?) : void
+    + SendMessageToConnection(Id:object, data:IList<byte>, headers:ScriptObject?) : void
+    - SendMessageToConnection(Id:object, data:byte[], headers:ScriptObject?) : void
+    + SendMessageToConnection(Id:object, data:string, headers:ScriptObject?) : void
+    + LogError(message:object) : void
+    + LogWarning(message:object) : void
+    + LogInfo(message:object) : void
+    + CheckContainsInStorage(key:string) : bool
+    + WriteIntoStorage(key:string, value:object) : void
+    + ReadFromStorage(key:string) : object?
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+class "ConcurrentQueue`1"<T> {
+}
+class "List`1"<T> {
+}
+JsContext o-> "_logger" ILogger
+JsContext o-> "_dbLogingService" AbstractDbLogingService
+JsContext o-> "_internalStorage<string,object?>" "ConcurrentDictionary`2"
+JsContext --> "CurrentSenderId" Guid
+JsContext o-> "Chanels" PropertyBag
+JsContext o-> "Connections" PropertyBag
+JsContext o-> "_sending<MessageLog>" "ConcurrentQueue`1"
+JsContext --> "GetMessages<MessageLog>" "List`1"
+@enduml
