@@ -129,6 +129,8 @@ export default{
 
             this.$emit("StartLoading")
 
+            console.log(this.filters);
+
             var res = await this.GetChanelLogs(
                 this.channelId,
                 this.PageSize, 

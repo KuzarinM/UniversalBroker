@@ -41,16 +41,16 @@ export default{
                     weight:"20%",
                     value: []
                 },
-                {
-                    filterName:"direction",
-                    type:"multi-select",
-                    displayName:"Направление",
-                    discription:"Указывает откуда и куда передавалось сообщение",
-                    placeholder:"",
-                    options: [],
-                    weight:"20%",
-                    value: []
-                },
+                // {
+                //     filterName:"direction",
+                //     type:"multi-select",
+                //     displayName:"Направление",
+                //     discription:"Указывает откуда и куда передавалось сообщение",
+                //     placeholder:"",
+                //     options: [],
+                //     weight:"20%",
+                //     value: []
+                // },
 
             ],
             TableStructure:[
@@ -188,8 +188,8 @@ export default{
                 this.PageSize, 
                 this.PageNumber -1,
                 this.filters[0].value,
-                this.filters[1].value,
-                this.filters[3].value
+                this.filters[1].value
+                //this.filters[3].value
             )
 
             if(res.code == 200){
@@ -253,11 +253,11 @@ export default{
         },
     },
     mounted(){
-        this.filters[3].options = this.DirectionMapping.map((currElement, index)=>({
-            "value": index,
-            "label": currElement
-            })
-        )
+        // this.filters[3].options = this.DirectionMapping.map((currElement, index)=>({
+        //     "value": index,
+        //     "label": currElement
+        //     })
+        // )
     }
 }
 </script>

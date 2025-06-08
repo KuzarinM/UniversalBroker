@@ -8,7 +8,7 @@ export default defineConfig({
     proxy: {
       // Проксируем все запросы с таким вот
       '^/proxy/.*': {
-        target: 'https://localhost:9091', // Целевой url
+        target: 'https://192.168.0.105:9091', // Целевой url
         changeOrigin: true, // меняем origin. Возможно оно нам надо
         secure: false, // Отключаем проверки сертификата
         rewrite: (path) => path.replace(/^\/proxy/, '') // Вырезаем слово proxy
