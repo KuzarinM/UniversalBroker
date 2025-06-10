@@ -76,7 +76,7 @@ namespace UniversalBroker.Core.Extentions
             {
                 //cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.254.121");
 
-                cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=localhost");
+                cfg.UseNpgsql("Password=postgres;Username=postgres;Database=brocker;Host=192.168.0.105");
                 cfg.EnableServiceProviderCaching();
             }, ServiceLifetime.Transient);
 

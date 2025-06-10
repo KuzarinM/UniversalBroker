@@ -47,6 +47,7 @@ namespace UniversalBroker.Core.Logic.Managers
                 // Даём чуть больше времени
                 if(item.SiliensInterval.TotalSeconds > (_timeToLiveS*1.25))
                 {
+                    _logger.LogWarning("Обнаружен адаптор, который не отвечает. Убиравем его");
                     disregisterList.Add(item);
                 }
             }
@@ -77,7 +78,7 @@ namespace UniversalBroker.Core.Logic.Managers
         {
             _ = Task.Run(async () =>
             {
-                while (stoppingToken.IsCancellationRequested)
+                while (!stoppingToken.IsCancellationRequested)
                 {
                     await LifesignCheck();
                     await Task.Delay(_timeToLiveS * 800); // *0.8*1000 = * 800

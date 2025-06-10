@@ -97,9 +97,9 @@ export default{
                 physics: {
                     stabilization: true,
                     barnesHut: {
-                        gravitationalConstant: -1000,      // Слабее отталкивание
-                        centralGravity: 0.05,              // Ослабить притяжение к центру
-                        springLength: 80,                  // Еще короче связи
+                        gravitationalConstant: -300,      // Слабее отталкивание
+                        centralGravity: 0.01,              // Ослабить притяжение к центру
+                        springLength: 100,                  // Еще короче связи
                         springConstant: 0.04,
                         damping: 0.5,
                         avoidOverlap: 0.7   
@@ -144,7 +144,8 @@ export default{
 
                         for (let j = 0; j < element.outputIds.length; j++) {
                             const egeDto = element.outputIds[j];
-                            allEges.push(this.AddEge(egeDto, element))
+                            if(element.objectId != egeDto.targetId)
+                                allEges.push(this.AddEge(egeDto, element))
                         }
                     }
 

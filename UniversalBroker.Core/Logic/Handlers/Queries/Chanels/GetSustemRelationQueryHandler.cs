@@ -60,7 +60,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
 
             // Получаем списко каналов, чтобы их все указать
             var allChanels = await _context.Chanels
-                                    .Include(x => x.ToChanels)
+                                    .Include(x => x.FromChanels)
                                     .Include(x => x.Connections)
                                     .ToListAsync();
 
@@ -74,7 +74,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
 
                 node.ObjectName = item.Name;
 
-                foreach (var chanelRelation in item.ToChanels.Select(x => GetOrAddRelationDto(node.OutputIds, x.Id)))
+                foreach (var chanelRelation in item.FromChanels.Select(x => GetOrAddRelationDto(node.OutputIds, x.Id)))
                 {
                     chanelRelation.Status = chanelRelation.Status == RelationUsageStatus.NotMarked ? RelationUsageStatus.InUse : chanelRelation.Status;
                 }
@@ -131,7 +131,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Chanels
                 dto = new RelationDto()
                 {
                     TargetId = id,
-                    Status = RelationUsageStatus.InUse
+                    Status = RelationUsageStatus.NotUsed
                 };
                 list.Add(dto);
             }

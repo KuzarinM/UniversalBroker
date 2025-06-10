@@ -78,7 +78,7 @@ const ChanelApiMixine = {
                 }
             ));
         },
-        async GetChanelMessages(id, pageSize, pageIndex, startInterval, stopInterval, directions){
+        async GetChanelMessages(id, pageSize, pageIndex, startInterval, stopInterval){
             return await this.__CreateResponce(await this.__makeRequest(
                 "GET", 
                 `/api/Chanel/${id}/messages`, 
@@ -88,8 +88,7 @@ const ChanelApiMixine = {
                     pageSize: pageSize == null? 10 : pageSize,
                     pageIndex: pageIndex == null? 0 : pageIndex,
                     startInterval: startInterval,
-                    stopInterval: stopInterval,
-                    directions: directions
+                    stopInterval: stopInterval
                 }
             ));
         },
