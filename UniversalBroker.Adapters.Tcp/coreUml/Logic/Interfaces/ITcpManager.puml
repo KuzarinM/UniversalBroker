@@ -1,0 +1,11 @@
+@startuml
+interface ITcpManager {
+    RestartListeners() : Task
+    StartService(client:TcpClient, tcpConfiguration:TcpConfiguration, path:string, needRead:bool) : Task<ITcpClientService>
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ITcpManager --> "GetTcpListeners<Task<TcpClient>,TcpServerModel>" "ConcurrentDictionary`2"
+ITcpManager --> "GetTcpServers<string,TcpServerModel>" "ConcurrentDictionary`2"
+ITcpManager --> "GetTcpClients<string,TcpClientModel>" "ConcurrentDictionary`2"
+@enduml

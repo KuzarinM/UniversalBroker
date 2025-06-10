@@ -1,0 +1,13 @@
+@startuml
+class RemoveClientCommandHandler {
+    + <<async>> Handle(request:RemoveClientCommand, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<RemoveClientCommand,bool>" <|-- RemoveClientCommandHandler
+RemoveClientCommandHandler o-> "_logger" ILogger
+RemoveClientCommandHandler o-> "_initService" IInitService
+RemoveClientCommandHandler o-> "_tcpManager" ITcpManager
+@enduml

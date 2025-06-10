@@ -27,7 +27,7 @@
       "applicationUrl": "https://localhost:7218;http://localhost:5129",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "BASE_CONFIGURATION_CORE_BASE_URL": "https://localhost:7071",
+        "BASE_CONFIGURATION_CORE_BASE_URL": "https://localhost:9091",
         "BASE_CONFIGURATION_ADAPTER_TYPE_ID": "b688bec9-923d-43b0-a095-314711c30f1a",
         "BASE_CONFIGURATION_ADAPTER_NAME": "Адаптер Tcp",
         "BASE_CONFIGURATION_ADAPTER_DESCRIPTION": "Самый сложный, потому с первого раза 100% не запустится"

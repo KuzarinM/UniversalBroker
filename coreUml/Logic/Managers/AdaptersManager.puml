@@ -1,0 +1,25 @@
+@startuml
+class AdaptersManager {
+    - _timeToLiveS : int = 120
+    + <<override>> TimeToLiveS : int <<get>>
+    + <<override>> <<async>> RegisterNewAdapter(communicationId:Guid, coreService:IAdapterCoreService) : Task
+    - <<async>> LifesignCheck() : Task
+    + <<override>> <<async>> DisregisterAdapter(communicationId:Guid) : Task
+    + <<override>> GetAdapterById(id:Guid) : IAdapterCoreService?
+    - <<async>> SetCommunicationStatus(communicationId:Guid, staus:bool) : Task
+    # <<override>> <<async>> ExecuteAsync(stoppingToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "Func`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+AbstractAdaptersManager <|-- AdaptersManager
+AdaptersManager o-> "_logger" ILogger
+AdaptersManager o-> "_mediatorFunc<IMediator>" "Func`1"
+AdaptersManager o-> "_contextFunc<BrockerContext>" "Func`1"
+AdaptersManager o-> "_serviceProvider" IServiceProvider
+AdaptersManager o-> "_activeServices<Guid,IAdapterCoreService>" "ConcurrentDictionary`2"
+AdaptersManager --> "CreateService" IAdapterCoreService
+@enduml

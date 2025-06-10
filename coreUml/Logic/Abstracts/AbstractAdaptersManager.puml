@@ -1,0 +1,10 @@
+@startuml
+abstract class AbstractAdaptersManager {
+    + <<virtual>> TimeToLiveS : int <<get>>
+    + {abstract} RegisterNewAdapter(communicationId:Guid, coreService:IAdapterCoreService) : Task
+    + {abstract} DisregisterAdapter(communicationId:Guid) : Task
+    + {abstract} GetAdapterById(id:Guid) : IAdapterCoreService?
+}
+BackgroundService <|-- AbstractAdaptersManager
+AbstractAdaptersManager --> "CreateService" IAdapterCoreService
+@enduml

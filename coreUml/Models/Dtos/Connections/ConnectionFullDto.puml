@@ -1,0 +1,9 @@
+@startuml
+class ConnectionFullDto {
+}
+class "List`1"<T> {
+}
+ConnectionViewDto <|-- ConnectionFullDto
+ConnectionFullDto o-> "Communication" CommunicationDto
+ConnectionFullDto o-> "ChannelsIds<Guid>" "List`1"
+@enduml

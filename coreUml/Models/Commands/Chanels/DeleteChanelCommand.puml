@@ -1,0 +1,6 @@
+@startuml
+class DeleteChanelCommand {
+}
+IRequest <|-- DeleteChanelCommand
+DeleteChanelCommand --> "Id" Guid
+@enduml

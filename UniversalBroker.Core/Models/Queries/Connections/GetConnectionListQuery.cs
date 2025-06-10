@@ -5,7 +5,7 @@ using UniversalBroker.Core.Models.Dtos.Connections;
 
 namespace UniversalBroker.Core.Models.Queries.Connections
 {
-    public class GetConnectionListQuery: IRequest<PaginationModel<ConnectionDto>>
+    public class GetConnectionListQuery: IRequest<PaginationModel<ConnectionViewDto>>
     {
         public int PageSize { get; set; }
 

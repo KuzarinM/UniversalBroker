@@ -1,0 +1,10 @@
+@startuml
+class ChanelFullDto {
+}
+class "List`1"<T> {
+}
+ChanelDto <|-- ChanelFullDto
+ChanelFullDto o-> "OutputChanels<ChanelDto>" "List`1"
+ChanelFullDto o-> "InputConnections<ConnectionViewDto>" "List`1"
+ChanelFullDto o-> "OutputConnections<ConnectionViewDto>" "List`1"
+@enduml

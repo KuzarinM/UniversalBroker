@@ -1,0 +1,8 @@
+@startuml
+class BaseConfiguration {
+    + CoreBaseUrl : string <<get>> <<set>>
+    + AdapterName : string <<get>> <<set>>
+    + AdapterDescription : string <<get>> <<set>>
+}
+BaseConfiguration o-> "AdapterTypeId" Guid
+@enduml

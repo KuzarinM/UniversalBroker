@@ -1,0 +1,8 @@
+@startuml
+class CustomControllerBase {
+    # <<async>> ControllerSimpleRequest(request:IRequest<T>, unexpectedErrorText:string) : Task<IActionResult>
+    # <<async>> ControllerSimpleRequest(request:IRequest, unexpectedErrorText:string) : Task<IActionResult>
+}
+ControllerBase <|-- CustomControllerBase
+CustomControllerBase o-> "_mediator" IMediator
+@enduml

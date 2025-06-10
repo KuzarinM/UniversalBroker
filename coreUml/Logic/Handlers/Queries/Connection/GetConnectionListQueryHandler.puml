@@ -1,0 +1,13 @@
+@startuml
+class GetConnectionListQueryHandler {
+    + <<async>> Handle(request:GetConnectionListQuery, cancellationToken:CancellationToken) : Task<PaginationModel<ConnectionViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetConnectionListQuery,PaginationModel<ConnectionViewDto>>" <|-- GetConnectionListQueryHandler
+GetConnectionListQueryHandler o-> "_logger" ILogger
+GetConnectionListQueryHandler o-> "_mapper" IMapper
+GetConnectionListQueryHandler o-> "_context" BrockerContext
+@enduml

@@ -24,7 +24,7 @@ namespace UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands
                 {
                     // todo обработка заголовка Custom.ToAddres
 
-                    await Task.WhenAll(tcpServer.Clients.Select(x => x.SendMessage(request.Message.Data.ToList())).ToArray());
+                    await Task.WhenAll(tcpServer.Clients.Where(x=>x != null).Select(x => x.SendMessage(request.Message.Data.ToList())).ToArray());
                 }
                 else
                     _logger.LogInformation("Серверов по пути {path} не найдено", request.Message.Path);

@@ -1,0 +1,7 @@
+@startuml
+class ClientDisconectCommand {
+    + Path : string <<get>> <<set>>
+}
+IRequest <|-- ClientDisconectCommand
+ClientDisconectCommand --> "Client" ITcpClientService
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+interface ISchedulerManager {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ISchedulerManager --> "GetActiveSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+@enduml

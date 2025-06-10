@@ -1,0 +1,7 @@
+@startuml
+enum MessageDirection {
+    ConnectionToChanel,
+    ChanelToChanel,
+    ChanelToConnection,
+}
+@enduml

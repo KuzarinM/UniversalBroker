@@ -1,0 +1,21 @@
+@startuml
+class BrockerContext <<partial>> {
+    + BrockerContext()
+    + BrockerContext(options:DbContextOptions<BrockerContext>)
+    # <<override>> OnModelCreating(modelBuilder:ModelBuilder) : void
+    <<partial>> - OnModelCreatingPartial(modelBuilder:ModelBuilder) : void
+}
+class "DbSet`1"<T> {
+}
+DbContext <|-- BrockerContext
+BrockerContext --> "Attributes<Attribute>" "DbSet`1"
+BrockerContext --> "Chanels<Chanel>" "DbSet`1"
+BrockerContext --> "Communications<Communication>" "DbSet`1"
+BrockerContext --> "CommunicationAttributes<CommunicationAttribute>" "DbSet`1"
+BrockerContext --> "Connections<Connection>" "DbSet`1"
+BrockerContext --> "ConnectionAttributes<ConnectionAttribute>" "DbSet`1"
+BrockerContext --> "ExecutionLogs<ExecutionLog>" "DbSet`1"
+BrockerContext --> "Headers<Header>" "DbSet`1"
+BrockerContext --> "Messages<Message>" "DbSet`1"
+BrockerContext --> "Scripts<Script>" "DbSet`1"
+@enduml

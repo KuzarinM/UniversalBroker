@@ -155,12 +155,9 @@ export default{
 
             this.$emit("StopLoading")
         },
-        async DeleteCommunication(item){
+        async RemoveCommunication(item){
             if(!confirm(`Вы уверены, что хотите удалить подключение ${item.name}`))
                 return
-
-            alert("Для теста функцию заблокировал")
-            return
 
             this.$emit("StartLoading")
             var res = await this.DeleteCommunication(item.id)
@@ -233,7 +230,7 @@ export default{
         :structure="this.TableStructure"
         :canAdd = "false"
         @RowClick="this.OpenCommunication"
-        @DeleteRow="this.DeleteCommunication"
+        @DeleteRow="this.RemoveCommunication"
     />
 
     <EntityModal
@@ -243,7 +240,7 @@ export default{
         :canBeCreate="false"
         :canBeEdit="true"
         :canBeDelete="true"
-        @Delete = "this.DeleteCommunication"
+        @Delete = "this.RemoveCommunication"
         @Save="this.SaveCommunication"
         ref="updateModal"
      />

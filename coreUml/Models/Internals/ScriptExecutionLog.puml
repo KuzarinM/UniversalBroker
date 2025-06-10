@@ -1,0 +1,8 @@
+@startuml
+class ScriptExecutionLog {
+    + MessageText : string <<get>> <<set>>
+}
+ScriptExecutionLog --> "ScriptId" Guid
+ScriptExecutionLog o-> "Created" DateTime
+ScriptExecutionLog o-> "LogLevel" LogLevel
+@enduml

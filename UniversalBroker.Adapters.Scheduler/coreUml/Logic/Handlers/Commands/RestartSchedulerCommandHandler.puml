@@ -1,0 +1,17 @@
+@startuml
+class RestartSchedulerCommandHandler {
+    + <<async>> Handle(request:RestartSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<RestartSchedulerCommand,bool>" <|-- RestartSchedulerCommandHandler
+RestartSchedulerCommandHandler o-> "_logger" ILogger
+RestartSchedulerCommandHandler o-> "_mediator" IMediator
+RestartSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+RestartSchedulerCommandHandler o-> "_initService" IInitService
+RestartSchedulerCommandHandler o-> "_schedulerConfig" SchedulerConfiguration
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+class SchedulerConfiguration {
+    + IntervalMs : int <<get>> <<set>> = 25000
+    + MessageText : string? = null
+    + AutoReset : bool = true
+}
+@enduml

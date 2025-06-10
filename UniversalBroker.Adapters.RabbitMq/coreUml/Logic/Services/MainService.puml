@@ -1,0 +1,37 @@
+@startuml
+class MainService {
+    - _myCommunication : CommunicationFullDto?
+    + <<async>> StartWork(CancellationTokenSource:CancellationTokenSource) : Task<SemaphoreSlim>
+    - <<async>> StartStatusCheker(cancellationToken:CancellationToken) : Task
+    - <<async>> StartLifesignChecker(CancellationTokenSource:CancellationTokenSource) : Task
+    - <<async>> SendInit(cancellationToken:CancellationToken) : Task
+    - <<async>> ListenMessages(cancellationToken:CancellationToken) : Task
+    # <<async>> HandleStatusMessage(statusMessage:Protos.StatusDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDataMessage(dataMessage:MessageDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConnectionMessage(connectionDto:ConnectionDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConfigMessage(communicationFullDto:CommunicationFullDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDeleteConnectionMessage(connectionDeleteDto:ConnectionDeleteDto, cancellationToken:CancellationToken) : Task
+    # <<async>> LoadConnections(cancellationToken:CancellationToken) : Task
+    # <<async>> GetOrUpdateAttribute(attributeName:string, getter:Func<BaseConfiguration,Task<string>>, setter:Func<BaseConfiguration, string, Task>) : Task<bool>
+    + <<async>> SendMessage(coreMessage:CoreMessage, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IAsyncStreamReader`1"<T> {
+}
+IMainService <|-- MainService
+MainService o-> "_logger" ILogger
+MainService o-> "_mediator" IMediator
+MainService o-> "_coreService" CoreServiceClient
+MainService o-> "_rabbitMqService" IRabbitMqService
+MainService o-> "_baseConfig" BaseConfiguration
+MainService o-> "_adapterConfig" AdapterConfiguration
+MainService --> "_responseStream<CoreMessage>" "IAsyncStreamReader`1"
+MainService o-> "_processSemaphore" SemaphoreSlim
+MainService o-> "_lastSendMessage" DateTime
+MainService o-> "_lastReceivedMessage" DateTime
+MainService --> "Communication" CommunicationFullDto
+MainService --> "SiliensInterval" TimeSpan
+@enduml

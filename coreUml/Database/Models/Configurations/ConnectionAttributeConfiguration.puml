@@ -1,0 +1,9 @@
+@startuml
+class ConnectionAttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<ConnectionAttribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<ConnectionAttribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<ConnectionAttribute>" <|-- ConnectionAttributeConfiguration
+@enduml

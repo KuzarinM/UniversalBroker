@@ -1,0 +1,7 @@
+@startuml
+class CreateConnectionDto {
+    + IsInput : bool <<get>> <<set>>
+}
+UpdateConnectionDto <|-- CreateConnectionDto
+CreateConnectionDto --> "CommunicationId" Guid
+@enduml

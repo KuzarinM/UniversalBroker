@@ -1,0 +1,6 @@
+@startuml
+class PublishConfiguration {
+    + UseExchenge : bool = false
+    + Mandatory : bool <<get>> <<set>> = false
+}
+@enduml

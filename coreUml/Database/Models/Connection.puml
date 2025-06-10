@@ -1,0 +1,15 @@
+@startuml
+class Connection <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Isinput : bool <<get>> <<set>>
+    + Path : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Connection --> "Id" Guid
+Connection --> "CommunicationId" Guid
+Connection --> "Communication" Communication
+Connection o-> "ConnectionAttributes<ConnectionAttribute>" "ICollection`1"
+Connection o-> "Messages<Message>" "ICollection`1"
+Connection o-> "Chanels<Chanel>" "ICollection`1"
+@enduml

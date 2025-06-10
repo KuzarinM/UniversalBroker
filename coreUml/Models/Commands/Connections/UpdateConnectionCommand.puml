@@ -1,0 +1,10 @@
+@startuml
+class UpdateConnectionCommand {
+    + NeedNotifyAdapter : bool <<get>> <<set>> = true
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<ConnectionFullDto>" <|-- UpdateConnectionCommand
+UpdateConnectionCommand --> "ConnectionId" Guid
+UpdateConnectionCommand --> "UpdateDto" UpdateConnectionDto
+@enduml

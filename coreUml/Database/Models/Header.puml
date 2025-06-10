@@ -1,0 +1,9 @@
+@startuml
+class Header <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Value : string <<get>> <<set>>
+}
+Header --> "Id" Guid
+Header --> "MessagesId" Guid
+Header --> "Messages" Message
+@enduml

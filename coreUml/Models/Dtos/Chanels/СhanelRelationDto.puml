@@ -1,0 +1,9 @@
+@startuml
+class СhanelRelationDto {
+    + RelationName : string <<get>> <<set>>
+    + IsInput : bool <<get>> <<set>>
+}
+СhanelRelationDto --> "RelationId" Guid
+СhanelRelationDto --> "Direction" MessageDirection
+СhanelRelationDto --> "Status" RelationUsageStatus
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+class ControllerException {
+    - _statusCode : int = 400
+    + StatusCodeInt : int <<get>> <<set>>
+    + ControllerException(statusCode:int?)
+    + ControllerException(message:string, statusCode:int?)
+    + ControllerException(message:string, inner:Exception, statusCode:int?)
+}
+Exception <|-- ControllerException
+ControllerException --> "StatusCode" HttpStatusCode
+@enduml

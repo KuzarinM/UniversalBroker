@@ -1,0 +1,9 @@
+@startuml
+class AttributeConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Attribute>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Attribute>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Attribute>" <|-- AttributeConfiguration
+@enduml

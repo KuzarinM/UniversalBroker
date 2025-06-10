@@ -1,0 +1,12 @@
+@startuml
+class ClientDisconectCommandHandler {
+    + <<async>> Handle(request:ClientDisconectCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<ClientDisconectCommand>" <|-- ClientDisconectCommandHandler
+ClientDisconectCommandHandler o-> "_logger" ILogger
+ClientDisconectCommandHandler o-> "_tcpManager" ITcpManager
+@enduml

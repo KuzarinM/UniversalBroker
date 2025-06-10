@@ -1,0 +1,11 @@
+@startuml
+interface IAdapterCoreService {
+    Stop() : Task
+    StartWork(communication:Models.Dtos.Communications.CommunicationDto) : Task
+    ConnectAdapter(responseStream:IServerStreamWriter<CoreMessage>) : Task<SemaphoreSlim>
+    SendMessageToPath(message:InternalMessage, Path:string) : Task
+    ReceiveMessage(message:CoreMessage, cancellationToken:CancellationToken) : Task<Protos.StatusDto>
+    SendMessage(coreMessage:Protos.CoreMessage, cancellationToken:CancellationToken) : Task
+}
+IAdapterCoreService --> "SiliensInterval" TimeSpan
+@enduml

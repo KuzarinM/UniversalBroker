@@ -1,0 +1,18 @@
+@startuml
+class AddOrUpdateSchedulerCommandHandler {
+    + <<async>> Handle(request:AddOrUpdateSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+    - <<async>> TimerCallback(model:SchedulerInstanceModel) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddOrUpdateSchedulerCommand,bool>" <|-- AddOrUpdateSchedulerCommandHandler
+AddOrUpdateSchedulerCommandHandler o-> "_logger" ILogger
+AddOrUpdateSchedulerCommandHandler o-> "_mediator" IMediator
+AddOrUpdateSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+AddOrUpdateSchedulerCommandHandler o-> "_initService" IInitService
+AddOrUpdateSchedulerCommandHandler o-> "_schedulerConfig" SchedulerConfiguration
+@enduml

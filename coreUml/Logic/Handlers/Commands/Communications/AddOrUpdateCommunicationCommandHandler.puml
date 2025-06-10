@@ -1,0 +1,13 @@
+@startuml
+class AddOrUpdateCommunicationCommandHandler {
+    + <<async>> Handle(request:AddOrUpdateCommunicationCommand, cancellationToken:CancellationToken) : Task<CommunicationDto>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddOrUpdateCommunicationCommand,CommunicationDto>" <|-- AddOrUpdateCommunicationCommandHandler
+AddOrUpdateCommunicationCommandHandler o-> "_logger" ILogger
+AddOrUpdateCommunicationCommandHandler o-> "_mapper" IMapper
+AddOrUpdateCommunicationCommandHandler o-> "_context" BrockerContext
+@enduml

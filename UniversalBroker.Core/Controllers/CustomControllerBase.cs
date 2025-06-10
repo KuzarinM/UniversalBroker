@@ -30,7 +30,7 @@ namespace UniversalBroker.Core.Controllers
             {
                 return StatusCode(ex.StatusCodeInt, ex.Message);
             }
-            catch
+            catch(Exception ex) 
             {
                 return BadRequest(unexpectedErrorText);
             }

@@ -1,0 +1,7 @@
+@startuml
+class AppExtentions <<static>> {
+    + {static} AddMiddlewares(app:WebApplication) : WebApplication
+    + {static} AddSwagger(app:WebApplication) : WebApplication
+    + {static} ClearCommunications(app:WebApplication) : WebApplication
+}
+@enduml

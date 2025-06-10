@@ -1,0 +1,14 @@
+@startuml
+class GetSustemRelationQueryHandler {
+    + <<async>> Handle(request:GetSystemRelationQuery, cancellationToken:CancellationToken) : Task<List<NodeDto>>
+    - GetOrAddNodeDto(dict:Dictionary<Guid, NodeDto>, id:Guid, dto:NodeDto) : NodeDto
+    - GetOrAddRelationDto(list:List<RelationDto>, id:Guid) : RelationDto
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetSystemRelationQuery,List<NodeDto>>" <|-- GetSustemRelationQueryHandler
+GetSustemRelationQueryHandler o-> "_logger" ILogger
+GetSustemRelationQueryHandler o-> "_context" BrockerContext
+@enduml

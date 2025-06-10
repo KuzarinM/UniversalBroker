@@ -1,0 +1,11 @@
+@startuml
+class ExchangeConfig {
+    + NeedDeclare : bool <<get>> <<set>> = false
+    + Type : string <<get>> <<set>>
+    + Durable : bool <<get>> <<set>>
+    + Exclusive : bool <<get>> <<set>>
+    + AutoDelete : bool <<get>> <<set>>
+    + Passive : bool <<get>> <<set>> = false
+    + NoWait : bool <<get>> <<set>> = false
+}
+@enduml

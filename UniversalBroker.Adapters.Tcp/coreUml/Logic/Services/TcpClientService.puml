@@ -1,0 +1,28 @@
+@startuml
+class TcpClientService {
+    - _listening : bool = false
+    - _path : string <<get>> <<set>>
+    + <<async>> StartWork(tcpClient:TcpClient, tcpConfiguration:TcpConfiguration, path:string, needRead:bool) : Task
+    + StartListen() : void
+    + StopListen() : void
+    + <<async>> StopWork() : Task
+    + <<async>> SendMessage(message:List<byte>) : Task<bool>
+    - <<async>> ListenMessages() : Task
+    - <<async>> ExtractMessagesFromBufer() : Task<List<List<byte>>>
+    - <<async>> HandleIncommingMessage(messageData:List<byte>) : Task
+    - <<async>> ReadStream(networkStream:NetworkStream) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "List`1"<T> {
+}
+ITcpClientService <|-- TcpClientService
+TcpClientService o-> "_logger" ILogger
+TcpClientService o-> "_initService" IInitService
+TcpClientService o-> "_mediator" IMediator
+TcpClientService o-> "_cancellationTokenSource" CancellationTokenSource
+TcpClientService o-> "_buffer<byte>" "List`1"
+TcpClientService o-> "SendSemaphore" SemaphoreSlim
+TcpClientService --> "_tcpConfiguration" TcpConfiguration
+TcpClientService --> "_tcpClient" TcpClient
+@enduml

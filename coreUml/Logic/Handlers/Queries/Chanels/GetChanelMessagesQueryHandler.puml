@@ -1,0 +1,13 @@
+@startuml
+class GetChanelMessagesQueryHandler {
+    + <<async>> Handle(request:GetChanelMessagesQuery, cancellationToken:CancellationToken) : Task<PaginationModel<MessageViewDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelMessagesQuery,PaginationModel<MessageViewDto>>" <|-- GetChanelMessagesQueryHandler
+GetChanelMessagesQueryHandler o-> "_logger" ILogger
+GetChanelMessagesQueryHandler o-> "_mapper" IMapper
+GetChanelMessagesQueryHandler o-> "_context" BrockerContext
+@enduml

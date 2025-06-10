@@ -1,0 +1,14 @@
+@startuml
+class ExecuteScriptCommandHandler {
+    + <<async>> Handle(request:ExecuteScriptCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<ExecuteScriptCommand>" <|-- ExecuteScriptCommandHandler
+ExecuteScriptCommandHandler o-> "_logger" ILogger
+ExecuteScriptCommandHandler o-> "_mapper" IMapper
+ExecuteScriptCommandHandler o-> "_context" BrockerContext
+ExecuteScriptCommandHandler o-> "_interpretatorService" IChanelJsInterpretatorService
+@enduml

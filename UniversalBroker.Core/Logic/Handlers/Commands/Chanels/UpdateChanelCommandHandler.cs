@@ -71,8 +71,8 @@ namespace UniversalBroker.Core.Logic.Handlers.Commands.Chanels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при удалении канала");
-                throw new ControllerException("Ошибка при удалении канала");
+                _logger.LogError(ex, "Ошибка при изменении канала");
+                throw new ControllerException("Ошибка при изменении канала");
             }
         }
 

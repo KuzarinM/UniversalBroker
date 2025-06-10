@@ -1,0 +1,13 @@
+@startuml
+class GetAllCommunicationsQueryHandler {
+    + <<async>> Handle(request:GetAllCommunicationsQuery, cancellationToken:CancellationToken) : Task<PaginationModel<CommunicationDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetAllCommunicationsQuery,PaginationModel<CommunicationDto>>" <|-- GetAllCommunicationsQueryHandler
+GetAllCommunicationsQueryHandler o-> "_logger" ILogger
+GetAllCommunicationsQueryHandler o-> "_mapper" IMapper
+GetAllCommunicationsQueryHandler o-> "_brockerContext" BrockerContext
+@enduml

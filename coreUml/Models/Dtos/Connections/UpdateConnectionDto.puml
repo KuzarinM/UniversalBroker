@@ -1,0 +1,12 @@
+@startuml
+class UpdateConnectionDto {
+    + Name : string <<get>> <<set>>
+    + Path : string <<get>> <<set>>
+}
+class "Dictionary`2"<T1,T2> {
+}
+class "List`1"<T> {
+}
+UpdateConnectionDto o-> "Attribues<string,string>" "Dictionary`2"
+UpdateConnectionDto o-> "ChannelsIds<Guid>" "List`1"
+@enduml

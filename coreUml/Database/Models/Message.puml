@@ -1,0 +1,15 @@
+@startuml
+class Message <<partial>> {
+}
+class "ICollection`1"<T> {
+}
+Message --> "Id" Guid
+Message --> "Datetime" DateTime
+Message --> "ConnectionId" Guid
+Message --> "SourceChannelId" Guid
+Message --> "TargetChannelId" Guid
+Message --> "Connection" Connection
+Message o-> "Headers<Header>" "ICollection`1"
+Message --> "SourceChannel" Chanel
+Message --> "TargetChannel" Chanel
+@enduml

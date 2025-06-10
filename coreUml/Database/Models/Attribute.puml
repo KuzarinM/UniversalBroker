@@ -1,0 +1,9 @@
+@startuml
+class Attribute <<partial>> {
+    + Key : string <<get>> <<set>>
+    + Value : string <<get>> <<set>>
+}
+Attribute --> "Id" Guid
+Attribute --> "CommunicationAttribute" CommunicationAttribute
+Attribute --> "ConnectionAttribute" ConnectionAttribute
+@enduml

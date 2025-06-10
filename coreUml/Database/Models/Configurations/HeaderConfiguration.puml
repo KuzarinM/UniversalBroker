@@ -1,0 +1,9 @@
+@startuml
+class HeaderConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<Header>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<Header>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<Header>" <|-- HeaderConfiguration
+@enduml

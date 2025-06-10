@@ -1,0 +1,8 @@
+@startuml
+class SchedulerInstanceModel {
+}
+SchedulerInstanceModel --> "MyTimer" Timer
+SchedulerInstanceModel --> "SchedulerConfiguration" SchedulerConfiguration
+SchedulerInstanceModel o-> "CancellationTokenSource" CancellationTokenSource
+SchedulerInstanceModel --> "Connection" ConnectionDto
+@enduml

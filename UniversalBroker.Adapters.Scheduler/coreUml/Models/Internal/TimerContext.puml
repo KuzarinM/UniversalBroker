@@ -1,0 +1,6 @@
+@startuml
+class TimerContext {
+}
+TimerContext --> "InitService" IInitService
+TimerContext --> "SchedulerInstanceModel" SchedulerInstanceModel
+@enduml

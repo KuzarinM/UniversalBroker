@@ -3,7 +3,7 @@
     /// <summary>
     /// Dto Подключения
     /// </summary>
-    public class ConnectionDto: CreateConnectionDto
+    public class ConnectionViewDto: CreateConnectionDto
     {
         /// <summary>
         /// Id

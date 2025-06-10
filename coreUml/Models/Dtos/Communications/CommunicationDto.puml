@@ -1,0 +1,10 @@
+@startuml
+class CommunicationDto {
+    + Status : bool <<get>> <<set>>
+}
+class "Dictionary`2"<T1,T2> {
+}
+CreateCommunicationDto <|-- CommunicationDto
+CommunicationDto --> "Id" Guid
+CommunicationDto o-> "Attributes<string,string>" "Dictionary`2"
+@enduml

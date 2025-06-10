@@ -1,0 +1,492 @@
+@startuml
+class AdapterConfiguration {
+    + TimeToLiveSeconds : double <<get>> <<set>> = 20
+}
+class BaseConfiguration {
+    + CoreBaseUrl : string <<get>> <<set>>
+    + AdapterName : string <<get>> <<set>>
+    + AdapterDescription : string <<get>> <<set>>
+}
+BaseConfiguration o-> "AdapterTypeId" Guid
+class SchedulerConfiguration {
+    + IntervalMs : int <<get>> <<set>> = 25000
+    + MessageText : string? = null
+    + AutoReset : bool = true
+}
+class ConvertationExtention <<static>> {
+    + {static} GetModelFromAttributes(attributes:RepeatedField<AttributeDto>) : T
+    + {static} SetValueFromAttributes(model:T, attributes:RepeatedField<AttributeDto>) : int
+    + {static} GetAttributesFromModel(model:T, existing:RepeatedField<AttributeDto>, ignoreDefault:bool) : int
+    + {static} AddOrUpdateAttribute(attributes:RepeatedField<AttributeDto>, name:string, value:string) : int
+}
+class DiExtention <<static>> {
+    + {static} AddServices(services:IServiceCollection) : IServiceCollection
+    + {static} AddSingletons(services:IServiceCollection) : IServiceCollection
+    + {static} AddScopeds(services:IServiceCollection) : IServiceCollection
+    + {static} AddGrpc(services:IServiceCollection) : IServiceCollection
+    + {static} AddLogger(builder:WebApplicationBuilder) : void
+}
+interface IInitService {
+}
+IHostedService <|-- IInitService
+IInitService --> "GetService" IMainService
+interface IMainService {
+    StartWork(CancellationTokenSource:CancellationTokenSource) : Task<SemaphoreSlim>
+    SendMessage(coreMessage:CoreMessage, cancellationToken:CancellationToken) : Task
+}
+IMainService --> "Communication" CommunicationFullDto
+interface ISchedulerManager {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ISchedulerManager --> "GetActiveSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+class SchedulerManager {
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ISchedulerManager <|-- SchedulerManager
+SchedulerManager o-> "_logger" ILogger
+SchedulerManager o-> "_activeSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+SchedulerManager --> "GetActiveSchedulers<string,SchedulerInstanceModel>" "ConcurrentDictionary`2"
+class InitService {
+    # _mainService : IMainService?
+    + <<async>> StartAsync(cancellationToken:CancellationToken) : Task
+    + StopAsync(cancellationToken:CancellationToken) : Task
+    - PingHost(nameOrAddress:string) : bool
+}
+class "ILogger`1"<T> {
+}
+IInitService <|-- InitService
+InitService o-> "_logger" ILogger
+InitService o-> "_serviceProvider" IServiceProvider
+InitService o-> "_cancellationTokenSource" CancellationTokenSource
+InitService --> "GetService" IMainService
+class MainService {
+    - _myCommunication : CommunicationFullDto?
+    + <<async>> StartWork(CancellationTokenSource:CancellationTokenSource) : Task<SemaphoreSlim>
+    - <<async>> StartStatusCheker(cancellationToken:CancellationToken) : Task
+    - <<async>> StartLifesignChecker(CancellationTokenSource:CancellationTokenSource) : Task
+    - <<async>> SendInit(cancellationToken:CancellationToken) : Task
+    - <<async>> ListenMessages(cancellationToken:CancellationToken) : Task
+    # <<async>> HandleStatusMessage(statusMessage:Protos.StatusDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDataMessage(dataMessage:MessageDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConnectionMessage(connectionDto:ConnectionDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleConfigMessage(communicationFullDto:CommunicationFullDto, cancellationToken:CancellationToken) : Task
+    # <<async>> HandleDeleteConnectionMessage(connectionDeleteDto:ConnectionDeleteDto, cancellationToken:CancellationToken) : Task
+    # <<async>> LoadConnections(cancellationToken:CancellationToken) : Task
+    + <<async>> SendMessage(coreMessage:CoreMessage, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IAsyncStreamReader`1"<T> {
+}
+IMainService <|-- MainService
+MainService o-> "_logger" ILogger
+MainService o-> "_mediator" IMediator
+MainService o-> "_coreService" CoreServiceClient
+MainService o-> "_baseConfig" BaseConfiguration
+MainService o-> "_adapterConfig" AdapterConfiguration
+MainService --> "_responseStream<CoreMessage>" "IAsyncStreamReader`1"
+MainService o-> "_processSemaphore" SemaphoreSlim
+MainService o-> "_lastSendMessage" DateTime
+MainService o-> "_lastReceivedMessage" DateTime
+MainService --> "Communication" CommunicationFullDto
+MainService --> "SiliensInterval" TimeSpan
+class AddOrUpdateSchedulerCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<bool>" <|-- AddOrUpdateSchedulerCommand
+AddOrUpdateSchedulerCommand --> "Connection" ConnectionDto
+class DisableSchedulerCommand {
+    + Path : string <<get>> <<set>>
+    + ConnectionId : string? <<get>> <<set>> = null
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<bool>" <|-- DisableSchedulerCommand
+class RestartSchedulerCommand {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<bool>" <|-- RestartSchedulerCommand
+RestartSchedulerCommand --> "Message" MessageDto
+class SchedulerInstanceModel {
+}
+SchedulerInstanceModel --> "MyTimer" Timer
+SchedulerInstanceModel --> "SchedulerConfiguration" SchedulerConfiguration
+SchedulerInstanceModel o-> "CancellationTokenSource" CancellationTokenSource
+SchedulerInstanceModel --> "Connection" ConnectionDto
+class TimerContext {
+}
+TimerContext --> "InitService" IInitService
+TimerContext --> "SchedulerInstanceModel" SchedulerInstanceModel
+class AddOrUpdateSchedulerCommandHandler {
+    + <<async>> Handle(request:AddOrUpdateSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+    - <<async>> TimerCallback(model:SchedulerInstanceModel) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<AddOrUpdateSchedulerCommand,bool>" <|-- AddOrUpdateSchedulerCommandHandler
+AddOrUpdateSchedulerCommandHandler o-> "_logger" ILogger
+AddOrUpdateSchedulerCommandHandler o-> "_mediator" IMediator
+AddOrUpdateSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+AddOrUpdateSchedulerCommandHandler o-> "_initService" IInitService
+AddOrUpdateSchedulerCommandHandler o-> "_schedulerConfig" SchedulerConfiguration
+class DisableSchedulerCommandHandler {
+    + <<async>> Handle(request:DisableSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+    - <<async>> DisposeScheduler(model:SchedulerInstanceModel, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<DisableSchedulerCommand,bool>" <|-- DisableSchedulerCommandHandler
+DisableSchedulerCommandHandler o-> "_logger" ILogger
+DisableSchedulerCommandHandler o-> "_mediator" IMediator
+DisableSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+DisableSchedulerCommandHandler o-> "_initService" IInitService
+class RestartSchedulerCommandHandler {
+    + <<async>> Handle(request:RestartSchedulerCommand, cancellationToken:CancellationToken) : Task<bool>
+}
+class "ILogger`1"<T> {
+}
+class "IOptions`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<RestartSchedulerCommand,bool>" <|-- RestartSchedulerCommandHandler
+RestartSchedulerCommandHandler o-> "_logger" ILogger
+RestartSchedulerCommandHandler o-> "_mediator" IMediator
+RestartSchedulerCommandHandler o-> "_schedulerManager" ISchedulerManager
+RestartSchedulerCommandHandler o-> "_initService" IInitService
+RestartSchedulerCommandHandler o-> "_schedulerConfig" SchedulerConfiguration
+class CoreServiceReflection <<static>> <<partial>> {
+    {static} - CoreServiceReflection()
+}
+class CoreMessage <<sealed>> <<partial>> {
+    + CoreMessage()
+    <<partial>> - OnConstruction() : void
+    + CoreMessage(other:CoreMessage)
+    + Clone() : CoreMessage
+    + <<const>> StatusDtoFieldNumber : int = 1
+    + <<const>> ConfigFieldNumber : int = 2
+    + <<const>> ConnectionFieldNumber : int = 3
+    + <<const>> MessageFieldNumber : int = 4
+    + <<const>> DeletedConnectionFieldNumber : int = 5
+    - body_ : object
+    + ClearBody() : void
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:CoreMessage) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:CoreMessage) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class AdapterMessage <<sealed>> <<partial>> {
+    + AdapterMessage()
+    <<partial>> - OnConstruction() : void
+    + AdapterMessage(other:AdapterMessage)
+    + Clone() : AdapterMessage
+    + <<const>> AdapterIdFieldNumber : int = 1
+    - adapterId_ : string = ""
+    + AdapterId : string <<get>> <<set>>
+    + <<const>> MessageFieldNumber : int = 2
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:AdapterMessage) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:AdapterMessage) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class ConnectionsList <<sealed>> <<partial>> {
+    + ConnectionsList()
+    <<partial>> - OnConstruction() : void
+    + ConnectionsList(other:ConnectionsList)
+    + Clone() : ConnectionsList
+    + <<const>> ConnectionsFieldNumber : int = 1
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:ConnectionsList) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:ConnectionsList) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class StatusDto <<sealed>> <<partial>> {
+    + StatusDto()
+    <<partial>> - OnConstruction() : void
+    + StatusDto(other:StatusDto)
+    + Clone() : StatusDto
+    + <<const>> StatusFieldNumber : int = 1
+    - status_ : bool
+    + Status : bool <<get>> <<set>>
+    + <<const>> DataFieldNumber : int = 2
+    - data_ : string = ""
+    + Data : string <<get>> <<set>>
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:StatusDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:StatusDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class AttributeDto <<sealed>> <<partial>> {
+    + AttributeDto()
+    <<partial>> - OnConstruction() : void
+    + AttributeDto(other:AttributeDto)
+    + Clone() : AttributeDto
+    + <<const>> NameFieldNumber : int = 1
+    - name_ : string = ""
+    + Name : string <<get>> <<set>>
+    + <<const>> ValueFieldNumber : int = 2
+    - value_ : string = ""
+    + Value : string <<get>> <<set>>
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:AttributeDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:AttributeDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class CommunicationDto <<sealed>> <<partial>> {
+    + CommunicationDto()
+    <<partial>> - OnConstruction() : void
+    + CommunicationDto(other:CommunicationDto)
+    + Clone() : CommunicationDto
+    + <<const>> NameFieldNumber : int = 1
+    - name_ : string = ""
+    + Name : string <<get>> <<set>>
+    + <<const>> TypeIdentifierFieldNumber : int = 2
+    - typeIdentifier_ : string = ""
+    + TypeIdentifier : string <<get>> <<set>>
+    + <<const>> DescriptionFieldNumber : int = 3
+    - description_ : string = ""
+    + Description : string <<get>> <<set>>
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:CommunicationDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:CommunicationDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class CommunicationSmallDto <<sealed>> <<partial>> {
+    + CommunicationSmallDto()
+    <<partial>> - OnConstruction() : void
+    + CommunicationSmallDto(other:CommunicationSmallDto)
+    + Clone() : CommunicationSmallDto
+    + <<const>> IdFieldNumber : int = 1
+    - id_ : string = ""
+    + Id : string <<get>> <<set>>
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:CommunicationSmallDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:CommunicationSmallDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class CommunicationFullDto <<sealed>> <<partial>> {
+    + CommunicationFullDto()
+    <<partial>> - OnConstruction() : void
+    + CommunicationFullDto(other:CommunicationFullDto)
+    + Clone() : CommunicationFullDto
+    + <<const>> IdFieldNumber : int = 1
+    - id_ : string = ""
+    + Id : string <<get>> <<set>>
+    + <<const>> NameFieldNumber : int = 2
+    - name_ : string = ""
+    + Name : string <<get>> <<set>>
+    + <<const>> TypeIdentifierFieldNumber : int = 3
+    - typeIdentifier_ : string = ""
+    + TypeIdentifier : string <<get>> <<set>>
+    + <<const>> DescriptionFieldNumber : int = 4
+    - description_ : string = ""
+    + Description : string <<get>> <<set>>
+    + <<const>> AttributesFieldNumber : int = 5
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:CommunicationFullDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:CommunicationFullDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class ConnectionDto <<sealed>> <<partial>> {
+    + ConnectionDto()
+    <<partial>> - OnConstruction() : void
+    + ConnectionDto(other:ConnectionDto)
+    + Clone() : ConnectionDto
+    + <<const>> IdFieldNumber : int = 1
+    - id_ : string = ""
+    + Id : string <<get>> <<set>>
+    + <<const>> NameFieldNumber : int = 2
+    - name_ : string = ""
+    + Name : string <<get>> <<set>>
+    + <<const>> PathFieldNumber : int = 3
+    - path_ : string = ""
+    + Path : string <<get>> <<set>>
+    + <<const>> IsInputFieldNumber : int = 4
+    - isInput_ : bool
+    + IsInput : bool <<get>> <<set>>
+    + <<const>> AttributesFieldNumber : int = 5
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:ConnectionDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:ConnectionDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class ConnectionDeleteDto <<sealed>> <<partial>> {
+    + ConnectionDeleteDto()
+    <<partial>> - OnConstruction() : void
+    + ConnectionDeleteDto(other:ConnectionDeleteDto)
+    + Clone() : ConnectionDeleteDto
+    + <<const>> IdFieldNumber : int = 1
+    - id_ : string = ""
+    + Id : string <<get>> <<set>>
+    + <<const>> PathFieldNumber : int = 2
+    - path_ : string = ""
+    + Path : string <<get>> <<set>>
+    + <<const>> IsInputFieldNumber : int = 3
+    - isInput_ : bool
+    + IsInput : bool <<get>> <<set>>
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:ConnectionDeleteDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:ConnectionDeleteDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class MessageDto <<sealed>> <<partial>> {
+    + MessageDto()
+    <<partial>> - OnConstruction() : void
+    + MessageDto(other:MessageDto)
+    + Clone() : MessageDto
+    + <<const>> PathFieldNumber : int = 1
+    - path_ : string = ""
+    + Path : string <<get>> <<set>>
+    + <<const>> DataFieldNumber : int = 2
+    + <<const>> HeadersFieldNumber : int = 3
+    + <<override>> Equals(other:object) : bool
+    + Equals(other:MessageDto) : bool
+    + <<override>> GetHashCode() : int
+    + <<override>> ToString() : string
+    + WriteTo(output:pb::CodedOutputStream) : void
+    - InternalWriteTo(output:pb::WriteContext) : void
+    + CalculateSize() : int
+    + MergeFrom(other:MessageDto) : void
+    + MergeFrom(input:pb::CodedInputStream) : void
+    - InternalMergeFrom(input:pb::ParseContext) : void
+}
+class "IMessage`1"<T> {
+}
+enum BodyOneofCase {
+    None= 0,
+    StatusDto= 1,
+    Config= 2,
+    Connection= 3,
+    Message= 4,
+    DeletedConnection= 5,
+}
+CoreMessage o-> "bodyCase_" BodyOneofCase
+CoreMessage --> "BodyCase" BodyOneofCase
+CoreMessage +-- BodyOneofCase
+class CoreService <<static>> <<partial>> {
+    {static} <<readonly>> - __ServiceName : string = "Core.CoreService"
+    {static} - __Helper_SerializeMessage(message:global::Google.Protobuf.IMessage, context:grpc::SerializationContext) : void
+    {static} - __Helper_DeserializeMessage(context:grpc::DeserializationContext, parser:global::Google.Protobuf.MessageParser<T>) : T
+    + {static} BindService(serviceImpl:CoreServiceBase) : grpc::ServerServiceDefinition
+    + {static} BindService(serviceBinder:grpc::ServiceBinderBase, serviceImpl:CoreServiceBase) : void
+}
+class "__Helper_MessageCache`1"<T> <<static>> {
+    + {static} <<readonly>> IsBufferMessage : bool
+}
+abstract class CoreServiceBase <<partial>> {
+    + <<virtual>> Init(request:global::Protos.CommunicationDto, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task<global::Protos.CommunicationFullDto>
+    + <<virtual>> Connect(request:global::Protos.CommunicationSmallDto, responseStream:grpc::IServerStreamWriter<global::Protos.CoreMessage>, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task
+    + <<virtual>> SendAdapterMessage(request:global::Protos.AdapterMessage, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task<global::Protos.StatusDto>
+    + <<virtual>> LoadInConnections(request:global::Protos.CommunicationSmallDto, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task<global::Protos.ConnectionsList>
+    + <<virtual>> LoadOutConnections(request:global::Protos.CommunicationSmallDto, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task<global::Protos.ConnectionsList>
+    + <<virtual>> Disconnect(request:global::Protos.CommunicationSmallDto, context:grpc::ServerCallContext) : global::System.Threading.Tasks.Task<global::Google.Protobuf.WellKnownTypes.Empty>
+}
+class CoreServiceClient <<partial>> {
+    + CoreServiceClient(channel:grpc::ChannelBase)
+    + CoreServiceClient(callInvoker:grpc::CallInvoker)
+    # CoreServiceClient()
+    # CoreServiceClient(configuration:ClientBaseConfiguration)
+    + <<virtual>> Init(request:global::Protos.CommunicationDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : global::Protos.CommunicationFullDto
+    + <<virtual>> Init(request:global::Protos.CommunicationDto, options:grpc::CallOptions) : global::Protos.CommunicationFullDto
+    + <<virtual>> InitAsync(request:global::Protos.CommunicationDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncUnaryCall<global::Protos.CommunicationFullDto>
+    + <<virtual>> InitAsync(request:global::Protos.CommunicationDto, options:grpc::CallOptions) : grpc::AsyncUnaryCall<global::Protos.CommunicationFullDto>
+    + <<virtual>> Connect(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncServerStreamingCall<global::Protos.CoreMessage>
+    + <<virtual>> Connect(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : grpc::AsyncServerStreamingCall<global::Protos.CoreMessage>
+    + <<virtual>> SendAdapterMessage(request:global::Protos.AdapterMessage, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : global::Protos.StatusDto
+    + <<virtual>> SendAdapterMessage(request:global::Protos.AdapterMessage, options:grpc::CallOptions) : global::Protos.StatusDto
+    + <<virtual>> SendAdapterMessageAsync(request:global::Protos.AdapterMessage, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncUnaryCall<global::Protos.StatusDto>
+    + <<virtual>> SendAdapterMessageAsync(request:global::Protos.AdapterMessage, options:grpc::CallOptions) : grpc::AsyncUnaryCall<global::Protos.StatusDto>
+    + <<virtual>> LoadInConnections(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : global::Protos.ConnectionsList
+    + <<virtual>> LoadInConnections(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : global::Protos.ConnectionsList
+    + <<virtual>> LoadInConnectionsAsync(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncUnaryCall<global::Protos.ConnectionsList>
+    + <<virtual>> LoadInConnectionsAsync(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : grpc::AsyncUnaryCall<global::Protos.ConnectionsList>
+    + <<virtual>> LoadOutConnections(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : global::Protos.ConnectionsList
+    + <<virtual>> LoadOutConnections(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : global::Protos.ConnectionsList
+    + <<virtual>> LoadOutConnectionsAsync(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncUnaryCall<global::Protos.ConnectionsList>
+    + <<virtual>> LoadOutConnectionsAsync(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : grpc::AsyncUnaryCall<global::Protos.ConnectionsList>
+    + <<virtual>> Disconnect(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : global::Google.Protobuf.WellKnownTypes.Empty
+    + <<virtual>> Disconnect(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : global::Google.Protobuf.WellKnownTypes.Empty
+    + <<virtual>> DisconnectAsync(request:global::Protos.CommunicationSmallDto, headers:grpc::Metadata, deadline:global::System.DateTime?, cancellationToken:global::System.Threading.CancellationToken) : grpc::AsyncUnaryCall<global::Google.Protobuf.WellKnownTypes.Empty>
+    + <<virtual>> DisconnectAsync(request:global::Protos.CommunicationSmallDto, options:grpc::CallOptions) : grpc::AsyncUnaryCall<global::Google.Protobuf.WellKnownTypes.Empty>
+    # <<override>> NewInstance(configuration:ClientBaseConfiguration) : CoreServiceClient
+}
+class "ClientBase`1"<T> {
+}
+CoreService +-- "__Helper_MessageCache`1"
+CoreService +-- CoreServiceBase
+CoreService +-- CoreServiceClient
+@enduml

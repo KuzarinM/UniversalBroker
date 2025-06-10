@@ -1,0 +1,14 @@
+@startuml
+class Chanel <<partial>> {
+    + Name : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Chanel --> "Id" Guid
+Chanel o-> "MessageSourceChannels<Message>" "ICollection`1"
+Chanel o-> "MessageTargetChannels<Message>" "ICollection`1"
+Chanel --> "Script" Script
+Chanel o-> "Connections<Connection>" "ICollection`1"
+Chanel o-> "FromChanels<Chanel>" "ICollection`1"
+Chanel o-> "ToChanels<Chanel>" "ICollection`1"
+@enduml

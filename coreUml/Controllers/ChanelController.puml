@@ -1,0 +1,16 @@
+@startuml
+class ChanelController {
+    + <<async>> GetChannels(pageSize:int, pageIndex:int, search:string?) : Task<IActionResult>
+    + <<async>> GetChannelRelations(id:Guid) : Task<IActionResult>
+    + <<async>> GetSystemRelations() : Task<IActionResult>
+    + <<async>> GetChannelLogs(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?, lavels:List<LogLevel>?) : Task<IActionResult>
+    + <<async>> GetChannelMessages(id:Guid, pageSize:int, pageIndex:int, startInterval:DateTime?, stopInterval:DateTime?) : Task<IActionResult>
+    + <<async>> GetChanel(id:Guid) : Task<IActionResult>
+    + <<async>> CreateChanel(chanel:CreateChanelDto) : Task<IActionResult>
+    + <<async>> SendMessageToChanel(id:Guid, message:InternalMessage) : Task<IActionResult>
+    + <<async>> UpdateChanel(id:Guid, chanel:CreateChanelDto) : Task<IActionResult>
+    + <<async>> UpdateChanelScript(id:Guid, newScript:string) : Task<IActionResult>
+    + <<async>> DeleteChanel(id:Guid) : Task<IActionResult>
+}
+CustomControllerBase <|-- ChanelController
+@enduml

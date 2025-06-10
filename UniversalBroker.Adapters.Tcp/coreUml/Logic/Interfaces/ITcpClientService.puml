@@ -1,0 +1,9 @@
+@startuml
+interface ITcpClientService {
+    StartWork(tcpClient:TcpClient, tcpConfiguration:TcpConfiguration, path:string, needRead:bool) : Task
+    StartListen() : void
+    StopListen() : void
+    StopWork() : Task
+    SendMessage(message:List<byte>) : Task<bool>
+}
+@enduml

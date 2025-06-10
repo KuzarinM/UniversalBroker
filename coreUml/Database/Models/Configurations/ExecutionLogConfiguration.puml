@@ -1,0 +1,9 @@
+@startuml
+class ExecutionLogConfiguration <<partial>> {
+    + Configure(entity:EntityTypeBuilder<ExecutionLog>) : void
+    <<partial>> - OnConfigurePartial(entity:EntityTypeBuilder<ExecutionLog>) : void
+}
+class "IEntityTypeConfiguration`1"<T> {
+}
+"IEntityTypeConfiguration`1" "<ExecutionLog>" <|-- ExecutionLogConfiguration
+@enduml

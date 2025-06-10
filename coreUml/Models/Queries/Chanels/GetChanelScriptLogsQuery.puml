@@ -1,0 +1,13 @@
+@startuml
+class GetChanelScriptLogsQuery {
+    + PageSize : int <<get>> <<set>>
+    + PageNumber : int <<get>> <<set>>
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<PaginationModel<ChanelScriptLogDto>>" <|-- GetChanelScriptLogsQuery
+GetChanelScriptLogsQuery --> "ChanelId" Guid
+GetChanelScriptLogsQuery --> "FromDate" DateTime
+GetChanelScriptLogsQuery --> "ToDate" DateTime
+GetChanelScriptLogsQuery --> "OnlyLavels<LogLevel>" "List`1"
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+class TcpManager {
+    + <<async>> RestartListeners() : Task
+    + <<async>> StartService(client:TcpClient, tcpConfiguration:TcpConfiguration, path:string, needRead:bool) : Task<ITcpClientService>
+    - <<async>> StartServerListening() : Task
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+ITcpManager <|-- TcpManager
+TcpManager o-> "_logger" ILogger
+TcpManager o-> "_serviceProvider" IServiceProvider
+TcpManager o-> "_tcpListeners<Task<TcpClient>,TcpServerModel>" "ConcurrentDictionary`2"
+TcpManager o-> "_tcpServers<string,TcpServerModel>" "ConcurrentDictionary`2"
+TcpManager o-> "_tcpClients<string,TcpClientModel>" "ConcurrentDictionary`2"
+TcpManager o-> "_stopListeningTokenSource" CancellationTokenSource
+TcpManager --> "GetTcpListeners<Task<TcpClient>,TcpServerModel>" "ConcurrentDictionary`2"
+TcpManager --> "GetTcpServers<string,TcpServerModel>" "ConcurrentDictionary`2"
+TcpManager --> "GetTcpClients<string,TcpClientModel>" "ConcurrentDictionary`2"
+@enduml

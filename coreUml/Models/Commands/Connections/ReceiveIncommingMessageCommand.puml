@@ -1,0 +1,13 @@
+@startuml
+class ReceiveIncommingMessageCommand {
+    + Path : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+IRequest <|-- ReceiveIncommingMessageCommand
+ReceiveIncommingMessageCommand --> "CommunicationId" Guid
+ReceiveIncommingMessageCommand o-> "Data<byte>" "List`1"
+ReceiveIncommingMessageCommand o-> "Headers<string,string>" "Dictionary`2"
+@enduml

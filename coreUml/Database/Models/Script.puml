@@ -1,0 +1,10 @@
+@startuml
+class Script <<partial>> {
+    + Path : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Script --> "Id" Guid
+Script o-> "ExecutionLogs<ExecutionLog>" "ICollection`1"
+Script --> "Chanel" Chanel
+@enduml

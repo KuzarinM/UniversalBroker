@@ -1,0 +1,13 @@
+@startuml
+class Communication <<partial>> {
+    + Name : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+    + Status : bool <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Communication --> "Id" Guid
+Communication --> "TypeIdentifier" Guid
+Communication o-> "CommunicationAttributes<CommunicationAttribute>" "ICollection`1"
+Communication o-> "Connections<Connection>" "ICollection`1"
+@enduml

@@ -35,6 +35,7 @@ namespace UniversalBroker.Adapters.Scheduler.Logic.Services
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    
                     _cancellationTokenSource.Cancel();
                     _cancellationTokenSource = new();
 

@@ -1,0 +1,8 @@
+@startuml
+class CommunicationAttribute <<partial>> {
+}
+CommunicationAttribute --> "Id" Guid
+CommunicationAttribute --> "ConnectionId" Guid
+CommunicationAttribute --> "Connection" Communication
+CommunicationAttribute --> "Attribute" Attribute
+@enduml

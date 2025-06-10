@@ -1,0 +1,8 @@
+@startuml
+class TcpClientModel {
+}
+TcpClientModel --> "InConnection" ConnectionDto
+TcpClientModel --> "OutConnection" ConnectionDto
+TcpClientModel --> "TcpConfiguration" TcpConfiguration
+TcpClientModel --> "Client" ITcpClientService
+@enduml

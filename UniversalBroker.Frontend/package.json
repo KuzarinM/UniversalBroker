@@ -27,7 +27,8 @@
     "vue-monaco": "^1.2.2",
     "vue-router": "^4.5.0",
     "vue-tri-state-checkbox": "^1.0.0",
-    "vue3-ace-editor": "^2.2.4"
+    "vue3-ace-editor": "^2.2.4",
+    "vue3-visjs": "^0.7.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",

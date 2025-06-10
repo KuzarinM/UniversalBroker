@@ -1,0 +1,15 @@
+@startuml
+class InitService {
+    # _mainService : IMainService?
+    + <<async>> StartAsync(cancellationToken:CancellationToken) : Task
+    + StopAsync(cancellationToken:CancellationToken) : Task
+    - PingHost(nameOrAddress:string) : bool
+}
+class "ILogger`1"<T> {
+}
+IInitService <|-- InitService
+InitService o-> "_logger" ILogger
+InitService o-> "_serviceProvider" IServiceProvider
+InitService o-> "_cancellationTokenSource" CancellationTokenSource
+InitService --> "GetService" IMainService
+@enduml

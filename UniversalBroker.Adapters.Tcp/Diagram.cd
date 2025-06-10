@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="UniversalBroker.Adapters.Tcp.Configurations.AdapterConfiguration" Collapsed="true">
+    <Position X="33" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Configurations\AdapterConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Configurations.BaseConfiguration" Collapsed="true">
+    <Position X="33" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAEAACAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>Configurations\BaseConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Configurations.TcpConfiguration" Collapsed="true">
+    <Position X="33" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAACAAAAAAAAAAAAEAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Configurations\TcpConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Extentions.ConvertationExtention" Collapsed="true">
+    <Position X="38.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAIAQAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extentions\ConvertationExtention.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Extentions.DiExtention" Collapsed="true">
+    <Position X="40" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAIAAABAAAAAQAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Extentions\DiExtention.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.AddOrUpdateClientCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="36.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAQAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\AddOrUpdateClientCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.AddOrUpdateServerCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAQAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\AddOrUpdateServerCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.ClientDisconectCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="36.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\ClientDisconectCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.RemoveClientCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAQAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\RemoveClientCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.RemoveServerCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="33" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAQAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\RemoveServerCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Handlers.Commands.SendMessageCommandHandler" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="36.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAIAAAAAIAAAAAAAAQAAA=</HashCode>
+      <FileName>Logic\Handlers\Commands\SendMessageCommandHandler.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Managers.TcpManager" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIEAgAAAAAAAAAAAAAAAACEAIAAAABAAAAgIABABAAA=</HashCode>
+      <FileName>Logic\Managers\TcpManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Services.InitService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="33" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAIAAAAAAAAAAAAgAAABAIAAAAAAAAQAAAAABAEA=</HashCode>
+      <FileName>Logic\Services\InitService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Services.MainService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQFAAAEAEARBBAAACAABUQAIAAEEAAEAACAAAoAAIA=</HashCode>
+      <FileName>Logic\Services\MainService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Logic.Services.TcpClientService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CQAhAIAgEAASAAAQACAAAAQAIAIAAAAAAAQAAUAQAAA=</HashCode>
+      <FileName>Logic\Services\TcpClientService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.AddOrUpdateClientCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Models\Commands\AddOrUpdateClientCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.AddOrUpdateServerCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Models\Commands\AddOrUpdateServerCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.ClientDisconectCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Models\Commands\ClientDisconectCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.RemoveClientCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="36.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIgAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Models\Commands\RemoveClientCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.RemoveServerCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIgAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Models\Commands\RemoveServerCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Commands.SendMessageCommand" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Commands\SendMessageCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Internal.TcpClientModel" Collapsed="true">
+    <Position X="38.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAQAAAQ=</HashCode>
+      <FileName>Models\Internal\TcpClientModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalBroker.Adapters.Tcp.Models.Internal.TcpServerModel" Collapsed="true">
+    <Position X="36.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACABAAAAAAACAAAAAAAAAAAAAAAAAAEAQAAAA=</HashCode>
+      <FileName>Models\Internal\TcpServerModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="UniversalBroker.Adapters.Tcp.Logic.Interfaces.IInitService" Collapsed="true">
+    <Position X="33" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Logic\Interfaces\IInitService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UniversalBroker.Adapters.Tcp.Logic.Interfaces.IMainService" Collapsed="true">
+    <Position X="34.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAAQAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Logic\Interfaces\IMainService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UniversalBroker.Adapters.Tcp.Logic.Interfaces.ITcpClientService" Collapsed="true">
+    <Position X="36.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAgAAAAAAAAAAAAACAAAAQAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Logic\Interfaces\ITcpClientService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="UniversalBroker.Adapters.Tcp.Logic.Interfaces.ITcpManager" Collapsed="true">
+    <Position X="38.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIEAAAAAAAAAAAAAAAAAACAAAAAAABAAAAAAABAAAAA=</HashCode>
+      <FileName>Logic\Interfaces\ITcpManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -15,7 +15,7 @@ namespace UniversalBroker.Core.Logic.Handlers.Queries.Connection
     /// <param name="mapper"></param>
     /// <param name="context"></param>
     public class GetConnectionQueryHandler(
-        ILogger<GetConnectionListQueryHandler> logger,
+        ILogger<GetConnectionQueryHandler> logger,
         IMapper mapper,
         BrockerContext context
         ) : IRequestHandler<GetConnectionQuery, ConnectionFullDto>

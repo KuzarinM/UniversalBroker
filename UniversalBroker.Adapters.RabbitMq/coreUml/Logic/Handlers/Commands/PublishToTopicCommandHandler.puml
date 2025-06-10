@@ -1,0 +1,15 @@
+@startuml
+class PublishToTopicCommandHandler {
+    + <<async>> Handle(request:PublishToTopicCommand, cancellationToken:CancellationToken) : Task
+    - CreateConfig(connection:ConnectionDto?, headers:RepeatedField<AttributeDto>) : T
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<PublishToTopicCommand>" <|-- PublishToTopicCommandHandler
+PublishToTopicCommandHandler o-> "_logger" ILogger
+PublishToTopicCommandHandler o-> "_mediator" IMediator
+PublishToTopicCommandHandler o-> "_rabbitMqService" IRabbitMqService
+PublishToTopicCommandHandler o-> "_initService" IInitService
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+abstract class AbstractDbLogingService {
+    + {abstract} LogMessage(log:MessageLog) : Task
+    + {abstract} LogScriptExecution(log:ScriptExecutionLog) : Task
+}
+BackgroundService <|-- AbstractDbLogingService
+@enduml

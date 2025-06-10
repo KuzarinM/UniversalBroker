@@ -1,0 +1,11 @@
+@startuml
+class CommunicationSetAttributeCommand {
+}
+class "IRequest`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+"IRequest`1" "<CommunicationDto>" <|-- CommunicationSetAttributeCommand
+CommunicationSetAttributeCommand --> "CommunicationId" Guid
+CommunicationSetAttributeCommand o-> "Attributes<string,string?>" "Dictionary`2"
+@enduml

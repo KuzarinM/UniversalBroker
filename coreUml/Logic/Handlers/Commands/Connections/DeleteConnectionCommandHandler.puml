@@ -1,0 +1,14 @@
+@startuml
+class DeleteConnectionCommandHandler {
+    + <<async>> Handle(request:DeleteConnectionCommand, cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`1"<T> {
+}
+"IRequestHandler`1" "<DeleteConnectionCommand>" <|-- DeleteConnectionCommandHandler
+DeleteConnectionCommandHandler o-> "_logger" ILogger
+DeleteConnectionCommandHandler o-> "_mapper" IMapper
+DeleteConnectionCommandHandler o-> "_context" BrockerContext
+DeleteConnectionCommandHandler o-> "_abstractAdaptersManager" AbstractAdaptersManager
+@enduml

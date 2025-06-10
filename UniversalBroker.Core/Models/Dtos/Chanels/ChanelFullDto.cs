@@ -15,11 +15,11 @@ namespace UniversalBroker.Core.Models.Dtos.Chanels
         /// <summary>
         /// Входные подключения
         /// </summary>
-        public new List<ConnectionDto> InputConnections { get; set; } = new();
+        public new List<ConnectionViewDto> InputConnections { get; set; } = new();
 
         /// <summary>
         /// Выходные подключения
         /// </summary>
-        public new List<ConnectionDto> OutputConnections { get; set; } = new();
+        public new List<ConnectionViewDto> OutputConnections { get; set; } = new();
     }
 }

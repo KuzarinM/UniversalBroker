@@ -1,0 +1,10 @@
+@startuml
+class "PaginationModel`1"<T> {
+    + CurrentPage : int <<get>> <<set>>
+    + PageSize : int <<get>> <<set>>
+    + TotalPages : int <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+"PaginationModel`1" --> "Page<T>" "List`1"
+@enduml

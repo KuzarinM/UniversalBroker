@@ -1,0 +1,17 @@
+@startuml
+class MessageViewDto {
+    + Text : string <<get>>
+    + SourceName : string <<get>> <<set>>
+    + TargetName : string <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+MessageViewDto o-> "Data<byte>" "List`1"
+MessageViewDto --> "Datetime" DateTime
+MessageViewDto --> "SourceId" Guid
+MessageViewDto --> "TargetId" Guid
+MessageViewDto --> "Direction" MessageDirection
+MessageViewDto o-> "Headers<string,string>" "Dictionary`2"
+@enduml

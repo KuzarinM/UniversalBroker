@@ -1,0 +1,7 @@
+@startuml
+class TimeMiddleware {
+    + TimeMiddleware(next:RequestDelegate)
+    + <<async>> InvokeAsync(context:HttpContext) : Task
+}
+TimeMiddleware --> "_next" RequestDelegate
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+class ConnectionAttribute <<partial>> {
+}
+ConnectionAttribute --> "Id" Guid
+ConnectionAttribute --> "ConnectionId" Guid
+ConnectionAttribute --> "Connection" Connection
+ConnectionAttribute --> "Attribute" Attribute
+@enduml

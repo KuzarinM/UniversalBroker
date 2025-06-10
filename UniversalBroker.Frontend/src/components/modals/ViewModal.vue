@@ -77,10 +77,12 @@ export default{
                                 {
                                     title:"Ключ",
                                     field:"key",
+                                    hrefFunc: null,
                                 },
                                 {
                                     title:"Значение",
                                     field:"value",
+                                    hrefFunc: null
                                 },
                             ]
                         }
@@ -170,7 +172,8 @@ export default{
                                         scope="row"
                                         v-for="column in item.structure" 
                                     >
-                                        {{ row[column.field] }}
+                                        <p v-if="column.hrefFunc == null">{{ row[column.field] }}</p>
+                                        <a v-else :href="column.hrefFunc(row)">{{ row[column.field] }}</a>
                                     </td>
                                 </tr>
                             </tbody>

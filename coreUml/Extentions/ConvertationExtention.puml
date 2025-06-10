@@ -1,0 +1,12 @@
+@startuml
+class ConvertationExtention <<static>> {
+    + {static} GetModelFromAttributes(attributes:Dictionary<string, string>) : T
+    + {static} GetModelFromAttributes(attributes:RepeatedField<AttributeDto>) : T
+    + {static} SetValueFromAttributes(model:T, attributes:RepeatedField<AttributeDto>) : int
+    + {static} SetValueFromAttributes(model:T, attributes:Dictionary<string, string>) : int
+    + {static} GetAttributesFromModel(model:T, existing:RepeatedField<AttributeDto>) : int
+    + {static} GetAttributesFromModel(model:T, existing:Dictionary<string,string?>) : int
+    + {static} AddOrUpdateAttribute(attributes:RepeatedField<AttributeDto>, name:string, value:string) : int
+    + {static} AddOrUpdateAttribute(attributes:Dictionary<string, string?>, name:string, value:string) : int
+}
+@enduml

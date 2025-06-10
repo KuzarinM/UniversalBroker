@@ -8,6 +8,7 @@ import EntityModal from '../components/modals/EntityModal.vue';
 import ViewModal from '../components/modals/ViewModal.vue'
 import ChanelLogsModal from '../components/modals/ChanelLogsModal.vue';
 import ChanelMessagesModal from '../components/modals/ChanelMessagesModal.vue';
+import RealRelationsModal from '../components/modals/RealRelationsModal.vue';
 
 
 export default{
@@ -163,7 +164,7 @@ export default{
                 outputChanels:[],
                 script:""
             },
-            viewedChannelId:null
+            viewedChannelId:null,
         }
     },
     mixins:[
@@ -177,7 +178,8 @@ export default{
         EntityModal,
         ViewModal,
         ChanelLogsModal,
-        ChanelMessagesModal
+        ChanelMessagesModal,
+        RealRelationsModal
     },
     watch:{
         async filters(oldFilters, newFilters){
@@ -353,6 +355,9 @@ export default{
                     id:id
                 })
             }
+        },
+        async OpenRelations(item){
+            await this.$refs.realRelationModal.Open(item.id);
         }
     },
     async mounted(){
@@ -381,6 +386,7 @@ export default{
     @DeleteRow="this.Delete"
     @OpenLogs = "this.OpenLogs"
     @OpenMessages = "this.OpenMessages"
+    @OpenRealConnections="this.OpenRelations"
 />
 
 <EntityModal
@@ -423,4 +429,11 @@ export default{
     v-model:PageNumber="this.PageNumber"
     v-model:PageSize = "this.PageSize"
 />
+
+<RealRelationsModal 
+    ref="realRelationModal"
+    @StartLoading="this.$emit('StartLoading')"
+    @StopLoading="this.$emit('StopLoading')"
+/>
+
 </template>

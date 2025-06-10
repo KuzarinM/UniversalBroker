@@ -1,0 +1,7 @@
+@startuml
+class GetSystemRelationQuery {
+}
+class "IRequest`1"<T> {
+}
+"IRequest`1" "<List<NodeDto>>" <|-- GetSystemRelationQuery
+@enduml

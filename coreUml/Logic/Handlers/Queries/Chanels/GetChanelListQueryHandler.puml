@@ -1,0 +1,13 @@
+@startuml
+class GetChanelListQueryHandler {
+    + <<async>> Handle(request:GetChanelListQuery, cancellationToken:CancellationToken) : Task<PaginationModel<ChanelDto>>
+}
+class "ILogger`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+"IRequestHandler`2" "<GetChanelListQuery,PaginationModel<ChanelDto>>" <|-- GetChanelListQueryHandler
+GetChanelListQueryHandler o-> "_logger" ILogger
+GetChanelListQueryHandler o-> "_mapper" IMapper
+GetChanelListQueryHandler o-> "_context" BrockerContext
+@enduml

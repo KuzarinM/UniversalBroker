@@ -1,0 +1,20 @@
+@startuml
+class RabbitMqService {
+    # _connection : IConnection?
+    + <<async>> ConnectAsync(cancellationToken:CancellationToken) : Task
+}
+class "ILogger`1"<T> {
+}
+class "ConcurrentDictionary`2"<T1,T2> {
+}
+IRabbitMqService <|-- RabbitMqService
+RabbitMqService o-> "_logger" ILogger
+RabbitMqService o-> "_mediator" IMediator
+RabbitMqService o-> "_mapper" IMapper
+RabbitMqService o-> "_connectionConfig" ConnectionFactory
+RabbitMqService --> "GetConnection" IConnection
+RabbitMqService --> "GetConnectionConfig" ConnectionFactory
+RabbitMqService o-> "InputConnections<string,ConnectionDto>" "ConcurrentDictionary`2"
+RabbitMqService o-> "Consumers<string,(CancellationTokenSource, IChannel)>" "ConcurrentDictionary`2"
+RabbitMqService o-> "OutputConnections<string,ConnectionDto>" "ConcurrentDictionary`2"
+@enduml

@@ -61,7 +61,7 @@ namespace UniversalBroker.Core.Logic.Services
             //_jsContext.Connections.ClearNoCheck();
             foreach (var connectionObj in chanel.Connections.Where(x => !x.Isinput))
             {
-                _jsContext.Connections.Add(connectionObj.Name, _mapper.Map<ConnectionDto>(connectionObj));
+                _jsContext.Connections.Add(connectionObj.Name, _mapper.Map<ConnectionViewDto>(connectionObj));
             }
 
             //_jsContext.Connections.ClearNoCheck();

@@ -1,0 +1,14 @@
+@startuml
+class TcpServerModel {
+}
+class "Task`1"<T> {
+}
+class "List`1"<T> {
+}
+TcpServerModel --> "InConnection" ConnectionDto
+TcpServerModel --> "OutConnection" ConnectionDto
+TcpServerModel --> "TcpListener" TcpListener
+TcpServerModel --> "TcpConfiguration" TcpConfiguration
+TcpServerModel --> "ReceiveClientTask<TcpClient>" "Task`1"
+TcpServerModel o-> "Clients<ITcpClientService>" "List`1"
+@enduml
